@@ -52,9 +52,7 @@ export default function LoginApp() {
                         '& .MuiOutlinedInput-root': {
                             backgroundColor: '#000',
                             color: '#fff',
-                            // ➡️ CAMBIO: Sombra alrededor del input
                             boxShadow: '0 0 5px rgba(0, 183, 255, 0.7)',
-                            // Ajustes de borde para hover y focus
                             '&:hover fieldset': {
                                 borderColor: 'rgb(0, 179, 255) !important',
                             },

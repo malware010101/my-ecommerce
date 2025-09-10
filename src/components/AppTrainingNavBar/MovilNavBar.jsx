@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Box, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -16,6 +16,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 export default function MovilNavBar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const navigate = useNavigate();
+    const location= useLocation();
 
     const toggleDrawer = (open) => () => {
         setDrawerOpen(open);
@@ -23,8 +24,8 @@ export default function MovilNavBar() {
 
     const menuItems = [
         { text: 'Inicio', path: '/apptraining/home', icon: <HomeIcon /> },
-        { text: 'Entrenamiento', path: '/apptraining/entrenamiento', icon: <FitnessCenterIcon /> },
-        { text: 'Nutricion', path: '/apptraining/Nutricion', icon: <RestaurantIcon /> },
+        { text: 'Entrenamiento', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
+        { text: 'Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
         { text: 'Profile', path: '/apptraining/profile', icon: <PersonOutlineIcon /> },
         { text: 'Settings', path: '/apptraining/settings', icon: <SettingsIcon /> },
     ];
@@ -77,16 +78,28 @@ export default function MovilNavBar() {
                 </IconButton>
             </Box>
                     <List sx={{ mt: 2 }}>
-                        {menuItems.map((item) => (
-                            <ListItem key={item.text} disablePadding>
-                                <ListItemButton onClick={() => navigate(item.path)}>
-                                    <ListItemIcon sx={{ color: 'rgb(0, 179, 255)' }}>
-                                        {item.icon}
-                                    </ListItemIcon>
-                                    <ListItemText primary={item.text} sx={{ color: '#fff' }}/>
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
+                    {menuItems.map((item) => {
+                            // Verificar si la ruta coincide con la ubicación actual
+                            const isSelected = location.pathname.startsWith(item.path);
+                            return (
+                                <ListItem key={item.text} disablePadding>
+                                    <ListItemButton
+                                        onClick={() => navigate(item.path)}
+                                        sx={{
+                                            bgcolor: isSelected ? 'rgba(0, 179, 255, 0.2)' : 'transparent',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(0, 179, 255, 0.1)'
+                                            },
+                                        }}
+                                    >
+                                        <ListItemIcon sx={{ color: isSelected ? 'rgb(0, 179, 255)' : '#fff' }}>
+                                            {item.icon}
+                                        </ListItemIcon>
+                                        <ListItemText primary={item.text} sx={{ color: isSelected ? 'rgb(0, 179, 255)' : '#fff' }}/>
+                                    </ListItemButton>
+                                </ListItem>
+                            );
+                        })}
                     </List>
                 </Box>
                 <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 45 }} >

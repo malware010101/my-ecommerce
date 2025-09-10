@@ -9,6 +9,9 @@ import LoginApp from '../ContentApp/LoginApp/index.jsx';
 import SuscriptionApp from '../ContentApp/SuscriptionApp/index.jsx';
 import HomeApp from '../ContentApp/HomeApp/index.jsx';
 import AppTrainingLayout from '../components/AppTrainingLayout.jsx';
+import Workout from '../ContentApp/Workout/index.jsx';
+import Porfile from '../ContentApp/Porfile/index.jsx';
+import Nutrition from '../ContentApp/Nutrition/index.jsx';
 
 
 
@@ -30,8 +33,10 @@ export default function AppRoutes() {
       <Route path="/apptraining" element={<AppTrainingLayout />}>
         {/* Rutas anidadas de la aplicación */}
         <Route path="home" element={<HomeApp />} />
-        <Route path="login" element={<LoginApp />} />
-        <Route path="suscription" element={<SuscriptionApp />} />
+        <Route path= "workout" element={<Workout />} />
+        <Route path="nutrition" element={<Nutrition />} />
+        <Route path="profile" element={<Porfile />} />
+       
       </Route>
     </Routes>
   );

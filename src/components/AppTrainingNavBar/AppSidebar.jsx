@@ -11,8 +11,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LogoReps from '../../assets/LogoReps.webp';
 
-const drawerWidth = 240;
-
 export default function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -20,9 +18,9 @@ export default function AppSidebar() {
 
     const menuItems = [
         { text: 'Inicio', path: '/apptraining/home', icon: <HomeIcon /> },
-        { text: 'Entrenamiento', path: '/apptraining/entrenamiento', icon: <FitnessCenterIcon /> },
-        { text: 'Nutricion', path: '/apptraining/Nutricion', icon: <RestaurantIcon /> },
-        { text: 'Perfil', path: '/apptraining/perfil', icon: <PersonOutlineIcon /> },
+        { text: 'Entrenamiento', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
+        { text: 'Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
+        { text: 'Perfil', path: '/apptraining/profile', icon: <PersonOutlineIcon /> },
         { text: 'Configuracion', path: '/apptraining/configuracion', icon: <SettingsIcon /> },
     ];
 

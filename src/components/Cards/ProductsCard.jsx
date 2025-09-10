@@ -75,7 +75,11 @@ export default function ProductsCard({ product }) {
       />
 
       {/* Contenido de la tarjeta */}
-      <CardContent sx={{ flexGrow: 1, bgcolor: '#000', color: 'white', borderRadius: '0 0 5px 5px'}}> {/* flexGrow para que el contenido ocupe el espacio restante */}
+      <CardContent
+       sx={{ flexGrow: 1,
+        bgcolor: '#000',
+         color: 'white', 
+         borderRadius: '0 0 5px 5px'}}> {/* flexGrow para que el contenido ocupe el espacio restante */}
         <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'Alumni Sans SC, sans-serif' }}>
           {product.type} {/* Por ejemplo: "Muscle build" */}
         </Typography>

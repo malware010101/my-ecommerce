@@ -348,7 +348,7 @@ const hndlNvgApp = (path) => {
 
             
 
-            {/* Menú */}
+            {/* Menu */}
             <List>
               {navItems.map((item) => (
                 <Box key={item.label}>
