@@ -11,13 +11,10 @@ export default function AppTrainingFooter() {
         <Box
             component="footer"
             sx={{
-                // Fondo negro puro
                 background: '#000',
                 color: '#fff',
                 py: { xs: 2, sm: 5 },
-                // Sombra en la parte superior para el efecto de "corriente eléctrica"
                 boxShadow: '0 -4px 10px rgba(0, 183, 255, 0.7)',
-                // Estilos responsivos
                 display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
                 justifyContent: 'center',

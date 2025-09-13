@@ -1,5 +1,3 @@
-// src/App.jsx
-
 import React from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Navbar from './components/Navbar';
@@ -35,10 +33,9 @@ export default function App() {
     activeNavbar = <SuscriptionNavbar />;
     activeFooter = <AppTrainingFooter />;
   } else if (currentPath.startsWith('/apptraining')) {
-    // Aquí no se renderiza un navbar principal, se usa el layout anidado
     activeNavbar = null; 
     activeFooter = <AppTrainingFooter />;
-    paddingTop = '0px'; // No se necesita padding si no hay navbar
+    paddingTop = '0px'; 
   } else {
     activeNavbar = <Navbar />;
     activeFooter = <Footer />;

@@ -1,13 +1,39 @@
 // src/ContentApp/LoginApp/index.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Typography, Box, TextField, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom"; 
+import { userState } from '../hooks/estadoGlobal';
+import { useSetRecoilState } from 'recoil';
 
 export default function LoginApp() {
     const navigate = useNavigate();
+    const setUsuario = useSetRecoilState(userState);
+    const [credenciales, setCredenciales] = useState({
+        usuario: '',
+        contraseña: ''
+    });
+
+    const hndlChange = (e) => {
+        const { name, value } = e.target;
+        setCredenciales({ ...credenciales, [name]: value });
+    };
 
     const hndlIniciarSesion = () => {
-        navigate('/apptraining/home'); 
+
+        //  simulacion de roles
+        if (credenciales.usuario === 'admin' && credenciales.contraseña === 'admin') {
+            setUsuario({ rol: 'admin' });
+            navigate('/apptraining/home');
+        } else if (credenciales.usuario === 'coach' && credenciales.contraseña === 'coach') {
+            setUsuario({ rol: 'coach' });
+            navigate('/apptraining/home');
+        }
+         else if (credenciales.usuario === 'usuario' && credenciales.contraseña === 'usuario') {
+            setUsuario({ rol: 'usuario' });
+            navigate('/apptraining/home');
+        } else {
+            alert('Credenciales incorrectas. Intenta con "admin/admin" o "usuario/usuario".');
+        }
     };
     return (
         <Container 
@@ -46,7 +72,9 @@ export default function LoginApp() {
                     variant="outlined"
                     fullWidth
                     margin="normal"
-                    placeholder="Ingresa tu nombre de usuario o correo"
+                    name='usuario'
+                    value={credenciales.usuario}
+                    onChange={hndlChange}
                     sx={{ 
                         mb: 2, 
                         '& .MuiOutlinedInput-root': {
@@ -73,7 +101,9 @@ export default function LoginApp() {
                     fullWidth
                     margin="normal"
                     type="password"
-                    placeholder="Ingresa tu contraseña"
+                    name='contraseña'
+                    value={credenciales.contraseña}
+                    onChange={hndlChange}
                     sx={{ 
                         mb: 3, 
                         '& .MuiOutlinedInput-root': {

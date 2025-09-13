@@ -12,8 +12,11 @@ import {
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import CrearEjercicio from '../CrearEjercicio';
+import { useSetRecoilState } from 'recoil';
+import { programasState } from '../../hooks/estadoGlobal';
 
 export default function CrearPrograma() {
+    const setProgramas = useSetRecoilState(programasState);
     const [step, setStep] = useState(1);
     const [programaData, setProgramaData] = useState({
         nombre: '',
@@ -39,7 +42,6 @@ export default function CrearPrograma() {
             return;
         }
 
-        // Inicializa la estructura de los días.
         const nuevosDias = {};
         for (let i = 1; i <= parseInt(programaData.diasEntrenamiento); i++) {
             nuevosDias[`Día ${i}`] = [];
@@ -53,9 +55,8 @@ export default function CrearPrograma() {
     };
 
     const hndlFinalizar = () => {
-        console.log("Programa Creado:", programaData);
+        setProgramas(prevProgramas => [...prevProgramas, programaData]);
         alert("Programa creado con éxito!");
-        // Aquí podrías agregar una redirección o un setStep(1) para volver a empezar
     };
 
     const estiloTexfield = {
@@ -100,9 +101,9 @@ export default function CrearPrograma() {
                             <InputLabel id="objetivo-label">Objetivo</InputLabel>
                             <Select name="objetivo" value={programaData.objetivo} onChange={hndlChange} labelId="objetivo-label" sx={{ color: '#fff' }}>
                                 <MenuItem value="Hipertrofia">Hipertrofia</MenuItem>
-                                <MenuItem value="Fuerza">Perdida de Grasa</MenuItem>
-                                <MenuItem value="Pérdida de Peso">Salud</MenuItem>
-                                <MenuItem value="Equilibrado">Funcional</MenuItem>
+                                <MenuItem value="Perdida de Grasa">Perdida de Grasa</MenuItem>
+                                <MenuItem value="Salud">Salud</MenuItem>
+                                <MenuItem value="Entrenamiento Funcional">Entrenamiento Funcional</MenuItem>
                             </Select>
                         </FormControl>
                         
@@ -130,7 +131,7 @@ export default function CrearPrograma() {
                         </FormControl>
                         
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                            <Button type="submit" variant="contained" endIcon={<ExpandMoreIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px' }}>
+                            <Button type="submit" variant="contained" endIcon={<ExpandMoreIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
                                 Siguiente
                             </Button>
                         </Box>
@@ -142,10 +143,10 @@ export default function CrearPrograma() {
                             onExercisesChange={hndlEjercicios}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
-                            <Button onClick={() => setStep(1)} variant="outlined" sx={{ color: 'rgb(0, 204, 255)', borderColor: 'rgb(0, 204, 255)' }}>
+                            <Button onClick={() => setStep(1)} variant="contained" sx={{ color: '#fff', fontWeight: 'bold', borderColor: 'rgb(0, 204, 255)',bgcolor: 'rgb(0, 204, 255)','&:hover': { bgcolor: 'rgb(0, 153, 204)',} }}>
                                 Volver
                             </Button>
-                            <Button onClick={hndlFinalizar} variant="contained" sx={{ bgcolor: 'rgb(0, 204, 255)', color: '#fff' }}>
+                            <Button onClick={hndlFinalizar} variant="contained" sx={{ bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight:'bold','&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
                                 Guardar Programa
                             </Button>
                         </Box>

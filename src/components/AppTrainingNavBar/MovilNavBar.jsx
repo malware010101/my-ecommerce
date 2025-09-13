@@ -24,10 +24,11 @@ export default function MovilNavBar() {
 
     const menuItems = [
         { text: 'Inicio', path: '/apptraining/home', icon: <HomeIcon /> },
-        { text: 'Entrenamiento', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
-        { text: 'Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
-        { text: 'Profile', path: '/apptraining/profile', icon: <PersonOutlineIcon /> },
-        { text: 'Settings', path: '/apptraining/settings', icon: <SettingsIcon /> },
+        { text: 'Mi Entrenamiento', path: '/apptraining/entrenamiento', icon: <FitnessCenterIcon /> },
+        { text: 'Mi Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
+        { text: 'Perfil', path: '/apptraining/profile', icon: <PersonOutlineIcon /> },
+        { text: 'Programas', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
+        { text: 'Configuracion', path: '/apptraining/settings', icon: <SettingsIcon /> },
     ];
 
     const hndlLogout = () => {
@@ -102,7 +103,7 @@ export default function MovilNavBar() {
                         })}
                     </List>
                 </Box>
-                <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 45 }} >
+                <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 35 }} >
                     <Button varaiant="contained" fullWidth sx={{ bgcolor: 'rgb(0, 179, 255)', color: '#fff' , '&:hover': { bgcolor: 'rgb(4, 159, 226)' },  fontWeight: 'bold', fontSize: '1rem', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)',  }} onClick={hndlGymklan}>
                     GYMKLAN
                 </Button>

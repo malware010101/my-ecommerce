@@ -1,5 +1,3 @@
-// src/components/AppTrainingNavBar/AppSidebar.jsx
-
 import React from 'react';
 import { Drawer, Box, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, useTheme } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -18,9 +16,10 @@ export default function AppSidebar() {
 
     const menuItems = [
         { text: 'Inicio', path: '/apptraining/home', icon: <HomeIcon /> },
-        { text: 'Entrenamiento', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
+        { text: 'Mi Entrenamiento', path: '/apptraining/entrenamiento', icon: <FitnessCenterIcon /> },
         { text: 'Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
         { text: 'Perfil', path: '/apptraining/profile', icon: <PersonOutlineIcon /> },
+        { text: 'Programas', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
         { text: 'Configuracion', path: '/apptraining/configuracion', icon: <SettingsIcon /> },
     ];
 

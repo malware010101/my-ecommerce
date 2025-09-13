@@ -8,31 +8,28 @@ import {
     InputAdornment,
     Stack,
     Card,
-    CardContent, 
-    Dialog,
-    DialogContent,
-    Button,
-    Grid
+    CardContent,
+    Button
 } from '@mui/material';
 import { Close as CloseIcon, Search as SearchIcon } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import dominadasLibresVideo from '../../assets/videos/dominadas_libres.MP4';
-import elevacionFrontalLigaVideo from '../../assets/videos/elevacion_frontal_liga.MP4';
-import fondosLibresVideo from '../../assets/videos/fondos_libres.MP4';
-import jalonUnilateralVideo from '../../assets/videos/jalon_unilateral.MP4';
-import elevacionLateralLigaVideo from '../../assets/videos/elevacion_lateral_liga.MP4';
-import elevacionLateralFrontalLigaVideo from '../../assets/videos/elevacion_lateral_frontal_liga.MP4';
-import remoInclinadoMaquinaVideo from '../../assets/videos/remo_inclinado_maquina.MP4';
-import remoInclinadoUnilateralMaquinaVideo from '../../assets/videos/remo_inclinado_unilateral_maquina.MP4';
+import dominadasLibresVideo from '/src/assets/Videos/dominadas_libres.MP4?url';
+import elevacionFrontalLigaVideo from '/src/assets/Videos/elevacion_frontal_liga.MP4?url';
+import fondosLibresVideo from '/src/assets/Videos/fondos_libres.MP4?url';
+import jalonUnilateralVideo from '/src/assets/Videos/jalon_unilateral.MP4?url';
+import elevacionLateralLigaVideo from '/src/assets/Videos/elevacion_lateral_liga.MP4?url';
+import elevacionLateralFrontalLigaVideo from '/src/assets/Videos/elevacion_lateral_frontal_liga.MP4?url';
+import remoInclinadoMaquinaVideo from '/src/assets/Videos/remo_inclinado_maquina.MP4?url';
+import remoInclinadoUnilateralMaquinaVideo from '/src/assets/Videos/remo_inclinado_unilateral_maquina.MP4?url';
 
 // Componente de tarjeta individual para la librería
 const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
     return (
-        <Card 
-            sx={{ 
-                bgcolor: '#1c1c1e', 
+        <Card
+            sx={{
+                bgcolor: '#1c1c1e',
                 borderRadius: '10px',
-                color: '#fff', 
+                color: '#fff',
                 border: '1px solid #333',
                 '&:hover': {
                     border: '1px solid rgb(0, 204, 255)',
@@ -40,17 +37,17 @@ const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
                 }
             }}
         >
-            <CardContent sx={{ p: 1, '&:last-child': { pb: 2 } }}> 
-                <Box 
-                    sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
+            <CardContent sx={{ p: 1, '&:last-child': { pb: 2 } }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
                         mb: 1
                     }}
                 >
-                    <Box 
-                        onClick={() => onSelect(exercise)} 
+                    <Box
+                        onClick={() => onSelect(exercise)}
                         sx={{ flexGrow: 1, cursor: 'pointer' }}
                     >
                         <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
@@ -60,8 +57,8 @@ const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
                             {exercise.descripcion}
                         </Typography>
                     </Box>
-                    <IconButton 
-                        size="small" 
+                    <IconButton
+                        size="small"
                         sx={{ color: 'rgb(0, 204, 255)' }}
                         onClick={() => onShowVideo(exercise.videoUrl)}
                     >
@@ -85,10 +82,8 @@ const ejercicios = [
     { id: 8, nombre: 'Remo Inclinado Unilateral Con Maquina', descripcion: 'Movimiento contralado', videoUrl: remoInclinadoUnilateralMaquinaVideo },
 ];
 
-export default function DrawerEjercicios({ open, onClose, onSelectExercise }) {
+export default function DrawerEjercicios({ open, onClose, onSelectExercise, onShowVideo }) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [ abrirVideo, setAbrirVideo ] = useState(false);
-    const [ videoUrl, setVideoUrl ] = useState('');
     const [vista, setVista] = useState('lista');
     const [ejercicioSeleccionado, setEjercicioSeleccionado] = useState(null);
     const [formData, setFormData] = useState({
@@ -101,14 +96,7 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise }) {
     const filteredExercises = ejercicios.filter(exercise =>
         exercise.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const hndlVerVideo = (url) => {
-        setVideoUrl(url);
-        setAbrirVideo(true);
-    };
-    const hndlCloseVideo = () => {
-        setAbrirVideo(false);
-        setVideoUrl('');
-    };
+    
     const hndlSelectCard = (exercise) => {
         setEjercicioSeleccionado(exercise);
         setVista('formulario');
@@ -138,6 +126,7 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise }) {
         setVista('lista');
         setEjercicioSeleccionado(null);
     };
+    
     const renderContenido = () => {
         if (vista === 'formulario') {
             return (
@@ -229,7 +218,7 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise }) {
             );
         } else {
             return (
-                <React.Fragment>
+                <>
                     <TextField
                         fullWidth
                         placeholder="Buscar un ejercicio..."
@@ -262,19 +251,19 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise }) {
                                     key={exercise.id}
                                     exercise={exercise}
                                     onSelect={hndlSelectCard}
-                                    onShowVideo={hndlVerVideo}
+                                    onShowVideo={onShowVideo}
                                 />
                             ))}
                         </Stack>
                     </Box>
-                </React.Fragment>
+                </>
             );
         }
     };
     
 
     return (
-        <React.Fragment>
+        <>
             <Drawer
                 anchor="right"
                 open={open}
@@ -301,26 +290,6 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise }) {
                 {renderContenido()} 
 
             </Drawer>
-            <Dialog
-                open={abrirVideo}
-                onClose={hndlCloseVideo} 
-                maxWidth="xs"
-                fullWidth
-                sx={{
-                    '& .MuiDialog-paper': { bgcolor: '#000', borderRadius: '10px' }
-                }}
-            >
-                <DialogContent>
-                    <video
-                        src={videoUrl} 
-                        controls
-                        muted
-                        autoPlay
-                        loop
-                        style={{ width: '100%', height: 'auto', borderRadius: '10px', display: 'block' }} 
-                    />
-                </DialogContent>
-            </Dialog>   
-        </React.Fragment>
+        </>
     );
 }

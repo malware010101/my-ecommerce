@@ -113,7 +113,7 @@ export default function WorkoutForm({ onFormSubmit }) {
 
             
 
-            <Button type="submit" variant="contained" sx={{ mt: 2, bgcolor: 'rgb(0, 179, 255)' }}>
+            <Button type="submit" variant="contained" sx={{ mt: 2, fontWeight: 'bold', bgcolor: 'rgb(0, 204, 255)','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
                 Enviar
             </Button>
         </Box>

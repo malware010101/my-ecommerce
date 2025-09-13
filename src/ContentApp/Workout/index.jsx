@@ -1,14 +1,11 @@
 import { Box, Button, Container, Typography } from "@mui/material";
-import DlgForm from "../../components/DlgForm";
 import {  useState } from "react";
-import WorkoutForm from "./WorkoutForm";
 import AddIcon from '@mui/icons-material/Add';
 import CrearPrograma from "./CrearPrograma";
-import CrearEntrenamiento from "./CrearEntrenamiento";
-import AsignarEntrenamiento from "./AsignarEntrenamiento";
+import CrearEntrenamiento from "./CrearPersonalizado";
+import AsignarEntrenamiento from "./CrearNutricion";
 
 export default function Workout () {
-    const [openDlg, setOpenDlg]= useState(false)
     const [ activarComponente, setActivarComponente] = useState(null)
 
     const hndlBtnActivado = (componente) => {
@@ -21,36 +18,23 @@ export default function Workout () {
         AsignarEntrenamiento: <AsignarEntrenamiento />,
     };
 
-    const hndlOpenDlg = () => {
-        setOpenDlg(true)
-    }
-    const hndlCloseDlg = () => {
-        setOpenDlg(false)
-    }
-
-    const hndlFormSubmit = (formData) => {
-        console.log('Respuestas Enviadas con exito', formData)
-        hndlCloseDlg()
-    }
-
-    const workoutFormContent = <WorkoutForm onFormSubmit={hndlFormSubmit} />
     return (
        <Container maxWidth="lg">
-                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 3, p: 2
+         <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center',
+                     mt: 3,
+                     p: 2
                    }}>
-                       <Typography variant="h4"  fontWeight={'bold'} color= {'#ccc'} textAlign={'center'} >¡Bienvenido a tu entrenamiento!</Typography>
+                       <Typography  variant="h4" fontWeight={'bold'} color= {'#ccc'} textAlign={'center'} >
+                            ¡Bienvenido a la creacion de programas!
+                        </Typography> 
                    </Box>
                    <Box sx={{ display: 'column', justifyContent: 'center', alignItems: 'center', mt: 3, borderRadius: '10px ', border: '1px solid #2a2f33',bgcolor: '#000', p: 1, boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)'
                    }}>
-                       <Typography variant="h6"  color= {'#fff'} textAlign={'left'} padding={'10px'}  >Para dirigirte a tu plan de entrenamiento , es necesario que respondas el siguiente formulario para conocer tu actividad fisica y dirigirte al plan adecuado.<br></br> 
-                       Cada programa de entrenamiento se a desarrollado a base de evidencia cientifica, años de estudio y experiencia para lograr una mejor calidad de vida y mejorar tu bienestar.<br></br>
-                       Es Importante responder con obsoluta sinceridad el cuestionario.</Typography>
-                       <Button
-                        onClick={hndlOpenDlg}
-                        variant="contained"
-                         sx={{ mt: 2,ml: 1,bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold',borderRadius: '10px',mb: 2 }}>
-                            Responder
-                            </Button>
+                       <Typography variant="h6"  color= {'#fff'} textAlign={'left'} padding={'10px'}  > Aqui es donde surgirá la magia para crear nuevos programas de entrenamientos para todos los usuarios, desde generales, hasta personalizados para los usuarios de suscripcion <strong>PRO</strong>. <br></br> Esta seccion es exculsivamente para los entrenadores de <strong>REPS</strong>.</Typography>
+                       
                    </Box>
                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 3, borderRadius: '10px ',bgcolor: '#000', p: 1 }}>
                    <Button 
@@ -64,7 +48,7 @@ export default function Workout () {
                     fontWeight: 'bold',
                     borderRadius: '10px',
                     borderColor: 'rgb(0, 204, 255)',
-                    // ➡️ ESTILOS CONDICIONALES
+                    '&:hover': { bgcolor: 'rgb(0, 153, 204)', borderColor: 'rgb(0, 153, 204)', color: '#fff' },
                     color: activarComponente === 'CrearPrograma' ? '#fff' : 'rgb(0, 204, 255)',
                     bgcolor: activarComponente === 'CrearPrograma' ? 'rgb(0, 204, 255)' : 'transparent',
                     '&:hover': {
@@ -92,7 +76,7 @@ export default function Workout () {
                             bgcolor: 'rgb(0, 204, 255)'
                         }
                     }}>
-                        Crear Entrenamiento
+                        Crear Personalizado
                     </Button>
                     <Button
                      variant="outlined" 
@@ -112,13 +96,12 @@ export default function Workout () {
                             bgcolor: 'rgb(0, 204, 255)',
                         }
                     }}>
-                        Asignar Entrenamiento
+                        Crear Nutricion
                     </Button>
                    </Box>
                    <Box sx={{ mt: 3, p: 2 }}>
                     {componentsMap[activarComponente] || null}
                    </Box>
-                   <DlgForm open={openDlg} onClose={hndlCloseDlg} title={'Anamnesis'} content={workoutFormContent}  />
                </Container>
     )
 }

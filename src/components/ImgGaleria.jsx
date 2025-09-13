@@ -3,8 +3,6 @@ import { Box, IconButton } from '@mui/material';
 import { useMediaQuery, useTheme } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-
-// --- COMPONENTE PARA MÓVILES (NO USA HOOKS) ---
 function ImgGaleriaMobile({ product, selectedVariant, setSelectedVariant }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -26,7 +24,6 @@ function ImgGaleriaMobile({ product, selectedVariant, setSelectedVariant }) {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-      {/* Imagen Principal y Controles de Carrusel */}
       <Box sx={{
         position: 'relative',
         width: '100%',
@@ -90,7 +87,6 @@ function ImgGaleriaMobile({ product, selectedVariant, setSelectedVariant }) {
   );
 }
 
-// --- COMPONENTE PARA ESCRITORIO (NO USA HOOKS) ---
 function ImgGaleriaDesktop({ product, selectedVariant, setSelectedVariant }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -110,7 +106,6 @@ function ImgGaleriaDesktop({ product, selectedVariant, setSelectedVariant }) {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-      {/* Imagen Principal (Fondo) */}
       <img
         src={selectedVariant.images[selectedImageIndex].url}
         alt={selectedVariant.label}
@@ -124,7 +119,6 @@ function ImgGaleriaDesktop({ product, selectedVariant, setSelectedVariant }) {
         }}
       />
       
-      {/* Miniaturas de Vistas (Flotantes a la izquierda) */}
       <Box sx={{
         position: 'absolute',
         top: 16,
@@ -187,8 +181,6 @@ function ImgGaleriaDesktop({ product, selectedVariant, setSelectedVariant }) {
     </Box>
   );
 }
-
-// --- COMPONENTE PADRE: El que usa los hooks y renderiza condicionalmente ---
 export default function ImgGaleria({ product, selectedVariant, setSelectedVariant }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -200,8 +192,6 @@ export default function ImgGaleria({ product, selectedVariant, setSelectedVarian
       </Box>
     );
   }
-
-  // Renderiza el componente adecuado según el tamaño de pantalla
   return isMobile ? (
     <ImgGaleriaMobile product={product} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
   ) : (

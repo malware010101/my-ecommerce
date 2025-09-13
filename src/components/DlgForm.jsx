@@ -13,14 +13,16 @@ export default function DlgForm({ open, onClose, title, content, buttonText, onC
                 {title}
             </DialogTitle>
             <DialogContent sx={{ bgcolor: '#111', color: '#fff', pt: 2 }}>
-                <Typography m={5}>{content}</Typography>
+                <Typography m={5}>
+                    {content}
+                </Typography>
             </DialogContent>
             <DialogActions sx={{ bgcolor: '#111' }}>
                 <Button onClick={onClose} sx={{ color: 'rgb(0, 179, 255)' }}>
                     Cerrar
                 </Button>
                 {onConfirm && (
-                    <Button onClick={onConfirm} variant="contained" sx={{ bgcolor: 'rgb(0, 179, 255)', color: '#fff' }}>
+                    <Button onClick={onConfirm} variant="contained" sx={{ bgcolor: 'rgb(0, 179, 255)', color: '#fff', fontWeight: 'bold','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
                         {buttonText}
                     </Button>
                 )}
