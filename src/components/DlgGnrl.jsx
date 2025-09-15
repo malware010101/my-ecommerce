@@ -1,15 +1,14 @@
-// src/components/ReusableDialog.jsx
 import React from 'react';
 import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogContentText,
     DialogActions,
-    Button
+    Button,
+    Box
 } from '@mui/material';
 
-export default function DlgGnrl({ open, onClose, onConfirm, title, content }) {
+export default function DlgGnrl({ open, onClose, onConfirm, title, content, actions }) {
     return (
         <Dialog
             open={open}
@@ -27,14 +26,28 @@ export default function DlgGnrl({ open, onClose, onConfirm, title, content }) {
             <DialogContent sx={{bgcolor: '#000', color: '#fff', textAlign: 'center', p: 6, fontSize: '1.2rem'}}>
                 {content}
             </DialogContent>
-            <DialogActions sx={{ bgcolor: '#000', justifyContent: 'center' }}>
-                <Button variant ="outlined" onClick={onClose} sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', mr: 2, fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
-                    No
-                </Button>
-                <Button variant= "outlined" onClick={onConfirm} sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
-                    Sí
-                </Button>
-            </DialogActions>
+            
+            {/* Si existe la prop 'actions', la renderiza (ej. para el botón de Cerrar). */}
+            {actions && (
+                <DialogActions sx={{ bgcolor: '#000', justifyContent: 'center', p: 2 }}>
+                    {actions}
+                </DialogActions>
+            )}
+
+            {/* Si no se le pasaron 'actions', revisa si se le pasó 'onConfirm'
+            para renderizar los botones de Sí/No.
+            Esto soluciona el problema de duplicación. */}
+            {!actions && onConfirm && (
+                <DialogActions sx={{ bgcolor: '#000', justifyContent: 'center', p: 2 }}>
+                    <Button variant="outlined" onClick={onConfirm} sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', mr: 2, fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
+                        Sí
+                    </Button>
+                    <Button variant="outlined" onClick={onClose} sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
+                        No
+                    </Button>
+                </DialogActions>
+            )}
+
         </Dialog>
     );
 }

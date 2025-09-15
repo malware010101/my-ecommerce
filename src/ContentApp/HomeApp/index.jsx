@@ -1,18 +1,31 @@
 import React, { useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil'; 
-import { Container, Typography, Box, Card, CardContent, IconButton } from "@mui/material";
+import { Container, Typography, Box, Card, CardContent, IconButton, Button } from "@mui/material";
 import { programasState } from '../hooks/estadoGlobal';
 import { objetivosImagenes } from '../UtilsApp/helper';
-import { userState } from '../hooks/estadoGlobal';
-import { Delete as DeleteIcon } from '@mui/icons-material';
+import { userState, usersDataState } from '../hooks/estadoGlobal';
 import CloseIcon from '@mui/icons-material/Close';
 import DlgGnrl from '../../components/DlgGnrl';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import ProgramPreview from '../ProgramPreview';
+import SearchUsersForm from '../SearchUsersForm';
 
-const ProgramCard = ({ programa, onOpenDeleteDialog }) => {
+const ProgramCard = ({ programa, onOpenDeleteDialog, onOpenPreviewDialog, onOpenAsignacionDlg, onOpenAñadirDlg }) => {
     const usuario = useRecoilValue(userState);
     const bgImage = objetivosImagenes[programa.objetivo];
+
+
+   const hndlCardClick = () => {
+       if (usuario.rol === 'admin' || usuario.rol === 'coach') {
+           onOpenAsignacionDlg(programa);
+       } else if (usuario.rol === 'usuario') {
+        onOpenAñadirDlg(programa);
+       }
+   }
+
     return (
         <Card
+        onClick={hndlCardClick}
         sx={{
             minWidth: 250,
             borderRadius: '10px',
@@ -20,6 +33,7 @@ const ProgramCard = ({ programa, onOpenDeleteDialog }) => {
             backgroundImage: `url(${bgImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            cursor: 'pointer',
             color: '#fff',
             boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)',
             position: 'relative',
@@ -36,15 +50,25 @@ const ProgramCard = ({ programa, onOpenDeleteDialog }) => {
         }}
         >
             <CardContent>
-            {usuario.rol === 'admin' && (
+            <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}>
                     <IconButton 
                         size="small" 
-                        sx={{ position: 'absolute', top: 5, right: 5, color: '#fff' }} 
-                        onClick={() => onOpenDeleteDialog(programa)}
+                        sx={{ color: '#fff' }} 
+                        onClick={(e) => { e.stopPropagation(); onOpenPreviewDialog(programa)}}
                     >
-                        <CloseIcon />
+                        <VisibilityIcon />
                     </IconButton>
-                )}
+                    
+                    {usuario.rol === 'admin' && (
+                        <IconButton 
+                            size="small" 
+                            sx={{ color: '#fff', ml: 1 }} 
+                            onClick={(e) => { e.stopPropagation(); onOpenDeleteDialog(programa)}}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    )}
+                </Box>
                 <Typography variant="body1" fontWeight="bold">
                     {programa.nombre}
                     </Typography>
@@ -68,31 +92,96 @@ const ProgramCard = ({ programa, onOpenDeleteDialog }) => {
 
 export default function HomeApp() {
     const [programas, setProgramas] = useRecoilState(programasState);
-    // Estado para el Dialog de confirmación
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [programaToDelete, setProgramaToDelete] = useState(null);
+    const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
+    const [programaToPreview, setProgramaToPreview] = useState(null);
+    const [ openAsignacionDlg, setOpenAsignacionDlg ] = useState(false);
+    const [ programaAsignar, setProgramaAsignar ] = useState(null);
+    const [openAñadirDlg, setOpenAñadirDlg] = useState(false);
+    const [añadirPrograma, setAñadirPrograma] = useState(null);
 
     const usuario = useRecoilValue(userState);
+    const [ allUsers, setAllUsers ] = useRecoilState(usersDataState);
     console.log("Rol del usuario actual:", usuario.rol);
 
     
-    // Función para abrir el diálogo de confirmación
+
+
+    const hndlOpenAsigancionDlg = (programa) => {
+        setProgramaAsignar(programa);
+        setOpenAsignacionDlg(true);
+    }
+
+    const hndlCloseAsignacionDlg = () => {
+        setOpenAsignacionDlg(false);
+        setProgramaAsignar(null);
+    }
+
+    const hndlConfirmarAsignacion = (selectedUser) => {
+        if (selectedUser && programaAsignar) {
+            console.log(`Asignando el programa "${programaAsignar.nombre}" a el usuario "${selectedUser.nombre}".`);
+
+            const updatedUsers = allUsers.map(user => {
+                if (user.id === selectedUser.id) {
+                    return { ...user, programasAsignados: [...user.programasAsignados, programaAsignar] };
+                }
+                return user;
+            });
+
+            setAllUsers(updatedUsers); // <-- Actualiza la lista central de usuarios
+            
+            hndlCloseAsignacionDlg();
+        }
+    };
+
+    const hndlOpenAñadirDlg = (programa) => {
+        setAñadirPrograma(programa);
+        setOpenAñadirDlg(true);
+    }
+
+    const hndlCloseAñadirDlg = () => {
+        setOpenAñadirDlg(false);
+        setAñadirPrograma(null);
+    }
+
+    const hndlConfirmarAñadir = () => {
+        if (añadirPrograma) {
+            console.log(`Haz agregado el programa: ${añadirPrograma.nombre}, con exito!`);
+            hndlCloseAñadirDlg();
+        }
+    }
+
+    const hndlOpenPreviewDialog = (programa) => {
+        console.log(`[HomeApp] hndlOpenPreviewDialog: programa=${programa ? programa.nombre : 'null'}`);
+        setProgramaToPreview(programa);
+        setOpenPreviewDialog(true);
+    };
+    
+    const hndlClosePreviewDialog = () => {
+        console.log(`[HomeApp] hndlClosePreviewDialog`);
+        setOpenPreviewDialog(false);
+        setProgramaToPreview(null);
+    };
+
     const hndlOpenDeleteDialog = (programa) => {
+        console.log(`[HomeApp] hndlOpenDeleteDialog: programa=${programa ? programa.nombre : 'null'}`);
         setProgramaToDelete(programa);
         setOpenDeleteDialog(true);
     };
 
-    // Función para cerrar el diálogo
     const hndlCloseDeleteDialog = () => {
+        console.log(`[HomeApp] hndlCloseDeleteDialog`);
         setOpenDeleteDialog(false);
-        setProgramaToDelete(null); // Limpiar el estado
+        setProgramaToDelete(null); 
     };
 
-    // Función para eliminar el programa
     const hndlConfirmDelete = () => {
         if (programaToDelete) {
+            console.log(`[HomeApp] hndlConfirmDelete: Haz eliminado el programa: ${programaToDelete.nombre}, con exito!`);
             const nuevosProgramas = programas.filter(p => p.nombre !== programaToDelete.nombre);
-            setProgramas(nuevosProgramas); // Actualiza el estado global
+            setProgramas(nuevosProgramas);
+            setProgramaToDelete(null);
             hndlCloseDeleteDialog();
         }
     };
@@ -135,12 +224,58 @@ export default function HomeApp() {
                                 key={programa.nombre}
                                  programa={programa}
                                  onOpenDeleteDialog={hndlOpenDeleteDialog}
+                                 onOpenPreviewDialog={hndlOpenPreviewDialog}
+                                 onOpenAsignacionDlg={hndlOpenAsigancionDlg}
+                                 onOpenAñadirDlg={hndlOpenAñadirDlg}
                                  />
                             ))}
                         </Box>
                     </Box>
                 ))
             )}
+
+             {openPreviewDialog && programaToPreview && (
+                <DlgGnrl
+                    open={openPreviewDialog}
+                    onClose={hndlClosePreviewDialog}
+                    title="Previsualización del Programa"
+                    content={<ProgramPreview programa={programaToPreview} />}
+                    actions={[
+                        <Button variant="outlined" onClick={hndlClosePreviewDialog}
+                         sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
+                            Cerrar
+                        </Button>
+                    ]}
+                />
+            )}
+
+            {openAsignacionDlg && programaAsignar && (
+                <DlgGnrl
+                    open={openAsignacionDlg}
+                    onClose={hndlCloseAsignacionDlg}
+                    title={`Asignar ${programaAsignar.nombre}`}
+                    content= { 
+                        <SearchUsersForm
+                            allUsers={allUsers}
+                            programa={programaAsignar}
+                            onAssign={hndlConfirmarAsignacion}
+                            onClose={hndlCloseAsignacionDlg}
+                        />
+                    }
+                />
+            )}
+
+            { openAñadirDlg && añadirPrograma && (
+                <DlgGnrl
+                    open={openAñadirDlg}
+                    onClose={hndlCloseAñadirDlg}
+                    title="Confirmacion"
+                    content= {`¿Quieres agregar el programa "${añadirPrograma.nombre}" a tu entrenamiento?`}
+                    onConfirm={hndlConfirmarAñadir}
+                />
+            )}
+
+            {/* Dialog del eliminar programa */}
             <DlgGnrl
                 open={openDeleteDialog}
                 onClose={hndlCloseDeleteDialog}
@@ -148,6 +283,7 @@ export default function HomeApp() {
                 content="¿Estas seguro de eliminar el programa?"
                 onConfirm={hndlConfirmDelete}
             />
+
         </Container>
     );
 }

@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { Container, Typography, Box, TextField, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom"; 
-import { userState } from '../hooks/estadoGlobal';
-import { useSetRecoilState } from 'recoil';
+import { userState, usersDataState } from '../hooks/estadoGlobal';
+import { useSetRecoilState, useRecoilValue } from 'recoil';
 
 export default function LoginApp() {
     const navigate = useNavigate();
     const setUsuario = useSetRecoilState(userState);
+    const usersData = useRecoilValue(usersDataState);
     const [credenciales, setCredenciales] = useState({
         usuario: '',
         contraseña: ''
@@ -19,20 +20,21 @@ export default function LoginApp() {
     };
 
     const hndlIniciarSesion = () => {
-
-        //  simulacion de roles
-        if (credenciales.usuario === 'admin' && credenciales.contraseña === 'admin') {
-            setUsuario({ rol: 'admin' });
-            navigate('/apptraining/home');
-        } else if (credenciales.usuario === 'coach' && credenciales.contraseña === 'coach') {
-            setUsuario({ rol: 'coach' });
-            navigate('/apptraining/home');
-        }
-         else if (credenciales.usuario === 'usuario' && credenciales.contraseña === 'usuario') {
-            setUsuario({ rol: 'usuario' });
+        const usuarioEncontrado = usersData.find(user => {
+            const usuarioIngresado = credenciales.usuario.toLowerCase();
+            const contraseñaIngresada = credenciales.contraseña.toLowerCase();
+    
+            const coincidePorNombre = user.nombre.toLowerCase() === usuarioIngresado;
+            const coincidePorRol = user.rol.toLowerCase() === usuarioIngresado;
+    
+            return (coincidePorNombre || coincidePorRol) && (user.rol.toLowerCase() === contraseñaIngresada);
+        });
+    
+        if (usuarioEncontrado) {
+            setUsuario(usuarioEncontrado);
             navigate('/apptraining/home');
         } else {
-            alert('Credenciales incorrectas. Intenta con "admin/admin" o "usuario/usuario".');
+            alert('Credenciales incorrectas. Intenta con "Admin/admin" o "Ana López/usuario".');
         }
     };
     return (
