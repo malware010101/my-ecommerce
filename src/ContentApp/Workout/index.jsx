@@ -2,8 +2,8 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import {  useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import CrearPrograma from "./CrearPrograma";
-import CrearEntrenamiento from "./CrearPersonalizado";
 import AsignarEntrenamiento from "./CrearNutricion";
+import CrearPersonalizado from "./CrearPersonalizado";
 
 export default function Workout () {
     const [ activarComponente, setActivarComponente] = useState(null)
@@ -11,10 +11,13 @@ export default function Workout () {
     const hndlBtnActivado = (componente) => {
         setActivarComponente (prev => prev === componente ? null : componente)
     }
+    const hndlCloseCrearPrograma = () => {
+        setActivarComponente(null)
+    }
 
     const componentsMap = {
-        CrearPrograma: <CrearPrograma />,
-        CrearEntrenamiento: <CrearEntrenamiento />,
+        CrearPrograma: <CrearPrograma onClose={hndlCloseCrearPrograma} />,
+        CrearEntrenamiento: <CrearPersonalizado onClose={hndlCloseCrearPrograma} />,
         AsignarEntrenamiento: <AsignarEntrenamiento />,
     };
 

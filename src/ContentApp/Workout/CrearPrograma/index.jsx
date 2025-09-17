@@ -14,8 +14,9 @@ import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import CrearEjercicio from '../CrearEjercicio';
 import { useSetRecoilState } from 'recoil';
 import { programasState } from '../../hooks/estadoGlobal';
+import { v4 as uuidv4 } from 'uuid';
 
-export default function CrearPrograma() {
+export default function CrearPrograma( { onClose } ) {
     const setProgramas = useSetRecoilState(programasState);
     const [step, setStep] = useState(1);
     const [programaData, setProgramaData] = useState({
@@ -36,7 +37,7 @@ export default function CrearPrograma() {
     const hndlNextStep = (e) => {
         e.preventDefault();
 
-        // Validación mejorada: Asegúrate de que los campos clave estén llenos.
+        
         if (!programaData.nombre || !programaData.diasEntrenamiento) {
             alert('Por favor, completa el nombre del programa y los días de entrenamiento.');
             return;
@@ -55,8 +56,13 @@ export default function CrearPrograma() {
     };
 
     const hndlFinalizar = () => {
-        setProgramas(prevProgramas => [...prevProgramas, programaData]);
+        const programaId= {
+            ...programaData,
+            id: uuidv4(),
+        }
+        setProgramas(prevProgramas => [...prevProgramas, programaId]);
         alert("Programa creado con éxito!");
+        onClose();
     };
 
     const estiloTexfield = {
@@ -102,6 +108,7 @@ export default function CrearPrograma() {
                             <Select name="objetivo" value={programaData.objetivo} onChange={hndlChange} labelId="objetivo-label" sx={{ color: '#fff' }}>
                                 <MenuItem value="Hipertrofia">Hipertrofia</MenuItem>
                                 <MenuItem value="Perdida de Grasa">Perdida de Grasa</MenuItem>
+                                <MenuItem value="Fuerza">Fuerza</MenuItem>
                                 <MenuItem value="Salud">Salud</MenuItem>
                                 <MenuItem value="Entrenamiento Funcional">Entrenamiento Funcional</MenuItem>
                             </Select>

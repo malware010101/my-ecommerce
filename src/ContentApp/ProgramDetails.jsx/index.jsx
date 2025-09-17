@@ -4,7 +4,7 @@ import { Dialog, DialogContent } from '@mui/material';
 import ExerciseCard from '../ExerciseCard';
 import MethodCard from '../MethodCard';
 
-export default function ProgramPreview({ programa }) {
+export default function ProgramDetails({ programa }) {
   const [value, setValue] = React.useState(0);
   const [abrirVideo, setAbrirVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
@@ -64,16 +64,11 @@ const hndlCloseVideo = () => {
           {programa.dias[Object.keys(programa.dias)[value]]?.map(item => {
               if (item.type === 'method') {
                   return (
-                      <MethodCard
-                       key={item.id}
-                        method={item} />
+                      <MethodCard key={item.id} method={item} />
                   );
               } else if (item.type === 'exercise') {
                   return (
-                      <ExerciseCard 
-                      key={item.id} 
-                      exercise={item} 
-                      onShowVideo={hndlVerVideo} />
+                      <ExerciseCard key={item.id} exercise={item} onShowVideo={hndlVerVideo} isInteractive={true} />
                   );
               }
               return null;

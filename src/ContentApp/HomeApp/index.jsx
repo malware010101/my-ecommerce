@@ -2,93 +2,11 @@ import React, { useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil'; 
 import { Container, Typography, Box, Card, CardContent, IconButton, Button } from "@mui/material";
 import { programasState } from '../hooks/estadoGlobal';
-import { objetivosImagenes } from '../UtilsApp/helper';
 import { userState, usersDataState } from '../hooks/estadoGlobal';
-import CloseIcon from '@mui/icons-material/Close';
 import DlgGnrl from '../../components/DlgGnrl';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import ProgramPreview from '../ProgramPreview';
 import SearchUsersForm from '../SearchUsersForm';
-
-const ProgramCard = ({ programa, onOpenDeleteDialog, onOpenPreviewDialog, onOpenAsignacionDlg, onOpenAñadirDlg }) => {
-    const usuario = useRecoilValue(userState);
-    const bgImage = objetivosImagenes[programa.objetivo];
-
-
-   const hndlCardClick = () => {
-       if (usuario.rol === 'admin' || usuario.rol === 'coach') {
-           onOpenAsignacionDlg(programa);
-       } else if (usuario.rol === 'usuario') {
-        onOpenAñadirDlg(programa);
-       }
-   }
-
-    return (
-        <Card
-        onClick={hndlCardClick}
-        sx={{
-            minWidth: 250,
-            borderRadius: '10px',
-            border: '1px solid rgb(0, 204, 255)',
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            cursor: 'pointer',
-            color: '#fff',
-            boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)',
-            position: 'relative',
-            '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                bgcolor: 'rgba(0, 0, 0, 0.5)', 
-                borderRadius: 'inherit',
-            }
-        }}
-        >
-            <CardContent>
-            <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}>
-                    <IconButton 
-                        size="small" 
-                        sx={{ color: '#fff' }} 
-                        onClick={(e) => { e.stopPropagation(); onOpenPreviewDialog(programa)}}
-                    >
-                        <VisibilityIcon />
-                    </IconButton>
-                    
-                    {usuario.rol === 'admin' && (
-                        <IconButton 
-                            size="small" 
-                            sx={{ color: '#fff', ml: 1 }} 
-                            onClick={(e) => { e.stopPropagation(); onOpenDeleteDialog(programa)}}
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                    )}
-                </Box>
-                <Typography variant="body1" fontWeight="bold">
-                    {programa.nombre}
-                    </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 14 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: '20px', border: '1px solid #333',p: 0.5, bgcolor: 'rgb(0, 204, 255)' }}>
-                            <Typography variant="body2" color="#fff" sx={{ mr: 1,  }}>
-                            {programa.categoria}
-                            </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: '20px', border: '1px solid #333',p: 0.5, bgcolor: 'rgb(0, 204, 255)' }}>
-                            <Typography variant="body2" color="#fff" sx={{ mr: 1,  }}>
-                              Nivel: {programa.nivel}
-                            </Typography>
-                            </Box>
-                            </Box>
-                
-            </CardContent>
-        </Card>
-    );
-};
+import ProgramCard from '../ProgramCard.jsx';
 
 export default function HomeApp() {
     const [programas, setProgramas] = useRecoilState(programasState);
@@ -105,8 +23,16 @@ export default function HomeApp() {
     const [ allUsers, setAllUsers ] = useRecoilState(usersDataState);
     console.log("Rol del usuario actual:", usuario.rol);
 
-    
 
+    
+    const hndlCardClick = (programa) => {
+        if (usuario.rol === 'admin' || usuario.rol === 'coach') {
+            hndlOpenAsigancionDlg(programa);
+        } else if (usuario.rol === 'usuario') {
+         hndlOpenAñadirDlg(programa);
+        }
+    }
+    
 
     const hndlOpenAsigancionDlg = (programa) => {
         setProgramaAsignar(programa);
@@ -129,7 +55,7 @@ export default function HomeApp() {
                 return user;
             });
 
-            setAllUsers(updatedUsers); // <-- Actualiza la lista central de usuarios
+            setAllUsers(updatedUsers); 
             
             hndlCloseAsignacionDlg();
         }
@@ -147,10 +73,21 @@ export default function HomeApp() {
 
     const hndlConfirmarAñadir = () => {
         if (añadirPrograma) {
-            console.log(`Haz agregado el programa: ${añadirPrograma.nombre}, con exito!`);
+            const updatedUsers = allUsers.map(user => {
+                if (user.id === usuario.id) {
+                    return { 
+                        ...user, 
+                        programasAsignados: [...user.programasAsignados, añadirPrograma] 
+                    };
+                }
+                return user;
+            });
+            setAllUsers(updatedUsers); 
+    
+            console.log(`¡Has agregado el programa: ${añadirPrograma.nombre}, con éxito!`);
             hndlCloseAñadirDlg();
         }
-    }
+    };
 
     const hndlOpenPreviewDialog = (programa) => {
         console.log(`[HomeApp] hndlOpenPreviewDialog: programa=${programa ? programa.nombre : 'null'}`);
@@ -221,12 +158,11 @@ export default function HomeApp() {
                         >
                             {programasPorObjetivo[objetivo].map(programa => (
                                 <ProgramCard 
-                                key={programa.nombre}
+                                key={programa.id}
                                  programa={programa}
                                  onOpenDeleteDialog={hndlOpenDeleteDialog}
                                  onOpenPreviewDialog={hndlOpenPreviewDialog}
-                                 onOpenAsignacionDlg={hndlOpenAsigancionDlg}
-                                 onOpenAñadirDlg={hndlOpenAñadirDlg}
+                                 onCardClick={hndlCardClick}
                                  />
                             ))}
                         </Box>

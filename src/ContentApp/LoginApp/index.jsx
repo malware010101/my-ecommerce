@@ -31,6 +31,9 @@ export default function LoginApp() {
         });
     
         if (usuarioEncontrado) {
+            console.log("¡Usuario encontrado! Objeto completo:", usuarioEncontrado);
+            console.log("ID del usuario encontrado:", usuarioEncontrado.id);
+            console.log("Programas asignados al usuario encontrado:", usuarioEncontrado.programasAsignados);
             setUsuario(usuarioEncontrado);
             navigate('/apptraining/home');
         } else {

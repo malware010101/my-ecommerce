@@ -12,87 +12,10 @@ import {
     DialogContent 
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import {
-    FitnessCenter as FitnessCenterIcon,
-    AccessAlarms as AccessAlarmsIcon,
-    Notes as NotesIcon,
-    Visibility as VisibilityIcon
-} from '@mui/icons-material';
 import DrawerEjercicios from './DrawerEjercicios';
 import DrawerMetodos from './DrawerMetodos';
-
-
-const ExerciseCard = ({ exercise, onDelete, onShowVideo }) => {
-    return (
-        <Card sx={{ bgcolor: '#000', mb: 2, p: 2, color: '#fff', border: '1px solid #000', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)'   }}>
-            <CardContent sx={{ p: 1, '&:last-child': { pb: 2 } }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                        {exercise.nombre}
-                    </Typography>
-                    <Box>
-                        <IconButton size="small" sx={{ color: 'rgb(0, 204, 255)' }} onClick={() => onShowVideo(exercise.videoUrl)}>
-                            <VisibilityIcon/>
-                        </IconButton>
-                        <IconButton onClick={onDelete} color="error" size="small">
-                            <DeleteIcon />
-                        </IconButton>
-                    </Box>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                    <NotesIcon sx={{ color: 'rgb(0, 204, 255)', mr: 1, fontSize: '1.2rem' }} />
-                    <Typography variant="body2" color="#fff" sx={{mb: 1}}>
-                        {exercise.descripcion}
-                    </Typography>
-                </Box>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <FitnessCenterIcon sx={{ color: 'rgb(0, 204, 255)', mr: 1, fontSize: '1.2rem' }} />
-                    <Typography variant="body2" color="rgb(0, 204, 255)" fontWeight='bold'>
-                        Series:
-                         <Typography component="span" sx={{ fontWeight: 'bold', ml:1 ,mr: 2, color: '#fff' }}>
-                            {exercise.series}
-                            </Typography>
-                    </Typography>
-
-                    <Typography variant="body2" color="rgb(0, 204, 255)" fontWeight='bold' sx={{ mr: 2 }}>
-                        Reps: 
-                        <Typography component="span" sx={{ fontWeight: 'bold',ml: 1, mr: 0, color:'#fff' }}>
-                            {exercise.repeticiones}
-                            </Typography>
-                    </Typography>
-                    <AccessAlarmsIcon sx={{ color: 'rgb(0, 204, 255)', mr: 1, fontSize: '1.2rem' }} />
-                    <Typography variant="body2" color="rgb(0, 204, 255)" fontWeight='bold'>
-                        Desc:
-                         <Typography component="span" sx={{ fontWeight: 'bold', color: '#fff', ml: 1 }}>
-                            {exercise.descanso} seg 
-                            </Typography>
-                    </Typography>
-                </Box>
-            </CardContent>
-        </Card>
-    );
-};
-
-const MethodCard = ({ method, onDelete }) => {
-    return (
-        <Card sx={{ bgcolor: 'rgba(0, 204, 255, 0.2)', mb: 2, p: 2, color: '#fff', border: '1px solid rgb(0, 204, 255)', borderRadius: '15px', position: 'relative' }}>
-            <Box sx={{ position: 'absolute', top: 5, right: 5 }}>
-                <IconButton onClick={onDelete} color="error" size="small">
-                    <DeleteIcon />
-                </IconButton>
-            </Box>
-            <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, color: 'rgb(0, 204, 255)' }}>
-                    {method.nombre}
-                </Typography>
-                <Typography variant="body2" color="#bbb">
-                    {method.descripcion}
-                </Typography>
-            </CardContent>
-        </Card>
-    );
-};
+import ExerciseCard from '../ExerciseCard';
+import MethodCard from '../MethodCard';
 
 export default function CrearEjercicio({ dias, onExercisesChange }) {
     const [drawerEjercicioOpen, setDrawerEjercicioOpen] = useState(false);
@@ -218,9 +141,20 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
             <Box sx={{ mt: 3 }}>
                 {dias[dayLabels[selectedDay]]?.map(item => {
                     if (item.type === 'method') {
-                        return <MethodCard key={item.id} method={item} onDelete={() => hndlDeleteItem(item.id)} />;
+                        return(
+                            <MethodCard key={item.id}
+                             method={item} 
+                             onDelete={() => hndlDeleteItem(item.id)} 
+                             isDeletable={true} />
+                        );  
                     } else if (item.type === 'exercise') {
-                        return <ExerciseCard key={item.id} exercise={item} onDelete={() => hndlDeleteItem(item.id)} onShowVideo={hndlVerVideo} />;
+                        return (
+                            <ExerciseCard 
+                            key={item.id} 
+                            exercise={item} 
+                            onDelete={() => hndlDeleteItem(item.id)}
+                             onShowVideo={hndlVerVideo} isDeletable={true} />
+                        );
                     }
                     return null;
                 })}

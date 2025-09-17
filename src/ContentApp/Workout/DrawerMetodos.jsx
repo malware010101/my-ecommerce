@@ -12,9 +12,9 @@ import { Close as CloseIcon } from '@mui/icons-material';
 
 
 const metodos = [
-    { id: 1, nombre: 'Serie', descripcion: 'Ejejercicio normal, idividual, con su respectivo descanso.' },
+    { id: 1, nombre: 'Serie', descripcion: 'Ejercicio normal, con su respectivo descanso.' },
     { id: 2, nombre: 'Biserie', descripcion: 'Realiza dos ejercicios uno seguido del otro, sin descanso. El descanso a tomar vendra en el segundo ejercicio.' },
-    { id: 3, nombre: 'Triserie', descripcion: 'Realiza tres ejercicios diferentes seguidos sin descanso entre ellos.' },
+    { id: 3, nombre: 'Triserie', descripcion: 'Realiza tres ejercicios seguidos sin descanso entre ellos. El descanso a tomar vendra en el 3er ejercicio' },
     { id: 1, nombre: 'Circuito', descripcion: 'Ronda de 4 o mas ejercicios consecutivos sin descanso. El descanso a tomar vendra en el ultimo ejercicio.' },
     { id: 4, nombre: 'Cluster Set', descripcion: 'Realiza un número de repeticiones, descansa brevemente y repite hasta completar la serie.' },
     { id: 5, nombre: 'Superserie', descripcion: 'Combina dos ejercicios opuestos, realizandolos uno seguido del otro sin descanso. El descanso a tomar vendra en el segundo ejercicio.' },
