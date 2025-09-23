@@ -5,13 +5,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { userState, usersDataState } from '../hooks/estadoGlobal';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 
+
+
 export default function LoginApp() {
     const navigate = useNavigate();
     const setUsuario = useSetRecoilState(userState);
-    const usersData = useRecoilValue(usersDataState);
     const [credenciales, setCredenciales] = useState({
-        usuario: '',
-        contraseña: ''
+        email: '',
+        password: ''
     });
 
     const hndlChange = (e) => {
@@ -19,25 +20,35 @@ export default function LoginApp() {
         setCredenciales({ ...credenciales, [name]: value });
     };
 
-    const hndlIniciarSesion = () => {
-        const usuarioEncontrado = usersData.find(user => {
-            const usuarioIngresado = credenciales.usuario.toLowerCase();
-            const contraseñaIngresada = credenciales.contraseña.toLowerCase();
-    
-            const coincidePorNombre = user.nombre.toLowerCase() === usuarioIngresado;
-            const coincidePorRol = user.rol.toLowerCase() === usuarioIngresado;
-    
-            return (coincidePorNombre || coincidePorRol) && (user.rol.toLowerCase() === contraseñaIngresada);
-        });
-    
-        if (usuarioEncontrado) {
-            console.log("¡Usuario encontrado! Objeto completo:", usuarioEncontrado);
-            console.log("ID del usuario encontrado:", usuarioEncontrado.id);
-            console.log("Programas asignados al usuario encontrado:", usuarioEncontrado.programasAsignados);
-            setUsuario(usuarioEncontrado);
-            navigate('/apptraining/home');
-        } else {
-            alert('Credenciales incorrectas. Intenta con "Admin/admin" o "Ana López/usuario".');
+    const hndlIniciarSesion = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: credenciales.email,
+                    password: credenciales.password
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("¡Inicio de sesión exitoso!", data);
+                // Aquí deberías guardar el ID y rol del usuario en tu estado global
+                setUsuario({
+                     id: data.user_id,
+                     nombre: data.nombre,
+                     rol: data.rol });
+                navigate('/apptraining/home');
+            } else {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.detail}`);
+            }
+        } catch (error) {
+            console.error("Error al conectar con la API:", error);
+            alert('Error al conectar con el servidor.');
         }
     };
     return (
@@ -73,12 +84,12 @@ export default function LoginApp() {
                 </Typography>
 
                 <TextField
-                    label="Usuario"
+                    label="Correo Electrónico"
                     variant="outlined"
                     fullWidth
                     margin="normal"
-                    name='usuario'
-                    value={credenciales.usuario}
+                    name='email'
+                    value={credenciales.email}
                     onChange={hndlChange}
                     sx={{ 
                         mb: 2, 
@@ -106,8 +117,8 @@ export default function LoginApp() {
                     fullWidth
                     margin="normal"
                     type="password"
-                    name='contraseña'
-                    value={credenciales.contraseña}
+                    name='password'
+                    value={credenciales.password}
                     onChange={hndlChange}
                     sx={{ 
                         mb: 3, 
