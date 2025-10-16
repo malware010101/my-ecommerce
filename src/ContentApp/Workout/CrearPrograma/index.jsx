@@ -12,12 +12,11 @@ import {
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import CrearEjercicio from '../CrearEjercicio';
-import { useSetRecoilState } from 'recoil';
-import { programasState } from '../../hooks/estadoGlobal';
-import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '../../AuthContext';
 
 export default function CrearPrograma( { onClose } ) {
-    const setProgramas = useSetRecoilState(programasState);
+
+    const { obtenerTokenActual, obtenerUsuarioActual } = useAuth();
     const [step, setStep] = useState(1);
     const [programaData, setProgramaData] = useState({
         nombre: '',
@@ -39,7 +38,7 @@ export default function CrearPrograma( { onClose } ) {
 
         
         if (!programaData.nombre || !programaData.diasEntrenamiento) {
-            alert('Por favor, completa el nombre del programa y los días de entrenamiento.');
+            console.error("Por favor, completa todos los campos del formulario.");
             return;
         }
 
@@ -55,14 +54,76 @@ export default function CrearPrograma( { onClose } ) {
         setProgramaData(prev => ({ ...prev, dias: ejerciciosPorDia }));
     };
 
-    const hndlFinalizar = () => {
-        const programaId= {
-            ...programaData,
-            id: uuidv4(),
+    const hndlFinalizar = async () => {
+        
+    const authToken = obtenerTokenActual(); 
+    const { id: creador_id, rol: userRol } = obtenerUsuarioActual(); 
+
+    if (!authToken || !creador_id) {
+        console.error("No autenticado. Por favor, inicia sesión.");
+       
+        return; 
+    }
+    if (userRol !== 'admin' && userRol !== 'coach') {
+        console.error("Permiso denegado: Rol insuficiente para crear programas.");
+        return;
+    }
+    console.log("Token a enviar:", authToken ? authToken.substring(0, 10) + '...' : "TOKEN NO DISPONIBLE"); 
+
+    const diasTransformados = Object.entries(programaData.dias).map(([nombreDia, ejercicios]) => {
+
+        const ejerciciosTransformados = ejercicios.map(ej => ({
+              id: String(ej.id), 
+              nombre: ej.nombre,
+              descripcion: ej.descripcion || '', 
+              videoUrl: ej.videoUrl || null, 
+              repeticiones: String(ej.repeticiones), 
+              series: parseInt(ej.series, 10) || 0,
+              descanso: parseInt(ej.descanso, 10) || 0,
+        }));
+    
+        return {
+            dia: nombreDia, 
+            ejercicios: ejerciciosTransformados,
+            metodos: [] 
+        };
+    });
+
+
+    const datosFinales = {
+        nombre: programaData.nombre,
+        objetivo: programaData.objetivo,
+        categoria: programaData.categoria, // FastAPI espera 'categoria'
+        nivel: parseInt(programaData.nivel, 10) || 0, 
+        duracion_semanas: parseInt(programaData.duracionSemanas, 10) || 0, 
+        dias_entrenamiento: parseInt(programaData.diasEntrenamiento, 10) || 0, 
+        dias: diasTransformados, // Objeto de días con ejercicios
+        creador_id: parseInt(creador_id, 10) , // Identificación requerida para la creación
+        is_general: true 
+    };
+    try {
+        const response = await fetch('/entrenamiento/programas/', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`, 
+            },
+            body: JSON.stringify(datosFinales)
+        });
+
+        if (response.ok) {
+            const nuevoPrograma = await response.json();
+            console.log("Programa creado exitosamente:", nuevoPrograma);
+            onClose(); 
+        } else {
+            const errorData = await response.json();
+            console.error("Error al crear programa:", errorData.detail);
+          
         }
-        setProgramas(prevProgramas => [...prevProgramas, programaId]);
-        alert("Programa creado con éxito!");
-        onClose();
+    } catch (error) {
+        console.error("Error de red al crear programa:", error);
+    }
+
     };
 
     const estiloTexfield = {

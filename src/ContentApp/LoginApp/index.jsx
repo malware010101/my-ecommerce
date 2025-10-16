@@ -2,14 +2,12 @@
 import React, { useState } from 'react';
 import { Container, Typography, Box, TextField, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom"; 
-import { userState, usersDataState } from '../hooks/estadoGlobal';
-import { useSetRecoilState, useRecoilValue } from 'recoil';
-
-
+import { useAuth } from '../AuthContext';
 
 export default function LoginApp() {
-    const navigate = useNavigate();
-    const setUsuario = useSetRecoilState(userState);
+     const navigate = useNavigate();
+     const {login} = useAuth();
+    // const setUsuario = useSetRecoilState(userState);
     const [credenciales, setCredenciales] = useState({
         email: '',
         password: ''
@@ -22,7 +20,7 @@ export default function LoginApp() {
 
     const hndlIniciarSesion = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/auth/login', {
+            const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -36,19 +34,35 @@ export default function LoginApp() {
             if (response.ok) {
                 const data = await response.json();
                 console.log("¡Inicio de sesión exitoso!", data);
-                // Aquí deberías guardar el ID y rol del usuario en tu estado global
-                setUsuario({
-                     id: data.user_id,
-                     nombre: data.nombre,
-                     rol: data.rol });
+                login(data);
+                // setUsuario({
+                //      id: data.user_id,
+                //      nombre: data.nombre,
+                //      rol: data.rol });
                 navigate('/apptraining/home');
             } else {
-                const errorData = await response.json();
-                alert(`Error: ${errorData.detail}`);
+                // 1. Preparamos un objeto de error inicial con el status HTTP
+                let errorDetail = `Error HTTP: ${response.status} - ${response.statusText}. Ruta incorrecta o servidor caído.`;
+                
+                try {
+                    // 2. Intentamos leer el cuerpo de la respuesta como texto
+                    const text = await response.text();
+                    
+                    if (text) {
+                        // 3. Si hay texto, intentamos parsearlo a JSON
+                        const errorData = JSON.parse(text);
+                        errorDetail = errorData.detail || errorDetail; // Usamos el detalle de la API si existe
+                    }
+                } catch (e) {
+                    // 4. Si el JSON.parse falla (SyntaxError), mantenemos el mensaje de error HTTP inicial
+                    console.warn("La respuesta de error no fue JSON. Posiblemente un 404 con cuerpo vacío.");
+                }
+            
+                // 5. Lanzamos el error capturado
+                console.error(`Error de autenticación: ${errorDetail}`);
             }
         } catch (error) {
-            console.error("Error al conectar con la API:", error);
-            alert('Error al conectar con el servidor.');
+            console.error("Hubo un error al iniciar sesión:", error.message || error);
         }
     };
     return (

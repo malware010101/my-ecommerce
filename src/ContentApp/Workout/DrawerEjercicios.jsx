@@ -72,14 +72,14 @@ const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
 
 // ejercicios temporales
 const ejercicios = [
-    { id: 1, nombre: 'Dominadas Libres', descripcion: 'Moviminento controlado', videoUrl: dominadasLibresVideo },
-    { id: 2, nombre: 'Elevacion Frontal Con Liga', descripcion: 'Movimiento explosivo', videoUrl: elevacionFrontalLigaVideo },
-    { id: 3, nombre: 'Elevacion Lateral Con Liga', descripcion: 'Movimiento explosivo', videoUrl: elevacionLateralLigaVideo },
-    { id: 4, nombre: 'Jalon Unilateral En Maquina', descripcion: 'Movimiento controlado', videoUrl: jalonUnilateralVideo },
-    { id: 5, nombre: 'Fondos Libres', descripcion: 'Movimiento explosivo', videoUrl: fondosLibresVideo },
-    { id: 6, nombre: 'Elevacion Lateral Frontal Con Liga', descripcion: 'Movimiento explosivo', videoUrl: elevacionLateralFrontalLigaVideo },
-    { id: 7, nombre: 'Remo Inclinado Con Maquina', descripcion: 'Movimiento controlado', videoUrl: remoInclinadoMaquinaVideo },
-    { id: 8, nombre: 'Remo Inclinado Unilateral Con Maquina', descripcion: 'Movimiento contralado', videoUrl: remoInclinadoUnilateralMaquinaVideo },
+    { id: "1", nombre: 'Dominadas Libres', videoUrl: dominadasLibresVideo },
+    { id: "2", nombre: 'Elevacion Frontal Con Liga',videoUrl: elevacionFrontalLigaVideo },
+    { id: "3", nombre: 'Elevacion Lateral Con Liga', videoUrl: elevacionLateralLigaVideo },
+    { id: "4", nombre: 'Jalon Unilateral En Maquina', videoUrl: jalonUnilateralVideo },
+    { id: "5", nombre: 'Fondos Libres',videoUrl: fondosLibresVideo },
+    { id: "6", nombre: 'Elevacion Lateral Frontal Con Liga',videoUrl: elevacionLateralFrontalLigaVideo },
+    { id: "7", nombre: 'Remo Inclinado Con Maquina', videoUrl: remoInclinadoMaquinaVideo },
+    { id: "8", nombre: 'Remo Inclinado Unilateral Con Maquina', videoUrl: remoInclinadoUnilateralMaquinaVideo },
 ];
 
 export default function DrawerEjercicios({ open, onClose, onSelectExercise, onShowVideo }) {
@@ -174,7 +174,6 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                         name="repeticiones"
                         value={formData.repeticiones}
                         onChange={hndlFormChange}
-                        type="number"
                         sx={{
                             '& .MuiOutlinedInput-root': { color: '#fff' },
                             '& .MuiInputLabel-root': { color: '#bbb' },

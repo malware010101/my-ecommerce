@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil'; 
 import { Container, Typography, Box, Card, CardContent, IconButton, Button } from "@mui/material";
-import { programasState } from '../hooks/estadoGlobal';
+// import { programasState } from '../hooks/estadoGlobal';
 import { userState, usersDataState } from '../hooks/estadoGlobal';
 import DlgGnrl from '../../components/DlgGnrl';
 import ProgramPreview from '../ProgramPreview';
 import SearchUsersForm from '../SearchUsersForm';
 import ProgramCard from '../ProgramCard.jsx';
+import { useAuth } from '../AuthContext/index.jsx';
 
 export default function HomeApp() {
-    const [programas, setProgramas] = useRecoilState(programasState);
+    // const [programas, setProgramas] = useRecoilState(programasState);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [programaToDelete, setProgramaToDelete] = useState(null);
     const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
@@ -18,17 +19,44 @@ export default function HomeApp() {
     const [ programaAsignar, setProgramaAsignar ] = useState(null);
     const [openAñadirDlg, setOpenAñadirDlg] = useState(false);
     const [añadirPrograma, setAñadirPrograma] = useState(null);
+    const [ programas, setProgramas ] = useState([]);
+    const [ isLoading, setIsLoading ] = useState(true);
 
-    const usuario = useRecoilValue(userState);
+    const { obtenerTokenActual, obtenerUsuarioActual } = useAuth();
+    const usuarioActual = obtenerUsuarioActual(); 
+    const userRol = usuarioActual.rol;
+
+    // const usuario = useRecoilValue(userState);
     const [ allUsers, setAllUsers ] = useRecoilState(usersDataState);
-    console.log("Rol del usuario actual:", usuario.rol);
+    console.log("Rol del usuario actual:", userRol);
+
+    const fetchProgramas = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch('/entrenamiento/programas/general');
+            
+            if (response.ok) {
+                const data = await response.json();
+                setProgramas(data); 
+            } else {
+                console.error("Error al cargar programas:", response.status);
+            }
+        } catch (error) {
+            console.error("Error de red al obtener programas:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchProgramas();
+    }, []);
 
 
     
     const hndlCardClick = (programa) => {
-        if (usuario.rol === 'admin' || usuario.rol === 'coach') {
+        if (userRol === 'admin' || userRol === 'coach') {
             hndlOpenAsigancionDlg(programa);
-        } else if (usuario.rol === 'usuario') {
+        } else if (userRol === 'usuario') {
          hndlOpenAñadirDlg(programa);
         }
     }
@@ -73,8 +101,9 @@ export default function HomeApp() {
 
     const hndlConfirmarAñadir = () => {
         if (añadirPrograma) {
+            const userId= usuarioActual.id;
             const updatedUsers = allUsers.map(user => {
-                if (user.id === usuario.id) {
+                if (user.id === userId) {
                     return { 
                         ...user, 
                         programasAsignados: [...user.programasAsignados, añadirPrograma] 
@@ -113,12 +142,46 @@ export default function HomeApp() {
         setProgramaToDelete(null); 
     };
 
-    const hndlConfirmDelete = () => {
-        if (programaToDelete) {
-            console.log(`[HomeApp] hndlConfirmDelete: Haz eliminado el programa: ${programaToDelete.nombre}, con exito!`);
-            const nuevosProgramas = programas.filter(p => p.nombre !== programaToDelete.nombre);
-            setProgramas(nuevosProgramas);
-            setProgramaToDelete(null);
+    const hndlConfirmDelete = async () => {
+        if (!programaToDelete) return;
+
+        const programaId = programaToDelete.id;
+        const authToken = obtenerTokenActual();
+
+        // 1. Verificación de Token y Rol (Frontend)
+        if (!authToken) {
+            console.error("No estás autenticado para eliminar programas.");
+            hndlCloseDeleteDialog();
+            return;
+        }
+        
+        // Mantenemos la restricción del frontend (solo admin puede eliminar)
+        if (userRol !== 'admin') {
+            console.error("Permiso denegado: Solo el admin puede eliminar programas.");
+            hndlCloseDeleteDialog();
+            return;
+        }
+
+        try {
+            // Petición DELETE con el ID y el Token
+            const response = await fetch(`/entrenamiento/programas/${programaId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`, // ¡TOKEN REQUERIDO!
+                }
+            });
+
+            if (response.ok) {
+                console.log(`Programa ${programaId} eliminado exitosamente.`);
+                // 3. Refrescar la lista de programas
+                fetchProgramas(); 
+            } else {
+                const errorData = await response.json();
+                console.error("Error de API al eliminar:", errorData.detail);
+            }
+        } catch (error) {
+            console.error("Error de red al eliminar el programa:", error);
+        } finally {
             hndlCloseDeleteDialog();
         }
     };
