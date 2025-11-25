@@ -11,11 +11,11 @@ export const objetivosImagenes = {
 
 
 /**
- * Genera un ID único para la conversación entre dos usuarios.
- * El ID se genera de forma consistente sin importar el orden de los IDs.
+ * Genera un id unico para la conversacion entre dos usuarios
+ * el id se genera de forma consistente sin importar el orden de los ids
  * @param {string} userAId
  * @param {string} userBId
- * @returns {string} El ID de la conversación.
+ * @returns {string} El id de la conversacio
  */
 export const getChatId = (userAId, userBId) => {
     return [userAId, userBId].sort().join('_');

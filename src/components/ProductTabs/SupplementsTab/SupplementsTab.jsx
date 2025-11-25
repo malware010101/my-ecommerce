@@ -9,7 +9,7 @@ const supplements = products.filter(
 );
 export default function SupplementsTab() {
 
-  // Configuración del Slider
+  // Config del Slider
   const settings = {
     dots: true, 
     infinite: false, 

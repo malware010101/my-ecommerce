@@ -27,16 +27,12 @@ export default function DlgGnrl({ open, onClose, onConfirm, title, content, acti
                 {content}
             </DialogContent>
             
-            {/* Si existe la prop 'actions', la renderiza (ej. para el botón de Cerrar). */}
             {actions && (
                 <DialogActions sx={{ bgcolor: '#000', justifyContent: 'center', p: 2 }}>
                     {actions}
                 </DialogActions>
             )}
 
-            {/* Si no se le pasaron 'actions', revisa si se le pasó 'onConfirm'
-            para renderizar los botones de Sí/No.
-            Esto soluciona el problema de duplicación. */}
             {!actions && onConfirm && (
                 <DialogActions sx={{ bgcolor: '#000', justifyContent: 'center', p: 2 }}>
                     <Button variant="outlined" onClick={onConfirm} sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', mr: 2, fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>

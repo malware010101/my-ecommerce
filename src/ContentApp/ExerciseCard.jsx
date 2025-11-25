@@ -45,7 +45,7 @@ const ExerciseCard = ({
                         <VisibilityIcon/>
                     </IconButton>
                     
-                    {/* Botón de completar, SÓLO si isInteractive es true */}
+                    {/* Boton de completar, solo si isInteractive es true */}
                     {isInteractive && (
                         <IconButton 
                             size="small" 

@@ -12,32 +12,30 @@ import WomansTab from './WomansTab/WomansTab.jsx';
 import AccessoriesTab from './AccessoriesTab/AccessoriesTab.jsx';
 import { styled } from '@mui/material/styles'; 
 
-// --- Componente Tab personalizado para el estilo deseado ---
-// Usaremos `styled` para aplicar estilos condicionales y base a los Tabs
 const CustomTab = styled(Tab)(({ theme }) => ({
-  textTransform: 'none', // Quita la transformación a mayúsculas por defecto
-  minWidth: 200, // Ancho mínimo para cada tab
-  padding: '10px 20px', // Relleno interno
-  fontSize: '17px', // Texto en negrita
-  color: 'grey', // Color del texto por defecto
-  backgroundColor: 'black', // Fondo blanco por defecto
-  border: '1px solid #000', // Borde gris claro
-  borderRadius: '5px', // Bordes ligeramente redondeados
-  margin: '0 20px', // Margen entre los tabs
-  opacity: 1, // Asegura que no haya opacidad adicional
+  textTransform: 'none', 
+  minWidth: 200, 
+  padding: '10px 20px', 
+  fontSize: '17px', 
+  color: 'grey', 
+  backgroundColor: 'black', 
+  border: '1px solid #000', 
+  borderRadius: '5px',
+  margin: '0 20px', 
+  opacity: 1, 
   ': hover': {
-    color: 'white', // Texto negro al pasar el mouse
-    backgroundColor: 'red', // Fondo blanco al pasar el mouse
-    borderColor: 'black', // Borde negro al pasar el mouse
+    color: 'white', 
+    backgroundColor: 'red', 
+    borderColor: 'black', 
   },
-  '&.Mui-selected': { // Estilos para el Tab cuando está seleccionado
-    color: 'white', // Texto blanco cuando está seleccionado
-    backgroundColor: 'red', // Fondo negro cuando está seleccionado
-    borderColor: 'black', // Borde negro cuando está seleccionado
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)', // Sombra sutil para el tab activo
+  '&.Mui-selected': { 
+    color: 'white', 
+    backgroundColor: 'red', 
+    borderColor: 'black', 
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)', 
   },
   '&.Mui-focusVisible': {
-    backgroundColor: '#000', // Color al enfocar (accesibilidad)
+    backgroundColor: '#000', 
   },
 }));
 
@@ -63,7 +61,7 @@ export default function ProductTabs() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          mb: 3, // Margen inferior para separar los tabs del contenido
+          mb: 3, 
           color: '#000',
           
           bgcolor: 'rgba(0,0,0,0.5)',

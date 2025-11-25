@@ -5,7 +5,6 @@ import AddIcon from '@mui/icons-material/Add';
 import React, { useState } from 'react';
 
 export default function InfoProductos({ product }) {
-  // Estado para la cantidad de ítems a comprar
   const [cantidad, setCantidad] = useState(1);
 
   const hndlCantidad = (type) => {
@@ -22,19 +21,16 @@ export default function InfoProductos({ product }) {
 
   return (
     <Box sx={{ p: 2, height: '100%', color: '#000', bgcolor:'#f5f5f5', borderRadius: '10px' }}>
-      {/* Nombre del Producto */}
       <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
         {product.name}
       </Typography>
 
       <Divider sx={{ my: 2, bgcolor: '#000' }} />
 
-      {/* Descripción Amplia */}
       <Typography variant="body1" sx={{ mt: 4 }}>
         {product.details}
       </Typography>
 
-      {/* Lista de Beneficios */}
       {product.benefits && (
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Beneficios Clave:</Typography>
@@ -50,14 +46,11 @@ export default function InfoProductos({ product }) {
 
       <Divider sx={{ my: 4, bgcolor: '#000' }} />
       
-      {/* Contenedor principal: Precio (izquierda) y Cantidad (derecha) */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4, mb: 2 }}>
-        {/* Precio */}
         <Typography variant="h4" component="p" sx={{ fontWeight: 'bold', fontSize: '1.5rem', color: '#ec1818' }}>
             ${product.price}
         </Typography>
 
-        {/* Grupo de contador de Cantidad */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ mr: 1 }}>Cantidad:</Typography>
             <IconButton size="small" sx={{ color: '#ec1818' }}
@@ -72,7 +65,6 @@ export default function InfoProductos({ product }) {
         </Box>
       </Box>
 
-      {/* Botón de Agregar al Carrito */}
       <Button
         variant="contained"
         fullWidth

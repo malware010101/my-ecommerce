@@ -24,7 +24,7 @@ export default function AppSidebar() {
     ];
 
     const hndlLogout = () => {
-        // Lógica para cerrar sesión
+       
         navigate('/apptraining/login');
     };
 

@@ -11,9 +11,9 @@ import { useNavigate } from "react-router-dom";
 export default function SuscriptionApp() {
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(0);
-    const [userData, setUserData] = useState({ email: '', plan: '', userId: null });
+    const [userData, setUserData] = useState({ name:'', email: '', password:'', plan: '', });
 
-    const steps = ['Registro', 'Selección de plan', 'Pago'];
+    const steps = ['Planes', 'Registro', 'Pago'];
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -23,8 +23,8 @@ export default function SuscriptionApp() {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
-    const hndlRegistrar = (email, userId) => {
-        setUserData({ ...userData, email: email, userId: userId });
+    const hndlRegistrar = (email, name, password) => {
+        setUserData({ ...userData, email: email, name: name, password: password });
         handleNext(); 
     };
 
@@ -39,13 +39,13 @@ export default function SuscriptionApp() {
 
     const getStepContent = (step) => {
         if (step === 0) {
-            return <RegistroForm onNext={hndlRegistrar} />;
+            return <PlanCards onSelectPlan={hndlSeleccionarPlan} />
         } else if (step === 1) {
-            return <PlanCards onSelectPlan={hndlSeleccionarPlan} />;
+            return <RegistroForm onNext={hndlRegistrar} />;
         } else if (step === 2) {
-            return <StripeForm plan={userData.plan} email={userData.email} user_id={userData.userId} onPaymentSuccess={hndlPaymentExitoso} />;
+            return <StripeForm plan={userData.plan} email={userData.email} name={userData.name} password={userData.password} onPaymentSuccess={hndlPaymentExitoso} />;
         } else {
-            return 'Paso desconocido';
+            return 'proximo paso hacer login';
         }
     };
 
@@ -55,7 +55,7 @@ export default function SuscriptionApp() {
              activeStep={activeStep}
              sx={{
                 '& .MuiStepLabel-root .Mui-completed': {
-                    color: 'rgb(0, 179, 255)', // Color del texto de los pasos completados
+                    color: 'rgb(0, 179, 255)', 
                 },
                 '& .MuiStepLabel-root .Mui-active': {
                     color: 'rgb(0, 179, 255)', 

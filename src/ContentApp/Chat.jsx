@@ -13,7 +13,7 @@ export default function Chat({ onClose }) {
     const allUsers = useRecoilValue(usersDataState);
     const [selectedUser, setSelectedUser] = useState(null);
     const [newMensaje, setNewMensaje] = useState('');
-    const [currentChatId, setCurrentChatId] = useState(null); // Estado para el ID del chat
+    const [currentChatId, setCurrentChatId] = useState(null); 
     const [allConversacion, setAllConversacion] = useRecoilState(chatConversationsState);
 
     const isUsario = currentUser.rol === 'usuario' || currentUser.rol === 'pro';
@@ -97,15 +97,15 @@ export default function Chat({ onClose }) {
                                 bgcolor: '#000',
                                 color: '#fff',
                                 '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: ' rgb(0, 204, 255)', // Color del borde en estado normal
+                                    borderColor: ' rgb(0, 204, 255)', 
                                     borderRadius: '20px'
                                     
                                 },
                                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgb(0, 204, 255)', // Color del borde al pasar el mouse
+                                    borderColor: 'rgb(0, 204, 255)', 
                                 },
                                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgb(0, 204, 255)', // Color del borde al estar enfocado (tu azul)
+                                    borderColor: 'rgb(0, 204, 255)', 
                                 },
                             }
 
@@ -154,14 +154,14 @@ export default function Chat({ onClose }) {
                                 bgcolor: '#000',
                                 color: '#fff',
                                 '& .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: ' rgb(0, 204, 255)', // Color del borde en estado normal
+                                    borderColor: ' rgb(0, 204, 255)', 
                                     borderRadius: '20px',
                                 },
                                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgb(0, 204, 255)', // Color del borde al pasar el mouse
+                                    borderColor: 'rgb(0, 204, 255)', 
                                 },
                                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: 'rgb(0, 204, 255)', // Color del borde al estar enfocado (tu azul)
+                                    borderColor: 'rgb(0, 204, 255)', 
                                 },
                             }
                         }}

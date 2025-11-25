@@ -21,8 +21,6 @@ export default function AppTrainingLayout() {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-
-            {/* Navbar para movil o Sidebar para escritorio */}
             {isMobile ? <MovilNavBar /> : <AppSidebar />}
 
             <Box 
@@ -55,17 +53,16 @@ export default function AppTrainingLayout() {
                 <ChatIcon />
             </Fab>
 
-            {/* Drawer que contendrá el componente de chat */}
             <Drawer
               anchor="right"
               open={chatOpen}
               onClose={hndlToggleChat}
-              hideBackdrop={true} // Deshabilita el sombreado de fondo
+              hideBackdrop={true} 
               PaperProps={{
                   sx: { 
                        width: isMobile ? '100%' : 400, 
                        bgcolor: '#000',
-                       boxShadow: '-4px 0 10px rgba(0, 183, 255, 0.7)' // Agrega una sombra al lado izquierdo
+                       boxShadow: '-4px 0 10px rgba(0, 183, 255, 0.7)' 
         }
     }}
 >

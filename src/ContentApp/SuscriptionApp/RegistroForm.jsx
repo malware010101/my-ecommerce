@@ -10,40 +10,8 @@ export default function RegistroForm({ onNext }) {
     const hndlSubmit = async (event) => {
         event.preventDefault();
         setIsLoading(true); 
-
-        const userData = {
-            nombre: name,
-            email: email,
-            password: password,
-            rol: "usuario", 
-        };
-
-        try {
-            const response = await fetch('http://127.0.0.1:8000/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'accept': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                console.log("Registro exitoso:", data);
-                // Si el registro es exitoso, avanzamos al siguiente paso
-                onNext(email, parseInt(data.user_id, 10));
-            } else {
-                console.error("Error en el registro:", data.detail);
-                alert(`Error en el registro: ${data.detail}`);
-            }
-        } catch (error) {
-            console.error("Error de conexión:", error);
-            alert("Error de conexión con el servidor. Inténtalo de nuevo.");
-        } finally {
-            setIsLoading(false); 
-        }
+        onNext(email,name,password);
+        setIsLoading(false);
     };
 
 

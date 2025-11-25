@@ -93,12 +93,12 @@ export default function CrearPrograma( { onClose } ) {
     const datosFinales = {
         nombre: programaData.nombre,
         objetivo: programaData.objetivo,
-        categoria: programaData.categoria, // FastAPI espera 'categoria'
+        categoria: programaData.categoria, 
         nivel: parseInt(programaData.nivel, 10) || 0, 
         duracion_semanas: parseInt(programaData.duracionSemanas, 10) || 0, 
         dias_entrenamiento: parseInt(programaData.diasEntrenamiento, 10) || 0, 
-        dias: diasTransformados, // Objeto de días con ejercicios
-        creador_id: parseInt(creador_id, 10) , // Identificación requerida para la creación
+        dias: diasTransformados, 
+        creador_id: parseInt(creador_id, 10) , 
         is_general: true 
     };
     try {

@@ -18,8 +18,8 @@ import { usersDataState } from '../../hooks/estadoGlobal';
 import { v4 as uuidv4 } from 'uuid';
 
 export default function CrearPersonalizado( { onClose } ) {
-    const setAllUsers = useSetRecoilState(usersDataState); // <-- Usar para actualizar el estado de usuarios
-    const allUsers = useRecoilValue(usersDataState); // <-- Obtener todos los usuarios
+    const setAllUsers = useSetRecoilState(usersDataState); 
+    const allUsers = useRecoilValue(usersDataState); 
 
     const usersPro = allUsers.filter(user => user.rol === 'pro');
 

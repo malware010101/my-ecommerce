@@ -9,7 +9,7 @@ import LogoGymKlanC from '../assets/logogymklanc.png';
 
 export default function Footer() { 
 
-  const currentYear = new Date().getFullYear();
+  const Year = new Date().getFullYear();
 
   return (
     <Box
@@ -36,7 +36,6 @@ export default function Footer() {
               <Typography variant="body2" color="text.secondary" sx={{ color: 'rgba(255,255,255, 0.8)' }}>
                 <Link href="mailto:www.gymclan.com" color="inherit" sx={{ '&:hover': { color: '#FF4500' } }}>
                   <span style={{ marginRight: '8px' }}>&#9993;</span> gymclan@gmail.com
-                  {/* O usar un icono si lo importas: <EmailIcon sx={{ verticalAlign: 'middle', mr: 0.5 }} /> */}
                 </Link>
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ color: 'rgba(255,255,255, 0.8)' }}>
@@ -46,13 +45,10 @@ export default function Footer() {
                  sx={{ '&:hover': { color: '#FF4500' } }}>
                   <span 
                   style={{ marginRight: '8px' }}>&#9742;</span> +52 (844) 506 4464
-                  {/* O usar un icono si lo importas: <PhoneIcon sx={{ verticalAlign: 'middle', mr: 0.5 }} /> */}
                 </Link>
               </Typography>
             </Box>
           </Grid>
-
-          {/* Sección Enlaces Rápidos */}
           <Grid item xs={12} sm={6} md={2} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#FF4500' }}>
               Enlaces 
@@ -75,8 +71,6 @@ export default function Footer() {
               </Link>
             </Box>
           </Grid>
-
-          {/* Sección Legal */}
           <Grid item xs={12} sm={6} md={2} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#FF4500' }}>
               Legal
@@ -94,7 +88,6 @@ export default function Footer() {
             </Box>
           </Grid>
 
-          {/* Sección Redes Sociales */}
           <Grid item xs={12} sm={6} md={2} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#FF4500' }}>
               Síguenos
@@ -134,7 +127,7 @@ export default function Footer() {
         
         <Box sx={{ mt: 5, borderTop: '1px solid rgba(255,255,255, 0.1)', pt: 3, textAlign: 'center' }}>
           <Typography variant="body2" sx={{ color: 'rgba(255,255,255, 0.7)' }}>
-            &copy; {currentYear} Gymklan. Todos los derechos reservados.
+            &copy; {Year} Gymklan. Todos los derechos reservados.
           </Typography>
         </Box>
       </Container>

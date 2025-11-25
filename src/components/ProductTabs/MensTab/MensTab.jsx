@@ -1,4 +1,3 @@
-// src/components/ProductTabs/MensTab/MensTab.jsx
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import Slider from 'react-slick'; 

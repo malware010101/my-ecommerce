@@ -61,7 +61,6 @@ function ImgGaleriaMobile({ product, selectedVariant, setSelectedVariant }) {
         </Box>
       </Box>
 
-      {/* Miniaturas de Variantes */}
       <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 2, width: '100%' }}>
         {product.variants.map((variant, index) => (
           <Box
@@ -141,7 +140,12 @@ function ImgGaleriaDesktop({ product, selectedVariant, setSelectedVariant }) {
             }}
             onClick={() => setSelectedImageIndex(index)}
           >
-            <img src={image.url} alt={image.alt} style={{ width: '80px', height: '80px', objectFit: 'cover' }} />
+            <img
+             src={image.url} 
+             alt={image.alt} 
+             style={{ 
+              width: '80px', height: '80px', objectFit: 'cover'
+               }} />
           </Box>
         ))}
       </Box>
@@ -193,7 +197,8 @@ export default function ImgGaleria({ product, selectedVariant, setSelectedVarian
     );
   }
   return isMobile ? (
-    <ImgGaleriaMobile product={product} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
+    <ImgGaleriaMobile 
+    product={product} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
   ) : (
     <ImgGaleriaDesktop product={product} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
   );

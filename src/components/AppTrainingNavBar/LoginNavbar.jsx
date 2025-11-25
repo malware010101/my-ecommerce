@@ -30,7 +30,6 @@ export default function LoginNavbar() {
                     </IconButton>
                 </Box>
                 
-                {/* Contenedor para el logo centrado */}
                 <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
                     <img
                         src={LogoReps}
@@ -41,7 +40,6 @@ export default function LoginNavbar() {
                     />
                 </Box>
                 
-                {/* Un Box vacío para empujar el logo al centro */}
                 <Box sx={{ flexGrow: 1 }} />
             </Toolbar>
         </AppBar>

@@ -209,7 +209,6 @@ const hndlNvgApp = (path) => {
             )}
           </Toolbar>
 
-          {/* Menú desktop */}
           {!isMobile && (
             <Toolbar
               sx={{
@@ -299,14 +298,14 @@ const hndlNvgApp = (path) => {
                   popper: {
                       sx: {
                           '& .MuiTooltip-tooltip': {
-                              bgcolor: '#ec1818', // Fondo rojo, como el color que usas
+                              bgcolor: '#ec1818', 
                               color: 'white',
                               fontSize: '0.7rem',
                               p: 1.5,
                               opacity: 0.5,
                           },
                           '& .MuiTooltip-arrow': {
-                              color: '#ec1818', // Hace que la flecha también sea roja
+                              color: '#ec1818', 
                           },
                       },
                   },
@@ -319,7 +318,6 @@ const hndlNvgApp = (path) => {
         </Box>
       </AppBar>
 
-      {/* Drawer mobile */}
       {isMobile && (
         <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer}
         slotProps= {{
@@ -333,14 +331,12 @@ const hndlNvgApp = (path) => {
         >
           <Box sx={{ width: 250, p: 2, mt: 10 }}>
 
-            {/* Usuario */}
             <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 0.5, mt: 4 }}>
               <IconButton >
                 <FaRegUser style={{ color: '#ff0000', }} /> 
                 <Typography sx={{ ml: 1, color: '#ff0000', fontWeight: 'bold' }}>My Account</Typography>
                 </IconButton>
             </Box>
-            {/* Búsqueda */}
             <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5, border: '1px solid #ccc', borderRadius: '5px', p: 1 }}>
               <FiSearch style={{ color: '#red' }} />
               <InputBase placeholder="Search..." fullWidth  sx={{ color: '#000', fontSize: '0.8rem' }} />
@@ -348,7 +344,6 @@ const hndlNvgApp = (path) => {
 
             
 
-            {/* Menu */}
             <List>
               {navItems.map((item) => (
                 <Box key={item.label}>

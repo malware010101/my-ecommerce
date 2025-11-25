@@ -1,4 +1,3 @@
-// src/ContentApp/LoginApp/index.jsx
 import React, { useState } from 'react';
 import { Container, Typography, Box, TextField, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom"; 
@@ -41,24 +40,19 @@ export default function LoginApp() {
                 //      rol: data.rol });
                 navigate('/apptraining/home');
             } else {
-                // 1. Preparamos un objeto de error inicial con el status HTTP
                 let errorDetail = `Error HTTP: ${response.status} - ${response.statusText}. Ruta incorrecta o servidor caído.`;
                 
                 try {
-                    // 2. Intentamos leer el cuerpo de la respuesta como texto
                     const text = await response.text();
                     
                     if (text) {
-                        // 3. Si hay texto, intentamos parsearlo a JSON
                         const errorData = JSON.parse(text);
-                        errorDetail = errorData.detail || errorDetail; // Usamos el detalle de la API si existe
+                        errorDetail = errorData.detail || errorDetail; 
                     }
                 } catch (e) {
-                    // 4. Si el JSON.parse falla (SyntaxError), mantenemos el mensaje de error HTTP inicial
                     console.warn("La respuesta de error no fue JSON. Posiblemente un 404 con cuerpo vacío.");
                 }
             
-                // 5. Lanzamos el error capturado
                 console.error(`Error de autenticación: ${errorDetail}`);
             }
         } catch (error) {

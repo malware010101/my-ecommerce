@@ -61,7 +61,6 @@ export default function PlanCards({ onSelectPlan }) {
                 gap: { xs: 4, md: 8 }
             }}
         >
-            {/* Tarjeta Plan Básico */}
             <Box sx={{ ...cardStyles, maxWidth: 400, width: '100%' }}>
                 <Typography variant="h4" sx={headingStyles}>
                     Plan Básico
@@ -138,7 +137,7 @@ export default function PlanCards({ onSelectPlan }) {
                         fontWeight: 'bold',
                     }}
                 >
-                    Suscribirse
+                    Seleccionar
                 </Button>
             </Box>
 
@@ -219,7 +218,7 @@ export default function PlanCards({ onSelectPlan }) {
                         fontWeight: 'bold',
                     }}
                 >
-                    Suscribirse
+                    Seleccionar
                 </Button>
             </Box>
         </Container>

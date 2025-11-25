@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -18,16 +18,44 @@ import {
     CircularProgress 
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { usersDataState } from '../../hooks/estadoGlobal';
 import { v4 as uuidv4 } from 'uuid';
 
 export default function CrearNutricion({ onClose }) {
     const allUsers = useRecoilValue(usersDataState);
+    const setAllUsers = useSetRecoilState(usersDataState);
     const usersPro = allUsers.filter(user => user.rol === 'pro');
     const [planData, setPlanData] = useState(null);
     const [tabValue, setTabValue] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [explicacionComidas, setExplicacionComidas] = useState('');
+    const [mensajeComidas, setMensajeComidas] = useState("");
+
+
+
+    useEffect(() => {
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/auth/users');
+
+            if (!response.ok) {
+                throw new Error('Error al cargar los usuarios desde la API');
+            }
+
+            const data = await response.json();
+
+            setAllUsers(data);
+
+        } catch (error) {
+            console.error("Error al cargar la lista de usuarios:", error);
+        }
+    };
+
+    if (allUsers.length === 0) {
+        fetchUsers();
+    }
+}, [allUsers.length, setAllUsers]);
 
     const [step, setStep] = useState(1);
     const [nutricionData, setNutricionData] = useState({
@@ -40,12 +68,16 @@ export default function CrearNutricion({ onClose }) {
         objetivo: '',
         enfermedades: [],
         tipoDieta: '',
-        alergias: ''
+        alergias: '',
+        comidas: 0
     });
 
     const hndlChange = (e) => {
         const { name, value } = e.target;
         setNutricionData({ ...nutricionData, [name]: value });
+        if (name === "comidas") {
+    setNutricionData({ ...nutricionData, comidas: Number(value) });
+}
     };
 
     const hndlNextStep = (e) => {
@@ -57,6 +89,7 @@ export default function CrearNutricion({ onClose }) {
             !nutricionData.edad ||
             !nutricionData.genero ||
             !nutricionData.nivelActividad ||
+            !nutricionData.comidas ||
             !nutricionData.objetivo) {
             alert('Por favor, completa todos los campos del formulario.');
             return;
@@ -70,32 +103,53 @@ export default function CrearNutricion({ onClose }) {
     };
 
     const hndlGeneratePlan = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('http://127.0.0.1:8000/nutricion/plan', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(nutricionData),
-            });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Error al enviar los datos a la API');
-            }
-    
-            const data = await response.json();
-            console.log("Respuesta de la API:", data);
-            
-            setPlanData(data);
-        } catch (error) {
-            console.error("Hubo un error al generar el plan:", error);
-            alert("Error: No se pudo generar el plan. Revisa la consola.");
-        } finally {
-            setIsLoading(false);
+    setIsLoading(true);
+    try {
+        const { usuarioAsignado, alergias, ...restoData } = nutricionData;
+
+        if (!usuarioAsignado || !usuarioAsignado.id) {
+            throw new Error('No se ha seleccionado un usuario válido para asignar el plan.');
         }
-    };
+
+        const usuarioIdAsignado = usuarioAsignado.id;
+
+        const alergiasList = alergias && typeof alergias === 'string' && alergias.trim() !== '' 
+            ? alergias.split(',').map(a => a.trim()) 
+            : [];
+
+        const finalPayload = {
+            usuarioIdAsignado,
+            alergias: alergiasList,
+            ...restoData,
+            peso: parseFloat(restoData.peso),
+            altura: parseFloat(restoData.altura),
+            edad: parseInt(restoData.edad, 10),
+        };
+        console.log("Final Payload:", finalPayload);
+
+
+        const response = await fetch('http://127.0.0.1:8001/nutricion/plan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(finalPayload),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Detalle del error de la API:", errorData.detail);
+            throw new Error(errorData.detail || 'Error al enviar los datos a la API');
+        }
+
+        const data = await response.json();
+        setPlanData(data);
+
+    } catch (error) {
+        console.error("Hubo un error al generar el plan:", error);
+        alert(`Error: ${error.message}.`);
+    } finally {
+        setIsLoading(false);
+    }
+};
 
     const estiloTexfield = {
         '& .MuiOutlinedInput-root': {
@@ -127,6 +181,20 @@ export default function CrearNutricion({ onClose }) {
     
     const enfermedadesOpciones = ['Ninguna', 'Diabetes', 'Hipertensión', 'Sobre Peso'];
     const tipoDietaOpciones = ['Normal', 'Vegetariana', 'Vegana'];
+    const comidasPorDiaOpciones = [
+    { value: 3, label: "3 comidas (recomendado)" },
+    { value: 4, label: "4 comidas" },
+    { value: 5, label: "5 comidas" },
+    { value: 6, label: "6 comidas (solo atletas)" }
+];
+
+const mensajes = {
+    3: "Recomendado para la mayoría de usuarios. Facilita la adherencia.",
+    4: "Buena opción si entrenas moderado o tienes disponibilidad de tiempo para cocinar.",
+    5: "Recomendado si entrenas intenso, tu objetivo es hipertrofia o tienes disponibilidad de tiempo para cocinar.",
+    6: "6 comidas solo es recomendable si eres atleta o entrenas muy intenso."
+};
+
 
     return (
         <Container maxWidth="lg">
@@ -211,6 +279,28 @@ export default function CrearNutricion({ onClose }) {
                             </Select>
                         </FormControl>
                         <TextField name="alergias" label="Alergias (si aplica)" type="text" fullWidth margin="normal" onChange={hndlChange} value={nutricionData.alergias} sx={estiloTexfield} />
+                        <FormControl fullWidth margin="normal" sx={estiloTexfield}>
+    <InputLabel id='comidas-label'>¿Cuántas comidas al día?</InputLabel>
+    <Select
+        name="comidas"
+        value={nutricionData.comidas}
+        onChange={hndlChange}
+        labelId="comidas-label"
+        sx={{ color: '#fff' }}
+    >
+        {comidasPorDiaOpciones.map((op) => (
+            <MenuItem key={op.value} value={op.value}>
+                {op.label}
+            </MenuItem>
+        ))}
+    </Select>
+
+    {mensajeComidas && (
+        <Typography sx={{ color: "rgb(0, 204, 255)", mt: 1, fontSize: "0.85rem" }}>
+            {mensajeComidas}
+        </Typography>
+    )}
+</FormControl>
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
                             <Button type="submit" variant="contained" endIcon={<ExpandMoreIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
                                 Siguiente

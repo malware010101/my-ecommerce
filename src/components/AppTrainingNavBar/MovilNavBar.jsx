@@ -32,7 +32,6 @@ export default function MovilNavBar() {
     ];
 
     const hndlLogout = () => {
-        // Lógica para cerrar sesión
         navigate('/apptraining/login');
     };
 
@@ -40,7 +39,6 @@ export default function MovilNavBar() {
         navigate('/');
     };
     
-    // Puedes reemplazar esto con el estado real del usuario logueado
     const loggedInUser = "nombreusuario@gmail.com"; 
 
     return (
@@ -62,25 +60,21 @@ export default function MovilNavBar() {
                     <img src={LogoReps} alt="AppTraining Logo" style={{ height: '80px',  }}/>
                 </Box>
                 
-                {/* Ícono de usuario para móvil */}
                 <IconButton onClick={() => navigate('/apptraining/profile')} sx={{ color: 'rgb(0, 204, 255)' }}>
                     <PersonOutlineIcon />
                 </IconButton>
             </Toolbar>
 
-            {/* Drawer */}
             <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)} PaperProps={{ sx: { background: '#111', color: '#fff' } }}>
                 <Box sx={{ width: 360 }} role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
                 <Box sx={{  px: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #333' }}>
                 <img src={LogoReps} alt="AppTraining Logo" style={{ height: '70px'}}/>
-                {/* ➡️ Agrega el nuevo botón de cierre aquí */}
                 <IconButton onClick={toggleDrawer(false)} sx={{ color: 'rgb(0, 204, 255)' }}>
                     <CloseIcon />
                 </IconButton>
             </Box>
                     <List sx={{ mt: 2 }}>
                     {menuItems.map((item) => {
-                            // Verificar si la ruta coincide con la ubicación actual
                             const isSelected = location.pathname.startsWith(item.path);
                             return (
                                 <ListItem key={item.text} disablePadding>
