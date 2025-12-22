@@ -21,8 +21,9 @@ import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { usersDataState } from '../../hooks/estadoGlobal';
 import { v4 as uuidv4 } from 'uuid';
+import NutriViewer from '../../NutriViewer';
 
-export default function CrearNutricion({ onClose }) {
+export default function CrearNutricion({ onClose, selfMode = false, currentUser = null, onSaved = null }) {
     const allUsers = useRecoilValue(usersDataState);
     const setAllUsers = useSetRecoilState(usersDataState);
     const usersPro = allUsers.filter(user => user.rol === 'pro');
@@ -72,6 +73,16 @@ export default function CrearNutricion({ onClose }) {
         comidas: 0
     });
 
+    // Si estamos en selfMode y recibimos currentUser, prellenamos usuarioAsignado
+    useEffect(() => {
+        if (selfMode && currentUser) {
+            setNutricionData(prev => ({
+                ...prev,
+                usuarioAsignado: { id: currentUser.id, nombre: currentUser.nombre }
+            }));
+        }
+    }, [selfMode, currentUser]);
+
     const hndlChange = (e) => {
         const { name, value } = e.target;
         setNutricionData({ ...nutricionData, [name]: value });
@@ -83,7 +94,7 @@ export default function CrearNutricion({ onClose }) {
     const hndlNextStep = (e) => {
         e.preventDefault();
 
-        if (!nutricionData.usuarioAsignado ||
+        if ((!nutricionData.usuarioAsignado && !selfMode) ||
             !nutricionData.peso ||
             !nutricionData.altura ||
             !nutricionData.edad ||
@@ -102,54 +113,105 @@ export default function CrearNutricion({ onClose }) {
         setTabValue(newValue);
     };
 
-    const hndlGeneratePlan = async () => {
-    setIsLoading(true);
-    try {
-        const { usuarioAsignado, alergias, ...restoData } = nutricionData;
+        const hndlGeneratePlan = async () => {
+        setIsLoading(true);
+        try {
+            const { usuarioAsignado, alergias, ...restoData } = nutricionData;
 
-        if (!usuarioAsignado || !usuarioAsignado.id) {
-            throw new Error('No se ha seleccionado un usuario válido para asignar el plan.');
+            // Determinar id del usuario objetivo: si selfMode usamos currentUser
+            const usuarioIdAsignado = selfMode ? currentUser?.id : usuarioAsignado?.id;
+
+            if (!usuarioIdAsignado) {
+                throw new Error('No se ha seleccionado un usuario válido para asignar el plan.');
+            }
+
+            const alergiasList = alergias && typeof alergias === 'string' && alergias.trim() !== '' 
+                ? alergias.split(',').map(a => a.trim()) 
+                : [];
+
+            const finalPayload = {
+                usuarioIdAsignado,
+                alergias: alergiasList,
+                ...restoData,
+                peso: parseFloat(restoData.peso),
+                altura: parseFloat(restoData.altura),
+                edad: parseInt(restoData.edad, 10),
+            };
+            console.log("Final Payload:", finalPayload);
+
+            const response = await fetch('http://127.0.0.1:8001/nutricion/plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(finalPayload),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(()=>null);
+                console.error("Detalle del error de la API:", errorData?.detail);
+                throw new Error(errorData?.detail || 'Error al enviar los datos a la API');
+            }
+
+            const data = await response.json();
+            setPlanData(data);
+
+        } catch (error) {
+            console.error("Hubo un error al generar el plan:", error);
+            alert(`Error: ${error.message}.`);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+const hndlSavePlan = async () => {
+        if (!planData || (!nutricionData.usuarioAsignado && !selfMode)) {
+            alert("No hay un plan generado para guardar.");
+            return;
         }
 
-        const usuarioIdAsignado = usuarioAsignado.id;
+        const { usuarioAsignado, ...datosLimpios } = nutricionData;
 
-        const alergiasList = alergias && typeof alergias === 'string' && alergias.trim() !== '' 
-            ? alergias.split(',').map(a => a.trim()) 
-            : [];
+        try {
+            const payload = {
+                usuario_id: selfMode ? currentUser.id : usuarioAsignado.id,
+                calorias_diarias: planData.calorias_diarias,
+                macronutrientes: planData.macronutrientes,
+                opciones_menu: planData.opciones_menu,
+                datos_recibidos: {
+                    ...datosLimpios,
+                    usuarioIdAsignado: selfMode ? currentUser.id : usuarioAsignado.id
+                }
+            };
 
-        const finalPayload = {
-            usuarioIdAsignado,
-            alergias: alergiasList,
-            ...restoData,
-            peso: parseFloat(restoData.peso),
-            altura: parseFloat(restoData.altura),
-            edad: parseInt(restoData.edad, 10),
-        };
-        console.log("Final Payload:", finalPayload);
+            const response = await fetch("http://127.0.0.1:8001/nutricion/plan/guardar",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                }
+            );
 
+            if (!response.ok) {
+                const error = await response.json().catch(()=>null);
+                throw new Error(error?.detail || "Error al guardar el plan");
+            }
 
-        const response = await fetch('http://127.0.0.1:8001/nutricion/plan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(finalPayload),
-        });
+            const data = await response.json();
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Detalle del error de la API:", errorData.detail);
-            throw new Error(errorData.detail || 'Error al enviar los datos a la API');
+            alert("Plan nutricional guardado correctamente");
+
+            // Notificar al padre que se guardó para que refresque
+            onSaved?.();
+
+            onClose?.();
+
+        } catch (error) {
+            console.error("Error al guardar el plan:", error);
+            alert(error.message || 'Error al guardar');
         }
+    };
 
-        const data = await response.json();
-        setPlanData(data);
-
-    } catch (error) {
-        console.error("Hubo un error al generar el plan:", error);
-        alert(`Error: ${error.message}.`);
-    } finally {
-        setIsLoading(false);
-    }
-};
 
     const estiloTexfield = {
         '& .MuiOutlinedInput-root': {
@@ -210,21 +272,23 @@ const mensajes = {
 
                 {step === 1 ? (
                     <Box component="form" onSubmit={hndlNextStep}>
-                        <Autocomplete
-                            options={usersPro}
-                            getOptionLabel={(option) => option.nombre}
-                            onChange={(event, newValue) => {
-                                setNutricionData(prev => ({ ...prev, usuarioAsignado: newValue }));
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Seleccionar Usuario"
-                                    variant="outlined"
-                                    sx={{ ...estiloTexfield, mb: 2 }}
-                                />
-                            )}
-                        />
+                        {!selfMode && (
+    <Autocomplete
+        options={usersPro}
+        getOptionLabel={(option) => option.nombre}
+        onChange={(event, newValue) => {
+            setNutricionData(prev => ({ ...prev, usuarioAsignado: newValue }));
+        }}
+        renderInput={(params) => (
+            <TextField
+                {...params}
+                label="Seleccionar Usuario"
+                variant="outlined"
+                sx={{ ...estiloTexfield, mb: 2 }}
+            />
+        )}
+    />
+)}
                         <TextField name="peso" label="Peso (kg)" type="tel" fullWidth margin="normal" onChange={hndlChange} value={nutricionData.peso} sx={estiloTexfield} />
                         <TextField name="altura" label="Altura (cm)" type="tel" fullWidth margin="normal" onChange={hndlChange} value={nutricionData.altura} sx={estiloTexfield} />
                         <TextField name="edad" label="Edad" type="tel" fullWidth margin="normal" onChange={hndlChange} value={nutricionData.edad} sx={estiloTexfield} />
@@ -309,7 +373,7 @@ const mensajes = {
                     </Box>
                 ) : (
                     <Box sx={{ bgcolor: '#000', p: 2 }}>
-                        {/* Se agregó el bloque de carga aquí */}
+                        
                         {isLoading ? (
                             <Box sx={{ p: 4, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Typography color="#fff" variant="h6">
@@ -320,83 +384,7 @@ const mensajes = {
                         ) : (
                             planData ? (
                                 <>
-                                    <Typography variant="h5" color="#fff" textAlign="center" mb={2} fontWeight="bold">
-                                        Plan Nutricional
-                                    </Typography>
-                                    <Grid container spacing={2} sx={{ mb: 4, textAlign: 'center' }}>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Box sx={{ p: 2, bgcolor: '#17343d', borderRadius: '8px', border: '1px solid rgb(0, 204, 255)', boxShadow: '0px 0px 10px rgba(0, 204, 255, 0.5)' }}>
-                                                <Typography color="#bbb" variant="body2">Calorías Totales</Typography>
-                                                <Typography color="#fff" variant="h6">{planData.calorias_diarias} kcal</Typography>
-                                            </Box>
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Box sx={{ p: 2, bgcolor: '#17343d', borderRadius: '8px', border: '1px solid rgb(0, 204, 255)', boxShadow: '0px 0px 10px rgba(0, 204, 255, 0.5)' }}>
-                                                <Typography color="#bbb" variant="body2">Proteína</Typography>
-                                                <Typography color="#fff" variant="h6">{planData.macronutrientes.proteinas} g</Typography>
-                                            </Box>
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Box sx={{ p: 2, bgcolor: '#17343d', borderRadius: '8px', border: '1px solid rgb(0, 204, 255)', boxShadow: '0px 0px 10px rgba(0, 204, 255, 0.5)' }}>
-                                                <Typography color="#bbb" variant="body2">Carbohidratos</Typography>
-                                                <Typography color="#fff" variant="h6">{planData.macronutrientes.carbohidratos} g</Typography>
-                                            </Box>
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Box sx={{ p: 2, bgcolor: '#17343d', borderRadius: '8px', border: '1px solid rgb(0, 204, 255)', boxShadow: '0px 0px 10px rgba(0, 204, 255, 0.5)' }}>
-                                                <Typography color="#bbb" variant="body2">Grasas</Typography>
-                                                <Typography color="#fff" variant="h6">{planData.macronutrientes.grasas} g</Typography>
-                                            </Box>
-                                        </Grid>
-                                    </Grid>
-                                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                        <Tabs 
-                                            value={tabValue} 
-                                            onChange={hndlTabChange} 
-                                            aria-label="Opciones de Menú" 
-                                            centered
-                                            TabIndicatorProps={{ style: { backgroundColor: 'rgb(0, 204, 255)' } }}
-                                        >
-                                            {planData.opciones_menu?.map((opcion, index) => (
-                                                <Tab
-                                                    key={index} 
-                                                    label={`Menú ${opcion.opcion}`}
-                                                    sx={{ 
-                                                        color: '#fff',
-                                                        '&.Mui-selected': {
-                                                            color: 'rgb(0, 204, 255)', indicatorColor: 'rgb(0, 204, 255)'
-                                                        }
-                                                    }} 
-                                                />
-                                            ))}
-                                        </Tabs>
-                                    </Box>
-                                    {planData.opciones_menu?.map((opcion, index) => (
-                                        tabValue === index && (
-                                            <Box key={index} sx={{ p: 3, minHeight: '300px' }}>
-                                                <Grid container spacing={2}>
-                                                    {opcion.menu?.map((comida, comidaIndex) => (
-                                                        <Grid item xs={12} sm={6} md={3} key={comidaIndex}>
-                                                            <Card sx={{ bgcolor: '#000', border: '1px solid #000', color: '#fff', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)' }}>
-                                                                <CardContent>
-                                                                    <Typography variant="h6" color="rgb(0, 204, 255)" fontWeight="bold" gutterBottom>
-                                                                        {comida.comida}
-                                                                    </Typography>
-                                                                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                                                                        {comida.alimentos?.map((alimento, alimentoIndex) => (
-                                                                            <li key={alimentoIndex} style={{ color: '#fff' }}>
-                                                                                {alimento.nombre} - {alimento.gramos} g
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </CardContent>
-                                                            </Card>
-                                                        </Grid>
-                                                    ))}
-                                                </Grid>
-                                            </Box>
-                                        )
-                                    ))}
+                                  <NutriViewer plan={planData} />
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
                                         <Button 
                                             onClick={() => setStep(1)} 
@@ -405,7 +393,7 @@ const mensajes = {
                                             Volver
                                         </Button>
                                         <Button
-                                            onClick={() => alert('Plan guardado!')} 
+                                            onClick={hndlSavePlan}
                                             variant="contained"
                                             sx={{ ...estiloTexfield, bgcolor: 'rgb(0, 204, 255)', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
                                             Guardar Plan
