@@ -9,17 +9,29 @@ import {
     MenuItem,
     Typography,
     Container,
-    Autocomplete
+    Autocomplete,
+    Snackbar,
+    Alert
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import CrearEjercicio from '../CrearEjercicio';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { usersDataState } from '../../hooks/estadoGlobal';
-import { v4 as uuidv4 } from 'uuid';
+import api from '../../api';
+import { useAuth } from '../../AuthContext';
 
 export default function CrearPersonalizado( { onClose } ) {
     const setAllUsers = useSetRecoilState(usersDataState); 
     const allUsers = useRecoilValue(usersDataState); 
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const { obtenerUsuarioActual } = useAuth();
+    const { id: creador_id } = obtenerUsuarioActual();
+
+    const showSnackbar = (message, severity = 'success') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+
 
     const usersPro = allUsers.filter(user => user.rol === 'pro');
 
@@ -31,7 +43,8 @@ export default function CrearPersonalizado( { onClose } ) {
         duracionSemanas: '',
         diasEntrenamiento: '',
         usuarioAsignado: null, 
-        dias: {}
+        dias: {},
+        tipo: 'personalizado_base' 
     });
 
     const hndlChange = (e) => {
@@ -62,26 +75,51 @@ export default function CrearPersonalizado( { onClose } ) {
         setProgramaData(prev => ({ ...prev, dias: ejerciciosPorDia }));
     };
 
-    const hndlFinalizar = () => {
-        const nuevoPrograma = {
-            ...programaData,
-            id: uuidv4(),
-            usuarioAsignado: undefined, 
-        };
-        const updatedUsers = allUsers.map(user => {
-            if (user.id === programaData.usuarioAsignado.id) {
-                return {
-                    ...user,
-                    programasAsignados: [...user.programasAsignados, nuevoPrograma],
-                };
-            }
-            return user;
-        });
-        setAllUsers(updatedUsers);
-
-        alert(`Programa personalizado creado y asignado con éxito a ${programaData.usuarioAsignado.nombre}!`);
-        onClose();
+    const hndlFinalizar = async () => {
+  try {
+    // Crear programa personalizado
+    const payloadPrograma = {
+      nombre: programaData.nombre,
+      objetivo: programaData.objetivo,
+      categoria: "Personalizado",
+      nivel: 0,
+      duracion_semanas: Number(programaData.duracionSemanas, 10) || 0,
+      dias_entrenamiento: Number(programaData.diasEntrenamiento, 10) || 0,
+      dias: Object.entries(programaData.dias).map(([dia, items]) => ({
+        dia,
+        items,
+      })),
+      tipo: programaData.tipo, // personalizado_base | personalizado_complemento
+      creador_id: parseInt(creador_id),
+      is_general: false,
     };
+
+    const programaRes = await api.post(
+      "/entrenamiento/programas/",
+      payloadPrograma
+    );
+
+    const programaId = programaRes.data.id;
+
+    // Asignar programa al usuario
+    await api.post("/entrenamiento/programas/asignar", {
+      programa_id: programaId,
+      usuario_id: programaData.usuarioAsignado.id,
+    });
+
+    showSnackbar("Programa personalizado creado y asignado con éxito", "success");
+    onClose();
+
+  } catch (error) {
+    console.error("Error creando programa personalizado:", error.response || error);
+
+    showSnackbar(
+      error.response?.data?.detail || "Error al crear programa personalizado",
+      "error"
+    );
+  }
+};
+
 
     const estiloTexfield = {
         '& .MuiOutlinedInput-root': {
@@ -171,6 +209,23 @@ export default function CrearPersonalizado( { onClose } ) {
                                 <MenuItem value={6}>6 Días</MenuItem>
                             </Select>
                         </FormControl>
+
+                        <FormControl fullWidth margin="normal" sx={estiloTexfield}>
+                          <InputLabel id="tipo-label">Tipo de Personalizado</InputLabel>
+                            <Select
+                              name="tipo"
+                              value={programaData.tipo}
+                              onChange={hndlChange}
+                              labelId="tipo-label"
+                            >
+                               <MenuItem value="personalizado_base">
+                                  Personalizado Base
+                               </MenuItem>
+                               <MenuItem value="personalizado_complemento">
+                                   Personalizado Complemento
+                               </MenuItem>
+                            </Select>
+                       </FormControl>
                         
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
                             <Button type="submit" variant="contained" endIcon={<ExpandMoreIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
@@ -195,6 +250,21 @@ export default function CrearPersonalizado( { onClose } ) {
                     </Box>
                 )}
             </Box>
+            <Snackbar
+  open={snackbar.open}
+  autoHideDuration={4000}
+  onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+>
+  <Alert
+    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+    severity={snackbar.severity}
+    sx={{ width: '100%' }}
+  >
+    {snackbar.message}
+  </Alert>
+</Snackbar>
+
         </Container>
     );
 }

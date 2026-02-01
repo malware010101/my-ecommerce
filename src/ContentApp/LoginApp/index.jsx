@@ -32,12 +32,12 @@ export default function LoginApp() {
 
             if (response.ok) {
                 const data = await response.json();
+
                 console.log("¡Inicio de sesión exitoso!", data);
+                
+                localStorage.setItem("access_token", data.access_token);
+
                 login(data);
-                // setUsuario({
-                //      id: data.user_id,
-                //      nombre: data.nombre,
-                //      rol: data.rol });
                 navigate('/apptraining/home');
             } else {
                 let errorDetail = `Error HTTP: ${response.status} - ${response.statusText}. Ruta incorrecta o servidor caído.`;

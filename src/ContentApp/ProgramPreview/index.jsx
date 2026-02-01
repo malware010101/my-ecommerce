@@ -54,7 +54,7 @@ const hndlCloseVideo = () => {
             }
           }}
         >
-          {Object.keys(programa.dias).map((dia, index) => (
+          {programa.dias?.map((dia, index) => (
             <Tab label={dia} key={index} />
           ))}
         </Tabs>

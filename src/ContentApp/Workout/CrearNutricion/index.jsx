@@ -15,7 +15,10 @@ import {
     Tab,
     Card,
     CardContent,
-    CircularProgress 
+    CircularProgress, 
+    RadioGroup,
+    FormControlLabel,
+    Radio
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -70,7 +73,8 @@ export default function CrearNutricion({ onClose, selfMode = false, currentUser 
         enfermedades: [],
         tipoDieta: '',
         alergias: '',
-        comidas: 0
+        comidas: 0,
+        horarioEntrenamiento: ''
     });
 
     // Si estamos en selfMode y recibimos currentUser, prellenamos usuarioAsignado
@@ -101,6 +105,7 @@ export default function CrearNutricion({ onClose, selfMode = false, currentUser 
             !nutricionData.genero ||
             !nutricionData.nivelActividad ||
             !nutricionData.comidas ||
+            !nutricionData.horarioEntrenamiento ||
             !nutricionData.objetivo) {
             alert('Por favor, completa todos los campos del formulario.');
             return;
@@ -241,8 +246,8 @@ const hndlSavePlan = async () => {
         { value: 'athlete', label: 'Atleta (entrenamiento intenso 2 veces/día)' }
     ];
     
-    const enfermedadesOpciones = ['Ninguna', 'Diabetes', 'Hipertensión', 'Sobre Peso'];
-    const tipoDietaOpciones = ['Normal', 'Vegetariana', 'Vegana'];
+    const enfermedadesOpciones = ['Ninguna', 'Diabetes tipo 2', 'Hipertensión', 'Resistencia a la insulina'];
+    const tipoDietaOpciones = ['Normal'];
     const comidasPorDiaOpciones = [
     { value: 3, label: "3 comidas (recomendado)" },
     { value: 4, label: "4 comidas" },
@@ -365,6 +370,40 @@ const mensajes = {
         </Typography>
     )}
 </FormControl>
+
+<FormControl component="fieldset"  sx={{ mt: 3 }}>
+    <Typography sx={{ color: '#bbb', mb: 1, fontSize: '1.2rem' }}>
+        ¿A qué hora entrenas normalmente?
+    </Typography>
+
+    <RadioGroup
+        row
+        name="horarioEntrenamiento"
+        value={nutricionData.horarioEntrenamiento}
+        onChange={hndlChange}
+    >
+        <FormControlLabel
+            value="temprano"
+            control={<Radio sx={{ color: 'rgb(0, 204, 255)' }} />}
+            label="Temprano (antes de las 16:00)"
+            sx={{ color: '#fff' }}
+        />
+        <FormControlLabel
+            value="tarde"
+            control={<Radio sx={{ color: 'rgb(0, 204, 255)' }} />}
+            label="Tarde (después de las 16:00)"
+            sx={{ color: '#fff' }}
+        />
+    </RadioGroup>
+</FormControl>
+{nutricionData.horarioEntrenamiento && (
+    <Typography sx={{ color: 'rgb(0, 204, 255)', mt: 1, fontSize: '0.8rem' }}>
+        {nutricionData.horarioEntrenamiento === 'temprano'
+            ? 'La distribución nocturna se ajusta para favorecer la recuperación metabólica y el descanso, sin afectar el progreso.'
+            : 'La distribución nocturna se ajusta para maximizar la reposición de glucógeno y la recuperación muscular.'}
+    </Typography>
+)}
+
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
                             <Button type="submit" variant="contained" endIcon={<ExpandMoreIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
                                 Siguiente

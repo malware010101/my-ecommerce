@@ -25,7 +25,8 @@ export default function CrearPrograma( { onClose } ) {
         nivel: '',
         duracionSemanas: '',
         diasEntrenamiento: '',
-        dias: {} 
+        dias: [],
+        tipo:'base'
     });
 
     const hndlChange = (e) => {
@@ -42,17 +43,28 @@ export default function CrearPrograma( { onClose } ) {
             return;
         }
 
-        const nuevosDias = {};
-        for (let i = 1; i <= parseInt(programaData.diasEntrenamiento); i++) {
-            nuevosDias[`Día ${i}`] = [];
-        }
-        setProgramaData(prev => ({ ...prev, dias: nuevosDias }));
-        setStep(2);
-    };
+        const nuevosDias = [];
 
-    const hndlEjercicios = (ejerciciosPorDia) => {
-        setProgramaData(prev => ({ ...prev, dias: ejerciciosPorDia }));
-    };
+for (let i = 1; i <= parseInt(programaData.diasEntrenamiento); i++) {
+  nuevosDias.push({
+    dia: `Día ${i}`,
+    items: []
+  });
+}
+
+setProgramaData(prev => ({
+  ...prev,
+  dias: nuevosDias
+}));
+setStep(2);
+};
+
+    const hndlEjercicios = (diasActualizados) => {
+  setProgramaData(prev => ({
+    ...prev,
+    dias: diasActualizados
+  }));
+};
 
     const hndlFinalizar = async () => {
         
@@ -70,39 +82,26 @@ export default function CrearPrograma( { onClose } ) {
     }
     console.log("Token a enviar:", authToken ? authToken.substring(0, 10) + '...' : "TOKEN NO DISPONIBLE"); 
 
-    const diasTransformados = Object.entries(programaData.dias).map(([nombreDia, ejercicios]) => {
-
-        const ejerciciosTransformados = ejercicios.map(ej => ({
-              id: String(ej.id), 
-              nombre: ej.nombre,
-              descripcion: ej.descripcion || '', 
-              videoUrl: ej.videoUrl || null, 
-              repeticiones: String(ej.repeticiones), 
-              series: parseInt(ej.series, 10) || 0,
-              descanso: parseInt(ej.descanso, 10) || 0,
-        }));
-    
-        return {
-            dia: nombreDia, 
-            ejercicios: ejerciciosTransformados,
-            metodos: [] 
-        };
-    });
-
 
     const datosFinales = {
-        nombre: programaData.nombre,
-        objetivo: programaData.objetivo,
-        categoria: programaData.categoria, 
-        nivel: parseInt(programaData.nivel, 10) || 0, 
-        duracion_semanas: parseInt(programaData.duracionSemanas, 10) || 0, 
-        dias_entrenamiento: parseInt(programaData.diasEntrenamiento, 10) || 0, 
-        dias: diasTransformados, 
-        creador_id: parseInt(creador_id, 10) , 
-        is_general: true 
-    };
+  nombre: programaData.nombre,
+  objetivo: programaData.objetivo,
+  categoria: programaData.categoria,
+  nivel: parseInt(programaData.nivel, 10) || 0,
+  duracion_semanas: parseInt(programaData.duracionSemanas, 10) || 0,
+  dias_entrenamiento: parseInt(programaData.diasEntrenamiento, 10) || 0,
+  dias: programaData.dias, 
+  tipo: programaData.tipo,
+  creador_id: parseInt(creador_id),
+  is_general: true
+};
+{/* ("PAYLOAD FINAL FRONTEND") ELIMINAR ANTES DEL DEPLOY PA QUE NO SE ME OLVIDE*/}
+console.log(
+      "PAYLOAD FINAL (frontend):",
+      JSON.stringify(datosFinales, null, 2)
+    );
     try {
-        const response = await fetch('/entrenamiento/programas/', { 
+        const response = await fetch('http://127.0.0.1:8001/entrenamiento/programas/', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -184,9 +183,28 @@ export default function CrearPrograma( { onClose } ) {
                             </Select>
                         </FormControl>
                         
-                        <TextField name="nivel" label="Nivel (Ej. 1, 2, 3)" type="number" fullWidth margin="normal" onChange={hndlChange} value={programaData.nivel} sx={estiloTexfield} variant="outlined" />
+                        <TextField
+                         name="nivel" 
+                         label="Nivel (Ej. 1, 2, 3)" 
+                         type="number" 
+                         fullWidth margin="normal" 
+                         onChange={hndlChange} 
+                         value={programaData.nivel} 
+                         sx={
+                            estiloTexfield
+                            } 
+                            variant="outlined" />
                         
-                        <TextField name="duracionSemanas" label="Duración (en semanas)" type="number" fullWidth margin="normal" onChange={hndlChange} value={programaData.duracionSemanas} sx={estiloTexfield} variant="outlined" />
+                        <TextField 
+                        name="duracionSemanas" 
+                        label="Duración (en semanas)" 
+                        type="number" 
+                        fullWidth
+                         margin="normal" 
+                        onChange={hndlChange} 
+                        value={programaData.duracionSemanas} 
+                        sx={estiloTexfield} 
+                        variant="outlined" />
                         
                         <FormControl fullWidth margin="normal" sx={estiloTexfield}>
                             <InputLabel id="dias-label">Días de Entrenamiento</InputLabel>
@@ -195,6 +213,24 @@ export default function CrearPrograma( { onClose } ) {
                                 <MenuItem value={4}>4 Días</MenuItem>
                                 <MenuItem value={5}>5 Días</MenuItem>
                                 <MenuItem value={6}>6 Días</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        <FormControl 
+                        fullWidth 
+                        margin="normal" 
+                        sx={estiloTexfield}>
+                            <InputLabel id="tipo-label">
+                            Tipo Programa
+                            </InputLabel>
+                            <Select 
+                            name="tipo" 
+                            value={programaData.tipo} 
+                            onChange={hndlChange} 
+                            labelId="tipo-label" 
+                            sx={{ color: '#fff' }}>
+                                <MenuItem value='base'>Base</MenuItem>
+                                <MenuItem value='complemento'>Complemento</MenuItem>
                             </Select>
                         </FormControl>
                         

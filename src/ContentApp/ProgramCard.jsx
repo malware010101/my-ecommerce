@@ -70,6 +70,7 @@ const ProgramCard = ({ programa, onOpenDeleteDialog, onOpenPreviewDialog, onCard
                             <Typography variant="body2" color="#fff" sx={{ mr: 1,  }}>
                               Nivel: {programa.nivel}
                             </Typography>
+                            
                             </Box>
                             </Box>
                 

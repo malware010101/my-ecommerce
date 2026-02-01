@@ -1,20 +1,26 @@
-import { Box, Button, Container, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Container, Typography,Divider } from "@mui/material";
+import { useState, useEffect } from "react";
 import DlgForm from "../../components/DlgForm";
 import WorkoutForm from "../Workout/WorkoutForm";
 import { useRecoilValue } from 'recoil';
 import { userState, usersDataState } from '../hooks/estadoGlobal';
 import { useNavigate } from 'react-router-dom';
 import ProgramCard from '../ProgramCard'; 
+import api from "../../api";
+import { useAuth } from "../AuthContext";
 
 export default function MiEntrenamiento() {
     const [openDlg, setOpenDlg]= useState(false);
     const usuarioActual = useRecoilValue(userState);
     const allUsers = useRecoilValue(usersDataState);
     const navigate = useNavigate();
+    const [misProgramas, setMisProgramas] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const {obtenerUsuarioActual} = useAuth();
+    const usuario= obtenerUsuarioActual();
 
     const loggedInUser = allUsers.find(user => user.id === usuarioActual.id);
-    const programasDelUsuario = loggedInUser?.programasAsignados || [];
 
     const hndlOpenDlg = () => {
         setOpenDlg(true);
@@ -29,27 +35,51 @@ export default function MiEntrenamiento() {
         hndlCloseDlg();
     };
 
-    const hndlCardNavigate = (programa) => {
-        navigate(`/apptraining/entrenamiento/${programa.id}`);
+    const hndlCardNavigate = (item) => {
+        console.log("ITEM:", item);
+        navigate(`/apptraining/entrenamiento/${item.entrenamiento_id}`);
     };
     
     const workoutFormContent = <WorkoutForm onFormSubmit={hndlFormSubmit} />;
 
+    useEffect(() => {
+    const fetchMisProgramas = async () => {
+        try {
+            const res = await api.get("/entrenamiento/programas/mis-programas");
+            setMisProgramas(res.data);
+        } catch (error) {
+            console.error("Error cargando programas", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchMisProgramas();
+}, []);
+
+if (loading) {
+    return (
+        <Container maxWidth="lg">
+            <Typography color="#ccc">Cargando entrenamiento...</Typography>
+        </Container>
+    );
+}
     return (
         <Container maxWidth="lg">
             <Box sx={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center',
-                mt: 3,
-                p: 2
+                mt: 0,
+                p: 0
             }}>
-                <Typography variant="h4" fontWeight={'bold'} color={'#ccc'} textAlign={'center'}>
-                    ¡Bienvenido a tu entrenamiento!
+                <Typography variant="h5" fontWeight={'bold'} color={'#bbb'}  textAlign={'center'}>
+                    ¡Hola, {usuario?.nombre?.toUpperCase()}! <br />  Bienvenido a tu entrenamiento
                 </Typography>
             </Box>
+            <Divider sx={{ mt: 2, mb: 3 }} />
 
-            {programasDelUsuario.length === 0 ? (
+            {misProgramas.length === 0 ? (
                 <Box sx={{ display: 'column', justifyContent: 'center', alignItems: 'center', mt: 3, borderRadius: '10px ', border: '1px solid #2a2f33', bgcolor: '#000', p: 1, boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)' }}>
                     <Typography variant="h6" color={'#fff'} textAlign={'left'} padding={'10px'}>
                         Para dirigirte a tu plan de entrenamiento, es necesario que respondas el siguiente formulario para conocer tu actividad física y dirigirte al plan adecuado.
@@ -63,9 +93,9 @@ export default function MiEntrenamiento() {
                     </Button>
                 </Box>
             ) : (
-                // Si el usuario SÍ tiene programas, muéstralos en una lista horizontal
+                
                 <Box sx={{ mb: 4 }}>
-                    <Typography variant="h5" color="#ccc" fontWeight="bold">Tus Programas Asignados</Typography>
+                    <Typography variant="h5" color="rgb(0, 204, 255)" fontStyle={'italic'} fontWeight="bold">PROGRAMAS ASIGNADOS</Typography>
                     <Box
                         sx={{
                             display: 'flex',
@@ -77,11 +107,11 @@ export default function MiEntrenamiento() {
                             }
                         }}
                     >
-                        {programasDelUsuario.map(programa => (
+                        {misProgramas?.map((item) => (
                             <ProgramCard 
-                                key={programa.id}
-                                programa={programa}
-                                onCardClick={hndlCardNavigate} // <-- Aquí pasamos la nueva función para navegar
+                                key={item.entrenamiento_id}
+                                programa={item.programa}
+                                onCardClick= {() => hndlCardNavigate(item)} // <-- Aquí pasamos la nueva función para navegar
                             />
                         ))}
                     </Box>

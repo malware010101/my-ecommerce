@@ -2,16 +2,13 @@ import React, { useState } from 'react';
 import {
     Box,
     Button,
-    Card,
-    CardContent,
-    Typography,
     Tabs,
     Tab,
-    IconButton,
     Dialog, 
     DialogContent 
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+
 import DrawerEjercicios from './DrawerEjercicios';
 import DrawerMetodos from './DrawerMetodos';
 import ExerciseCard from '../ExerciseCard';
@@ -23,7 +20,8 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
     const [selectedDay, setSelectedDay] = useState(0);
     const [abrirVideo, setAbrirVideo] = useState(false);
     const [videoUrl, setVideoUrl] = useState('');
-    const dayLabels = Object.keys(dias);
+
+    const dayLabels = dias.map(d => d.dia);
 
     const hndlOpenDrawerEjercicio = () => {
         setDrawerEjercicioOpen(true);
@@ -34,16 +32,16 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
     };
 
     const hndlEjercicioSelect = (exercise) => {
-        const currentDayLabel = dayLabels[selectedDay];
         const newExercise = {
             ...exercise,
             id: Date.now(), 
             type: 'exercise', 
         };
-        const updatedDays = {
-            ...dias,
-            [currentDayLabel]: [...dias[currentDayLabel], newExercise],
-        };
+        const updatedDays = dias.map((day, index) =>
+      index === selectedDay
+        ? { ...day, items: [...day.items, newExercise] }
+        : day
+    );
         onExercisesChange(updatedDays);
         hndlCloseDrawerEjercicio();
     };
@@ -54,11 +52,14 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
 
     
     const hndlDeleteItem = (itemId) => {
-        const currentDayLabel = dayLabels[selectedDay];
-        const updatedItems = dias[currentDayLabel].filter(item => item.id !== itemId);
-        const updatedDays = { ...dias, [currentDayLabel]: updatedItems };
-        onExercisesChange(updatedDays);
-    };
+    const updatedDays = dias.map((day, index) =>
+      index === selectedDay
+        ? { ...day, items: day.items.filter(item => item.id !== itemId) }
+        : day
+    );
+
+    onExercisesChange(updatedDays);
+  };
 
     const hndlVerVideo = (url) => {
         setVideoUrl(url);
@@ -79,16 +80,16 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
     };
 
     const hndlMetodoSelect = (method) => {
-        const currentDayLabel = dayLabels[selectedDay];
         const newMethod = {
             ...method,
             id: Date.now(),
             type: 'method',
         };
-        const updatedDays = {
-            ...dias,
-            [currentDayLabel]: [...dias[currentDayLabel], newMethod],
-        };
+        const updatedDays = dias.map((day, index) =>
+      index === selectedDay
+        ? { ...day, items: [...day.items, newMethod] }
+        : day
+    );
         onExercisesChange(updatedDays);
         hndlCloseDrawerMetodo();
     };
@@ -139,26 +140,32 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
             </Box>
             
             <Box sx={{ mt: 3 }}>
-                {dias[dayLabels[selectedDay]]?.map(item => {
-                    if (item.type === 'method') {
-                        return(
-                            <MethodCard key={item.id}
-                             method={item} 
-                             onDelete={() => hndlDeleteItem(item.id)} 
-                             isDeletable={true} />
-                        );  
-                    } else if (item.type === 'exercise') {
-                        return (
-                            <ExerciseCard 
-                            key={item.id} 
-                            exercise={item} 
-                            onDelete={() => hndlDeleteItem(item.id)}
-                             onShowVideo={hndlVerVideo} isDeletable={true} />
-                        );
-                    }
-                    return null;
-                })}
-            </Box>
+  {dias[selectedDay]?.items.map(item => {
+    if (item.type === 'method') {
+      return (
+        <MethodCard
+          key={item.id}
+          method={item}
+          onDelete={() => hndlDeleteItem(item.id)}
+          isDeletable
+        />
+      );
+    }
+
+    if (item.type === 'exercise') {
+      return (
+        <ExerciseCard
+          key={item.id}
+          exercise={item}
+          onDelete={() => hndlDeleteItem(item.id)}
+          onShowVideo={hndlVerVideo}
+          isDeletable
+        />
+      );
+    }
+    return null;
+  })}
+</Box>
             
             <DrawerEjercicios
                 open={drawerEjercicioOpen}

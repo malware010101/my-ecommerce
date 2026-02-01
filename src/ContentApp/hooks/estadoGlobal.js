@@ -38,17 +38,6 @@ export const userState = atom({
   },
 });
 
-// const initialUsers = [
-//   { id: 'usr_001', nombre: 'mario Ponce', rol: 'usuario', programasAsignados: [] },
-//   { id: 'usr_002', nombre: 'Ana Lopez', rol: 'usuario', programasAsignados: [] },
-//   { id: 'usr_003', nombre: 'Maria Garcia', rol: 'usuario', programasAsignados: [] },
-//   { id: 'usr_004', nombre: 'Lucero Aranzazu', rol: 'pro', programasAsignados: [] },
-//   { id: 'usr_005', nombre: 'Nancy Perez', rol: 'pro', programasAsignados: [] },
-//   { id: 'usr_006', nombre: 'Robe Mendez', rol: 'pro', programasAsignados: [] },
-//   // amdins y coachs
-//   { id: 'adm_001', nombre: 'admin', rol: 'admin', programasAsignados: [] },
-//   { id: 'ch_001', nombre: 'coach', rol: 'coach', programasAsignados: [] },
-// ];
 
 export const usersDataState = atom({
   key: 'usersDataState',

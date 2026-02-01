@@ -33,7 +33,7 @@ export default function HomeApp() {
     const fetchProgramas = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('/entrenamiento/programas/general');
+            const response = await fetch('http://127.0.0.1:8001/entrenamiento/programas/general');
             
             if (response.ok) {
                 const data = await response.json();
@@ -56,7 +56,7 @@ export default function HomeApp() {
     const hndlCardClick = (programa) => {
         if (userRol === 'admin' || userRol === 'coach') {
             hndlOpenAsigancionDlg(programa);
-        } else if (userRol === 'usuario') {
+        } else if (userRol === 'usuario' || userRol === 'pro') {
          hndlOpenAñadirDlg(programa);
         }
     }
@@ -72,22 +72,42 @@ export default function HomeApp() {
         setProgramaAsignar(null);
     }
 
-    const hndlConfirmarAsignacion = (selectedUser) => {
-        if (selectedUser && programaAsignar) {
-            console.log(`Asignando el programa "${programaAsignar.nombre}" a el usuario "${selectedUser.nombre}".`);
+   const hndlConfirmarAsignacion = async (selectedUser) => {
+    if (!selectedUser || !programaAsignar) return;
 
-            const updatedUsers = allUsers.map(user => {
-                if (user.id === selectedUser.id) {
-                    return { ...user, programasAsignados: [...user.programasAsignados, programaAsignar] };
-                }
-                return user;
-            });
+    const token = obtenerTokenActual();
 
-            setAllUsers(updatedUsers); 
-            
-            hndlCloseAsignacionDlg();
+    try {
+        const response = await fetch(
+            'http://127.0.0.1:8001/entrenamiento/programas/asignar',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    programa_id: programaAsignar.id,
+                    usuario_id: selectedUser.id,
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Error al asignar:", data.detail);
+            return;
         }
-    };
+
+        console.log("Programa asignado:", data);
+        hndlCloseAsignacionDlg();
+
+    } catch (error) {
+        console.error("Error de red al asignar programa:", error);
+    }
+};
+
 
     const hndlOpenAñadirDlg = (programa) => {
         setAñadirPrograma(programa);
@@ -99,24 +119,41 @@ export default function HomeApp() {
         setAñadirPrograma(null);
     }
 
-    const hndlConfirmarAñadir = () => {
-        if (añadirPrograma) {
-            const userId= usuarioActual.id;
-            const updatedUsers = allUsers.map(user => {
-                if (user.id === userId) {
-                    return { 
-                        ...user, 
-                        programasAsignados: [...user.programasAsignados, añadirPrograma] 
-                    };
-                }
-                return user;
-            });
-            setAllUsers(updatedUsers); 
-    
-            console.log(`¡Has agregado el programa: ${añadirPrograma.nombre}, con éxito!`);
-            hndlCloseAñadirDlg();
+    const hndlConfirmarAñadir = async () => {
+    if (!añadirPrograma) return;
+
+    const token = obtenerTokenActual();
+
+    try {
+        const response = await fetch(
+            'http://127.0.0.1:8001/entrenamiento/programas/asignar',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    programa_id: añadirPrograma.id,
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Error al añadir programa:", data.detail);
+            return;
         }
-    };
+
+        console.log("Programa añadido al entrenamiento:", data);
+        hndlCloseAñadirDlg();
+
+    } catch (error) {
+        console.error("Error de red al añadir programa:", error);
+    }
+};
+
 
     const hndlOpenPreviewDialog = (programa) => {
         console.log(`[HomeApp] hndlOpenPreviewDialog: programa=${programa ? programa.nombre : 'null'}`);
@@ -164,7 +201,7 @@ export default function HomeApp() {
 
         try {
             // Petición DELETE con el ID y el Token
-            const response = await fetch(`/entrenamiento/programas/${programaId}`, {
+            const response = await fetch(`http://127.0.0.1:8001/entrenamiento/programas/${programaId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${authToken}`, // ¡TOKEN REQUERIDO!
@@ -199,11 +236,11 @@ export default function HomeApp() {
             <Typography variant="h4" color="#fff" mb={4} mt={2} textAlign="center" fontWeight="bold">¡Bienvenido a REPS!</Typography>
             <Box sx={{ display: 'column', justifyContent: 'center', alignItems: 'center', mt: 3,mb: 10, borderRadius: '10px ', border: '1px solid #2a2f33',bgcolor: '#000', p: 1, boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)'
                    }}>
-            <Typography color="#bbb" mb={10} mt={2} textAlign="center">Aqui encontraras programas de entrenamiento para diferentes objetivos, niveles, fuerza e intensidad, clases de abdomen, clases funcionales, entrenamientos metabolicos, videos y mucho mas.<br></br><br></br> Responde el <strong>cuestionario </strong>en tu seccion de <strong>ENTRENAMIENTO</strong>, para que nuestro algoritmo te asigne un plan de entrenamiento adecuado para ti y si el programa asignado no te gusta, puedes cambiarlo en calquier momento o solicitar ayuda en nuestro chat para asignarte el programa que se adapte mejor a tus necesidades. <br></br>Cada programa es parte de un macrociclo de entrenamiento y a sido desarrollado a base de fundamentos biomecanicos, años de experiencia y estudios.<br></br> Seguiremos actulizando programas, clases y contenido para ti.<br></br><br></br>Acompaña tu entrenamiento con tu plan alimenticio en la seccion de <strong> NUTRICION</strong> para obtener los mejores resultados.<br></br> <br></br>En caso de ser usuario de suscripcion <strong>PRO</strong>, en tu seccion de entrenamiento, tendras la opcion de agendar tu sesion de consulta online con el coach, para personalizarte un programa de entrenamiento y nutricion, <strong>exclusivo</strong> para ti.</Typography>
+            <Typography variant="body2"  textAlign={'left'} padding={'10px'} fontStyle={'italic'} color={'#bbb'}>Aqui encontraras programas de entrenamiento para diferentes objetivos, niveles, fuerza e intensidad, clases de abdomen, clases funcionales, entrenamientos metabolicos, videos y mucho mas.<br></br><br></br> Responde el <strong>cuestionario </strong>en tu seccion de <strong>ENTRENAMIENTO</strong>, para que nuestro algoritmo te asigne un plan de entrenamiento adecuado para ti y si el programa asignado no te gusta, puedes cambiarlo en calquier momento o solicitar ayuda en nuestro chat para asignarte el programa que se adapte mejor a tus necesidades. <br></br>Cada programa es parte de un macrociclo de entrenamiento y a sido desarrollado a base de fundamentos biomecanicos, años de experiencia y estudios. Seguiremos actulizando programas, clases y contenido para ti.<br></br><br></br>Acompaña tu entrenamiento con tu plan alimenticio en la seccion de <strong> NUTRICION</strong> para obtener los mejores resultados.<br></br> <br></br>En caso de ser usuario de suscripcion <strong>PRO</strong>, en tu seccion de entrenamiento, tendras la opcion de agendar tu sesion de consulta online con el coach, para personalizarte un programa de entrenamiento <strong>EXCLUSIVO </strong> para ti, adapptado a tus objetivos y preferencias.</Typography>
             </Box>
             <Typography variant="h4" color="#ccc" mb={4} mt={4} textAlign="center" fontWeight="bold">PROGRAMAS DE ENTRENAMIENTO</Typography>
             {Object.keys(programasPorObjetivo).length === 0 ? (
-                <Typography color="#bbb" textAlign="center">Aún no hay programas creados. ¡Crea uno!</Typography>
+                <Typography color="#bbb" textAlign="center" mb= {10}>Aún no hay programas creados, espera pronto para ver los programas disponibles. </Typography>
             ) : (
                 Object.keys(programasPorObjetivo).map(objetivo => (
                     <Box key={objetivo} mb={4}>
