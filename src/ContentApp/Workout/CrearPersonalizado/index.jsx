@@ -17,7 +17,7 @@ import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import CrearEjercicio from '../CrearEjercicio';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { usersDataState } from '../../hooks/estadoGlobal';
-import api from '../../api';
+import api from '../../../api';
 import { useAuth } from '../../AuthContext';
 
 export default function CrearPersonalizado( { onClose } ) {
