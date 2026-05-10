@@ -128,20 +128,20 @@ console.log(
     const estiloTexfield = {
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
-                borderColor: 'rgb(0, 204, 255)', 
+                borderColor: '#1f1f1fff',
                 borderRadius: '10px',
             },
             '&:hover fieldset': {
-                borderColor: 'rgb(0, 204, 255)', 
+                borderColor: 'rgb(0, 204, 255)',
             },
             '&.Mui-focused fieldset': {
-                borderColor: 'rgb(0, 204, 255)', 
+                borderColor: 'rgb(0, 204, 255)',
             },
-            backgroundColor: 'transparent', 
-            color: '#fff', 
+            backgroundColor: 'transparent',
+            color: '#fff',
         },
         '& .MuiInputBase-input': { color: '#fff' },
-        '& .MuiInputLabel-root': { color: '#bbb' },
+        '& .MuiInputLabel-root': { color: '#888' },
         '& .MuiInputLabel-root.Mui-focused': { color: 'rgb(0, 204, 255)' }
     };
 

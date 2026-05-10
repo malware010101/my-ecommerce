@@ -3,24 +3,48 @@ import { Box, Typography, Tabs, Tab, Card, CardContent, IconButton } from '@mui/
 import { Dialog, DialogContent } from '@mui/material';
 import ExerciseCard from '../ExerciseCard';
 import MethodCard from '../MethodCard';
+import api from '../../api';
 
 export default function ProgramPreview({ programa }) {
   const [value, setValue] = React.useState(0);
   const [abrirVideo, setAbrirVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
+  const [videoError, setVideoError] = useState('');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const hndlVerVideo = (url) => {
-    setVideoUrl(url);
+  const hndlVerVideo = async (videoId) => {
+  if (!videoId) {
+    setVideoError('Este ejercicio no tiene video disponible');
     setAbrirVideo(true);
+    return;
+  }
+
+  try {
+    const res = await api.get(`/videos/${videoId}/stream`);
+
+    if (!res.data?.embed_url) {
+      setVideoError('Este ejercicio no tiene video disponible');
+      setAbrirVideo(true);
+      return;
+    }
+
+    setVideoError('');
+    setVideoUrl(res.data.embed_url);
+    setAbrirVideo(true);
+  } catch (err) {
+    console.error(err);
+    setVideoError('Este ejercicio no tiene video disponible');
+    setAbrirVideo(true);
+  }
 };
 
 const hndlCloseVideo = () => {
     setAbrirVideo(false);
     setVideoUrl('');
+    setVideoError('');
 };
 
   return (
@@ -55,13 +79,13 @@ const hndlCloseVideo = () => {
           }}
         >
           {programa.dias?.map((dia, index) => (
-            <Tab label={dia} key={index} />
+            <Tab label={dia.dia} key={index} />
           ))}
         </Tabs>
       </Box>
 
       <Box sx={{ mt: 3 }}>
-          {programa.dias[Object.keys(programa.dias)[value]]?.map(item => {
+          {programa.dias[value]?.items.map(item => {
               if (item.type === 'method') {
                   return (
                       <MethodCard
@@ -80,25 +104,55 @@ const hndlCloseVideo = () => {
           })}
         </Box>
         <Dialog
-            open={abrirVideo}
-            onClose={hndlCloseVideo} 
-            maxWidth="xs"
-            fullWidth
+          open={abrirVideo}
+          onClose={hndlCloseVideo} 
+          maxWidth="xs"
+          fullWidth
             sx={{
-                '& .MuiDialog-paper': { bgcolor: '#000', borderRadius: '10px' }
-            }}
+              '& .MuiDialog-paper': { bgcolor: '#000', borderRadius: '10px' }
+                }}
         >
-            <DialogContent>
-                <video
-                    src={videoUrl || null} 
-                    controls
-                    muted
-                    autoPlay
-                    loop
-                    style={{ width: '100%', height: 'auto', borderRadius: '10px', display: 'block' }} 
-                />
+            <DialogContent
+              sx={{ p: 0 }}>
+                {videoError ? (
+                  <Typography
+                  backgroundColor="#000"
+        color="#bbb"
+        textAlign="center"
+        sx={{ 
+          py: 4,
+        borderColor: 'rgb(0, 204, 255)',
+        borderStyle: 'solid',
+        borderWidth: '0.5px',
+        borderRadius: '15px' }}
+      >
+        {videoError}
+      </Typography>
+                ): (
+              <Box sx={{ 
+                 position: 'relative', 
+                 paddingTop: '56.25%',
+                 aspectRatio: '9/16',
+                 backgroundColor: '#000'
+                        }}>
+            <iframe
+                src={videoUrl}
+                loading="lazy"
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                allowFullScreen
+                  style={{
+                      border: 0,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      }}
+             />
+                </Box>
+              )}
             </DialogContent>
-        </Dialog>
+        </Dialog>   
       
     </Box>
      

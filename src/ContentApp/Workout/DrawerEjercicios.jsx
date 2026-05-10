@@ -13,14 +13,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon, Search as SearchIcon } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import dominadasLibresVideo from '/src/assets/Videos/dominadas_libres.MP4?url';
-import elevacionFrontalLigaVideo from '/src/assets/Videos/elevacion_frontal_liga.MP4?url';
-import fondosLibresVideo from '/src/assets/Videos/fondos_libres.MP4?url';
-import jalonUnilateralVideo from '/src/assets/Videos/jalon_unilateral.MP4?url';
-import elevacionLateralLigaVideo from '/src/assets/Videos/elevacion_lateral_liga.MP4?url';
-import elevacionLateralFrontalLigaVideo from '/src/assets/Videos/elevacion_lateral_frontal_liga.MP4?url';
-import remoInclinadoMaquinaVideo from '/src/assets/Videos/remo_inclinado_maquina.MP4?url';
-import remoInclinadoUnilateralMaquinaVideo from '/src/assets/Videos/remo_inclinado_unilateral_maquina.MP4?url';
+import { ejercicios } from './Data/Ejercicios';
 
 // Componente de tarjeta individual para la librería
 const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
@@ -60,6 +53,7 @@ const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
                     <IconButton
                         size="small"
                         sx={{ color: 'rgb(0, 204, 255)' }}
+                        /// videoUrl es el videoId de bunny, no el url real, por logica anterior asi lo deje con ese nombre
                         onClick={() => onShowVideo(exercise.videoUrl)}
                     >
                         <VisibilityIcon/>
@@ -69,18 +63,6 @@ const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
         </Card>
     );
 };
-
-// ejercicios temporales
-const ejercicios = [
-    { id: "1", nombre: 'Dominadas Libres', videoUrl: dominadasLibresVideo },
-    { id: "2", nombre: 'Elevacion Frontal Con Liga',videoUrl: elevacionFrontalLigaVideo },
-    { id: "3", nombre: 'Elevacion Lateral Con Liga', videoUrl: elevacionLateralLigaVideo },
-    { id: "4", nombre: 'Jalon Unilateral En Maquina', videoUrl: jalonUnilateralVideo },
-    { id: "5", nombre: 'Fondos Libres',videoUrl: fondosLibresVideo },
-    { id: "6", nombre: 'Elevacion Lateral Frontal Con Liga',videoUrl: elevacionLateralFrontalLigaVideo },
-    { id: "7", nombre: 'Remo Inclinado Con Maquina', videoUrl: remoInclinadoMaquinaVideo },
-    { id: "8", nombre: 'Remo Inclinado Unilateral Con Maquina', videoUrl: remoInclinadoUnilateralMaquinaVideo },
-];
 
 export default function DrawerEjercicios({ open, onClose, onSelectExercise, onShowVideo }) {
     const [searchTerm, setSearchTerm] = useState('');

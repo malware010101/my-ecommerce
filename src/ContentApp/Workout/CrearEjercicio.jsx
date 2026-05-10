@@ -13,6 +13,7 @@ import DrawerEjercicios from './DrawerEjercicios';
 import DrawerMetodos from './DrawerMetodos';
 import ExerciseCard from '../ExerciseCard';
 import MethodCard from '../MethodCard';
+import api from '../../api';
 
 export default function CrearEjercicio({ dias, onExercisesChange }) {
     const [drawerEjercicioOpen, setDrawerEjercicioOpen] = useState(false);
@@ -61,15 +62,22 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
     onExercisesChange(updatedDays);
   };
 
-    const hndlVerVideo = (url) => {
-        setVideoUrl(url);
-        setAbrirVideo(true);
-    };
+    const hndlVerVideo = async (videoId) => {
+  try {
+      const res = await api.get(`/videos/${videoId}/stream`);
+      setVideoUrl(res.data.embed_url);
+      setAbrirVideo(true);
+  } catch (err) {
+      console.error('Error al obtener el video', err);
+  }
+};
 
-    const hndlCloseVideo = () => {
-        setAbrirVideo(false);
-      setVideoUrl('');
-    };
+
+const hndlCloseVideo = () => {
+  setAbrirVideo(false);
+  setVideoUrl('');
+};
+
     
     const hndlOpenDrawerMetodo = () => {
         setDrawerMetodoOpen(true);
@@ -93,6 +101,7 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
         onExercisesChange(updatedDays);
         hndlCloseDrawerMetodo();
     };
+
 
     return (
         <Box>
@@ -189,15 +198,29 @@ export default function CrearEjercicio({ dias, onExercisesChange }) {
                     '& .MuiDialog-paper': { bgcolor: '#000', borderRadius: '10px' }
                 }}
             >
-                <DialogContent>
-                    <video
-                        src={videoUrl || null} 
-                        controls
-                        muted
-                        autoPlay
-                        loop
-                        style={{ width: '100%', height: 'auto', borderRadius: '10px', display: 'block' }} 
+                <DialogContent
+                 sx={{ p: 0 }}>
+                   <Box sx={{ 
+                    position: 'relative', 
+                    paddingTop: '56.25%',
+                    aspectRatio: '9/16',
+                    backgroundColor: '#000'
+                    }}>
+                       <iframe
+                         src={videoUrl}
+                         loading="lazy"
+                         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                         allowFullScreen
+                         style={{
+                           border: 0,
+                           position: 'absolute',
+                           top: 0,
+                           left: 0,
+                           width: '100%',
+                           height: '100%',
+                      }}
                     />
+                  </Box>
                 </DialogContent>
             </Dialog>   
         </Box>

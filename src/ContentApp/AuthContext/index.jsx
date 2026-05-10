@@ -41,9 +41,17 @@ export const AuthProvider = ({ children }) => {
       token: data.access_token,
       userId: data.user_id,
       rol: data.rol,
-      nombre: data.nombre // Asumimos que el backend devuelve 'nombre'
+      nombre: data.nombre,
+      tiene_anamnesis: data.tiene_anamnesis
     });
   };
+
+  const updateUser = (newData) => {
+  setAuthData((prev) => ({
+    ...prev,
+    ...newData
+  }));
+};
 
   // Cierra sesión
   const logout = () => {
@@ -57,7 +65,8 @@ export const AuthProvider = ({ children }) => {
   const obtenerUsuarioActual = () => ({
       id: authData?.userId,
       rol: authData?.rol,
-      nombre: authData?.nombre
+      nombre: authData?.nombre,
+      tiene_anamnesis: authData?.tiene_anamnesis
   });
   
   const isAuthenticated = !!authData?.token;
@@ -69,7 +78,8 @@ export const AuthProvider = ({ children }) => {
       login, // Usado en el componente Login
       logout, // Usado en el botón de cerrar sesión
       obtenerTokenActual, // Usado en fetch requests (CrearPrograma, HomeApp)
-      obtenerUsuarioActual // Usado en fetch requests (CrearPrograma, HomeApp)
+      obtenerUsuarioActual, // Usado en fetch requests (CrearPrograma, HomeApp)
+      updateUser
     }}>
       {children}
     </AuthContext.Provider>

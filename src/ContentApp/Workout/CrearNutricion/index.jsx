@@ -10,56 +10,72 @@ import {
     Typography,
     Container,
     Autocomplete,
-    Grid,
-    Tabs,
-    Tab,
-    Card,
-    CardContent,
-    CircularProgress, 
     RadioGroup,
     FormControlLabel,
     Radio
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { usersDataState } from '../../hooks/estadoGlobal';
-import { v4 as uuidv4 } from 'uuid';
 import NutriViewer from '../../NutriViewer';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSnackbar } from "notistack";
+import api from "../../../api";
+import useUsers from '../../hooks/useUsers';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function CrearNutricion({ onClose, selfMode = false, currentUser = null, onSaved = null }) {
-    const allUsers = useRecoilValue(usersDataState);
-    const setAllUsers = useSetRecoilState(usersDataState);
-    const usersPro = allUsers.filter(user => user.rol === 'pro');
+  
+    const { data: users = [], isLoading } = useUsers();
+    const usersPro = users.filter(user => user.rol === 'pro');
     const [planData, setPlanData] = useState(null);
     const [tabValue, setTabValue] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
     const [explicacionComidas, setExplicacionComidas] = useState('');
     const [mensajeComidas, setMensajeComidas] = useState("");
 
+    const { enqueueSnackbar } = useSnackbar();
+    const queryClient = useQueryClient();
 
+    //Mutate para generar el plan nutricional
+    const generateMutation = useMutation({
+  mutationFn: async (payload) => {
+    const res = await api.post("/nutricion/plan", payload);
+    return res.data;
+  },
+  onSuccess: (data) => {
+    setPlanData(data);
+  },
+  onError: (error) => {
+    alert(error.response?.data?.detail || "Error al generar plan");
+  }
+});
 
-    useEffect(() => {
-    const fetchUsers = async () => {
-        try {
-            const response = await fetch('http://127.0.0.1:8001/auth/users');
-
-            if (!response.ok) {
-                throw new Error('Error al cargar los usuarios desde la API');
-            }
-
-            const data = await response.json();
-
-            setAllUsers(data);
-
-        } catch (error) {
-            console.error("Error al cargar la lista de usuarios:", error);
-        }
-    };
-
-    if (allUsers.length === 0) {
-        fetchUsers();
+//muate para guardar el plan
+const saveMutation = useMutation({
+  mutationFn: async (payload) => {
+    const res = await api.post("/nutricion/plan/guardar", payload);
+    return res.data;
+  },
+  onSuccess: async (_, variables) => {
+    try {
+      const notiSound = new Audio('/sounds/success.mp3');
+      await notiSound.play();
+    } catch (err) {
+      console.log("Error al reproducir el sonido:", err);
     }
-}, [allUsers.length, setAllUsers]);
+    enqueueSnackbar("Plan guardado correctamente", { variant: "success" });
+
+    // invalidar SOLO el usuario afectado
+    queryClient.invalidateQueries(["planNutricional", variables.usuario_id]);
+
+    onSaved?.();
+    onClose?.();
+  },
+  onError: (error) => {
+    enqueueSnackbar(
+      error.response?.data?.detail || "Error al guardar plan",
+      { variant: "error" }
+    );
+  }
+});
 
     const [step, setStep] = useState(1);
     const [nutricionData, setNutricionData] = useState({
@@ -73,7 +89,7 @@ export default function CrearNutricion({ onClose, selfMode = false, currentUser 
         enfermedades: [],
         tipoDieta: '',
         alergias: '',
-        comidas: 0,
+        comidas: '',
         horarioEntrenamiento: ''
     });
 
@@ -87,13 +103,70 @@ export default function CrearNutricion({ onClose, selfMode = false, currentUser 
         }
     }, [selfMode, currentUser]);
 
-    const hndlChange = (e) => {
-        const { name, value } = e.target;
-        setNutricionData({ ...nutricionData, [name]: value });
-        if (name === "comidas") {
-    setNutricionData({ ...nutricionData, comidas: Number(value) });
+const hndlChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === 'edad') {
+        const soloNumeros = value.replace(/\D/g, "").slice(0, 2);
+        setNutricionData(prev => ({
+            ...prev,
+            edad: soloNumeros
+        }));
+        return;
+    }
+
+    if (name === 'altura') {
+        const soloNumeros = value.replace(/\D/g, "").slice(0, 3);
+        setNutricionData(prev => ({
+            ...prev,
+            altura: soloNumeros
+        }));
+        return;
+    }
+
+    if (name === 'peso') {
+    const limpio = value.replace(",", "."); // permitir coma también
+
+    if (/^\d*\.?\d*$/.test(limpio)) {
+        setNutricionData(prev => ({
+            ...prev,
+            peso: limpio
+        }));
+    }
+    return;
+    }
+
+    if (name === "enfermedades") {
+       let newValue = typeof value === "string" ? value.split(",") : value;
+
+    if (newValue.includes("Ninguna") && newValue.length > 1) {
+    newValue = ["Ninguna"];
+    }
+
+  setNutricionData(prev => ({
+    ...prev,
+    enfermedades: newValue
+  }));
+  return;
 }
-    };
+
+   if (name === "comidas") {
+        const numero = Number(value);
+
+        setNutricionData(prev => ({
+            ...prev,
+            comidas: numero
+        }));
+
+        setMensajeComidas(mensajes[numero] || "");
+        return;
+    }
+
+    setNutricionData(prev => ({
+        ...prev,
+        [name]: value
+    }));
+};
 
     const hndlNextStep = (e) => {
         e.preventDefault();
@@ -107,9 +180,28 @@ export default function CrearNutricion({ onClose, selfMode = false, currentUser 
             !nutricionData.comidas ||
             !nutricionData.horarioEntrenamiento ||
             !nutricionData.objetivo) {
-            alert('Por favor, completa todos los campos del formulario.');
+            enqueueSnackbar("Por favor, complete todos los campos del formulario", { variant: "warning" });
             return;
         }
+        const altura = parseInt(nutricionData.altura, 10);
+        const edad = parseInt(nutricionData.edad, 10);
+        const peso = parseFloat(nutricionData.peso);
+
+    if (altura < 120 || altura > 230) {
+        enqueueSnackbar("Ingresa una altura válida (120 - 230 cm)", { variant: "warning" });
+        return;
+    }
+
+    if (edad < 12 || edad > 99) {
+        enqueueSnackbar("Ingresa una edad válida (12 - 99 años)", { variant: "warning" });
+        return;
+    }
+
+    if (isNaN(peso) || peso < 30 || peso > 300) {
+    enqueueSnackbar("Ingresa un peso válido (30 - 300 kg)", { variant: "warning" });
+    return;
+    }
+
 
         setStep(2);
     };
@@ -118,110 +210,68 @@ export default function CrearNutricion({ onClose, selfMode = false, currentUser 
         setTabValue(newValue);
     };
 
-        const hndlGeneratePlan = async () => {
-        setIsLoading(true);
-        try {
-            const { usuarioAsignado, alergias, ...restoData } = nutricionData;
+const hndlGeneratePlan = () => {
+  const { usuarioAsignado, alergias, ...restoData } = nutricionData;
 
-            // Determinar id del usuario objetivo: si selfMode usamos currentUser
-            const usuarioIdAsignado = selfMode ? currentUser?.id : usuarioAsignado?.id;
+  const usuarioIdAsignado = selfMode
+    ? currentUser?.id
+    : usuarioAsignado?.id;
 
-            if (!usuarioIdAsignado) {
-                throw new Error('No se ha seleccionado un usuario válido para asignar el plan.');
-            }
+  if (!usuarioIdAsignado) {
+    alert("Usuario inválido");
+    return;
+  }
 
-            const alergiasList = alergias && typeof alergias === 'string' && alergias.trim() !== '' 
-                ? alergias.split(',').map(a => a.trim()) 
-                : [];
+  const alergiasList =
+    alergias && alergias.trim() !== ""
+      ? alergias.split(",").map(a => a.trim())
+      : [];
 
-            const finalPayload = {
-                usuarioIdAsignado,
-                alergias: alergiasList,
-                ...restoData,
-                peso: parseFloat(restoData.peso),
-                altura: parseFloat(restoData.altura),
-                edad: parseInt(restoData.edad, 10),
-            };
-            console.log("Final Payload:", finalPayload);
+  const finalPayload = {
+    usuarioIdAsignado,
+    alergias: alergiasList,
+    ...restoData,
+    peso: parseFloat(restoData.peso),
+    altura: parseFloat(restoData.altura),
+    edad: parseInt(restoData.edad, 10),
+  };
+  console.log("Final Payload:", finalPayload);
 
-            const response = await fetch('http://127.0.0.1:8001/nutricion/plan', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(finalPayload),
-            });
+  generateMutation.mutate(finalPayload);
+};
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(()=>null);
-                console.error("Detalle del error de la API:", errorData?.detail);
-                throw new Error(errorData?.detail || 'Error al enviar los datos a la API');
-            }
+    
+const hndlSavePlan = () => {
+  if (!planData || (!nutricionData.usuarioAsignado && !selfMode)) {
+    alert("No hay un plan generado para guardar.");
+    return;
+  }
 
-            const data = await response.json();
-            setPlanData(data);
+  const { usuarioAsignado, ...datosLimpios } = nutricionData;
 
-        } catch (error) {
-            console.error("Hubo un error al generar el plan:", error);
-            alert(`Error: ${error.message}.`);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  const usuarioIdFinal = selfMode
+    ? currentUser.id
+    : usuarioAsignado.id;
 
-const hndlSavePlan = async () => {
-        if (!planData || (!nutricionData.usuarioAsignado && !selfMode)) {
-            alert("No hay un plan generado para guardar.");
-            return;
-        }
+  const payload = {
+    usuario_id: usuarioIdFinal,
+    calorias_diarias: planData.calorias_diarias,
+    macronutrientes: planData.macronutrientes,
+    opciones_menu: planData.opciones_menu,
+    datos_recibidos: {
+      ...datosLimpios,
+      usuarioIdAsignado: usuarioIdFinal
+    }
+  };
 
-        const { usuarioAsignado, ...datosLimpios } = nutricionData;
-
-        try {
-            const payload = {
-                usuario_id: selfMode ? currentUser.id : usuarioAsignado.id,
-                calorias_diarias: planData.calorias_diarias,
-                macronutrientes: planData.macronutrientes,
-                opciones_menu: planData.opciones_menu,
-                datos_recibidos: {
-                    ...datosLimpios,
-                    usuarioIdAsignado: selfMode ? currentUser.id : usuarioAsignado.id
-                }
-            };
-
-            const response = await fetch("http://127.0.0.1:8001/nutricion/plan/guardar",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
-
-            if (!response.ok) {
-                const error = await response.json().catch(()=>null);
-                throw new Error(error?.detail || "Error al guardar el plan");
-            }
-
-            const data = await response.json();
-
-            alert("Plan nutricional guardado correctamente");
-
-            // Notificar al padre que se guardó para que refresque
-            onSaved?.();
-
-            onClose?.();
-
-        } catch (error) {
-            console.error("Error al guardar el plan:", error);
-            alert(error.message || 'Error al guardar');
-        }
-    };
+  saveMutation.mutate(payload);
+};
 
 
     const estiloTexfield = {
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
-                borderColor: 'rgb(0, 204, 255)',
+                borderColor: '#1f1f1fff',
                 borderRadius: '10px',
             },
             '&:hover fieldset': {
@@ -234,7 +284,7 @@ const hndlSavePlan = async () => {
             color: '#fff',
         },
         '& .MuiInputBase-input': { color: '#fff' },
-        '& .MuiInputLabel-root': { color: '#bbb' },
+        '& .MuiInputLabel-root': { color: '#888' },
         '& .MuiInputLabel-root.Mui-focused': { color: 'rgb(0, 204, 255)' }
     };
 
@@ -249,17 +299,17 @@ const hndlSavePlan = async () => {
     const enfermedadesOpciones = ['Ninguna', 'Diabetes tipo 2', 'Hipertensión', 'Resistencia a la insulina'];
     const tipoDietaOpciones = ['Normal'];
     const comidasPorDiaOpciones = [
-    { value: 3, label: "3 comidas (recomendado)" },
-    { value: 4, label: "4 comidas" },
+    { value: 3, label: "3 comidas " },
+    { value: 4, label: "4 comidas (recomendado)" },
     { value: 5, label: "5 comidas" },
     { value: 6, label: "6 comidas (solo atletas)" }
 ];
 
 const mensajes = {
     3: "Recomendado para la mayoría de usuarios. Facilita la adherencia.",
-    4: "Buena opción si entrenas moderado o tienes disponibilidad de tiempo para cocinar.",
-    5: "Recomendado si entrenas intenso, tu objetivo es hipertrofia o tienes disponibilidad de tiempo para cocinar.",
-    6: "6 comidas solo es recomendable si eres atleta o entrenas muy intenso."
+    4: "Buena opción si entrenas moderado y tienes disponibilidad de tiempo para cocinar.",
+    5: "Recomendado si tu objetivo es hipertrofia y tienes disponibilidad de tiempo para cocinar.",
+    6: "6 comidas solo es recomendable si eres atleta"
 };
 
 
@@ -281,6 +331,7 @@ const mensajes = {
     <Autocomplete
         options={usersPro}
         getOptionLabel={(option) => option.nombre}
+        loading={isLoading}
         onChange={(event, newValue) => {
             setNutricionData(prev => ({ ...prev, usuarioAsignado: newValue }));
         }}
@@ -290,13 +341,54 @@ const mensajes = {
                 label="Seleccionar Usuario"
                 variant="outlined"
                 sx={{ ...estiloTexfield, mb: 2 }}
+                InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                        <>
+                            {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                        </>
+                    ),
+                }}
             />
         )}
     />
 )}
-                        <TextField name="peso" label="Peso (kg)" type="tel" fullWidth margin="normal" onChange={hndlChange} value={nutricionData.peso} sx={estiloTexfield} />
-                        <TextField name="altura" label="Altura (cm)" type="tel" fullWidth margin="normal" onChange={hndlChange} value={nutricionData.altura} sx={estiloTexfield} />
-                        <TextField name="edad" label="Edad" type="tel" fullWidth margin="normal" onChange={hndlChange} value={nutricionData.edad} sx={estiloTexfield} />
+                        <TextField 
+                             name="peso" 
+                             label="Peso (kg)" 
+                             type="tel" 
+                             fullWidth
+                             margin="normal"
+                             onChange={hndlChange} 
+                             value={nutricionData.peso}
+                             sx={estiloTexfield} 
+                             inputProps={{ inputMode: "decimal" }}
+                        />
+                        <TextField 
+                             name="altura" 
+                             label="Altura (cm)" 
+                             placeholder="Ej: 160"
+                             type="tel" 
+                             fullWidth 
+                             margin="normal" 
+                             onChange={hndlChange} 
+                             value={nutricionData.altura} 
+                             sx={estiloTexfield} 
+                             inputProps={{ maxLength: 3, inputMode: "numeric" }}
+                        />
+                        <TextField 
+                             name="edad" 
+                             label="Edad" 
+                             type="tel" 
+                             placeholder="Ej: 25"
+                             fullWidth 
+                             margin="normal" 
+                             onChange={hndlChange} 
+                             value={nutricionData.edad} 
+                             sx={estiloTexfield} 
+                             inputProps={{ maxLength: 2, inputMode: "numeric" }} 
+                        />
                         <FormControl fullWidth margin="normal" sx={estiloTexfield}>
                             <InputLabel id="genero-label">Género</InputLabel>
                             <Select name="genero" value={nutricionData.genero} onChange={hndlChange} labelId="genero-label" sx={{ color: '#fff' }}>
@@ -413,7 +505,7 @@ const mensajes = {
                 ) : (
                     <Box sx={{ bgcolor: '#000', p: 2 }}>
                         
-                        {isLoading ? (
+                        {generateMutation.isPending ? (
                             <Box sx={{ p: 4, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Typography color="#fff" variant="h6">
                                     Calculando macronutrientes y elaborando el plan alimenticio...
@@ -434,8 +526,9 @@ const mensajes = {
                                         <Button
                                             onClick={hndlSavePlan}
                                             variant="contained"
+                                            disabled={saveMutation.isPending}
                                             sx={{ ...estiloTexfield, bgcolor: 'rgb(0, 204, 255)', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
-                                            Guardar Plan
+                                            {saveMutation.isPending ? <CircularProgress size={24} /> : 'Guardar Plan'}
                                         </Button>
                                     </Box>
                                 </>
@@ -454,14 +547,14 @@ const mensajes = {
                                         <Button 
                                             onClick={hndlGeneratePlan} 
                                             variant="contained" 
-                                            disabled={isLoading} 
+                                            disabled={generateMutation.isPending} 
                                             sx={{ 
                                                 bgcolor: 'rgb(0, 204, 255)', 
                                                 color: '#fff', 
                                                 fontWeight: 'bold', 
                                                 '&:hover': { bgcolor: 'rgb(0, 153, 204)' }
                                             }}>
-                                            {isLoading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Generar Plan'}
+                                            {generateMutation.isPending ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Generar Plan'}
                                         </Button>
                                     </Box>
                                 </Box>

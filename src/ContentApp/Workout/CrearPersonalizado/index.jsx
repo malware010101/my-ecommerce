@@ -19,21 +19,23 @@ import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { usersDataState } from '../../hooks/estadoGlobal';
 import api from '../../../api';
 import { useAuth } from '../../AuthContext';
+import useUsers from '../../hooks/useUsers';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 export default function CrearPersonalizado( { onClose } ) {
-    const setAllUsers = useSetRecoilState(usersDataState); 
-    const allUsers = useRecoilValue(usersDataState); 
+
+    const { data: users = [], isLoading } = useUsers();
+    const usersPro = users.filter(user => user.rol === 'pro');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const { obtenerUsuarioActual } = useAuth();
     const { id: creador_id } = obtenerUsuarioActual();
+
 
     const showSnackbar = (message, severity = 'success') => {
         setSnackbar({ open: true, message, severity });
     };
 
-
-
-    const usersPro = allUsers.filter(user => user.rol === 'pro');
 
     const [step, setStep] = useState(1);
     const [programaData, setProgramaData] = useState({
@@ -63,10 +65,14 @@ export default function CrearPersonalizado( { onClose } ) {
             return;
         }
 
-        const nuevosDias = {};
-        for (let i = 1; i <= parseInt(programaData.diasEntrenamiento); i++) {
-            nuevosDias[`Día ${i}`] = [];
-        }
+        const nuevosDias = [];
+
+for (let i = 1; i <= Number(programaData.diasEntrenamiento); i++) {
+  nuevosDias.push({
+    dia: `Día ${i}`,
+    items: []
+  });
+}
         setProgramaData(prev => ({ ...prev, dias: nuevosDias }));
         setStep(2);
     };
@@ -124,20 +130,20 @@ export default function CrearPersonalizado( { onClose } ) {
     const estiloTexfield = {
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
-                borderColor: 'rgb(0, 204, 255)', 
+                borderColor: '#1f1f1fff',
                 borderRadius: '10px',
             },
             '&:hover fieldset': {
-                borderColor: 'rgb(0, 204, 255)', 
+                borderColor: 'rgb(0, 204, 255)',
             },
             '&.Mui-focused fieldset': {
-                borderColor: 'rgb(0, 204, 255)', 
+                borderColor: 'rgb(0, 204, 255)',
             },
-            backgroundColor: 'transparent', 
-            color: '#fff', 
+            backgroundColor: 'transparent',
+            color: '#fff',
         },
         '& .MuiInputBase-input': { color: '#fff' },
-        '& .MuiInputLabel-root': { color: '#bbb' },
+        '& .MuiInputLabel-root': { color: '#888' },
         '& .MuiInputLabel-root.Mui-focused': { color: 'rgb(0, 204, 255)' }
     };
 
@@ -158,6 +164,7 @@ export default function CrearPersonalizado( { onClose } ) {
                     <Box component="form" onSubmit={hndlNextStep}>
                         <Autocomplete
                         options={usersPro}
+                        loading={ isLoading}
                         getOptionLabel={(option) => option.nombre}
                         onChange={(event, newValue) => {
                             setProgramaData(prev => ({ ...prev, usuarioAsignado: newValue }));
@@ -168,6 +175,15 @@ export default function CrearPersonalizado( { onClose } ) {
                                 label="Seleccionar Usuario"
                                 variant="outlined"
                                 sx={{ ...estiloTexfield, mb: 2 }}
+                                InputProps={{
+                                  ...params.InputProps,
+                                    endAdornment: (
+                                        <>
+                                          {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                                          {params.InputProps.endAdornment}
+                                        </>
+                                            ),
+                                        }}
                             />
                         )}
                     />

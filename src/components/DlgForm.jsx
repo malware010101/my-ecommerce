@@ -1,32 +1,52 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, IconButton, Box } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
-export default function DlgForm({ open, onClose, title, content, buttonText, onConfirm }) {
+export default function DlgForm({ open, onClose, title, children, disableEscapeKeyDown, ...props }) {
+
+   
     return (
-        <Dialog open={open} onClose={onClose} sx={{
-            '& .MuiDialog-paper': {
-                width: '100%',
-                maxWidth: { xs: '90%', sm: '600px', md: '800px' },
-            }
+        <Dialog
+         open={open} 
+         onClose={onClose}
+         disableEscapeKeyDown={disableEscapeKeyDown}
+         TransitionProps={props.TransitionProps}
+         {...props}
+         keepMounted={false}
+          maxWidth="xs"
+        fullWidth
+        sx={{
+        '& .MuiDialog-paper': {
+          bgcolor: '#000',
+          borderRadius: '16px',
+          border: '1px solid rgba(0, 0, 0, 1)',
+          boxShadow: '0 4px 10px rgba(0, 204, 255, 0.7)'
+        }
+      }}
+        >
+            <DialogTitle
+             sx={{
+          color: 'white',
+          fontWeight: 'bold',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          bgcolor: '#00B3FF',
+
         }}>
-            <DialogTitle sx={{ bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold' }}>
                 {title}
+                
             </DialogTitle>
-            <DialogContent sx={{ bgcolor: '#111', color: '#fff', pt: 2 }}>
-                <Typography m={5}>
-                    {content}
-                </Typography>
+            <DialogContent 
+            sx={{ 
+                bgcolor: '#000', 
+                color: '#fff',
+                pt: 2 }}>
+                    <Box sx={{ p: 2 }}>
+        {children}
+    </Box>
             </DialogContent>
-            <DialogActions sx={{ bgcolor: '#111' }}>
-                <Button onClick={onClose} sx={{ color: 'rgb(0, 179, 255)' }}>
-                    Cerrar
-                </Button>
-                {onConfirm && (
-                    <Button onClick={onConfirm} variant="contained" sx={{ bgcolor: 'rgb(0, 179, 255)', color: '#fff', fontWeight: 'bold','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
-                        {buttonText}
-                    </Button>
-                )}
-            </DialogActions>
+           
         </Dialog>
     );
 }

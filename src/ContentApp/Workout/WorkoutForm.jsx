@@ -1,120 +1,383 @@
 import React, { useState } from 'react';
-import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography } from '@mui/material';
-import { Form } from 'react-router-dom';
+import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { useSnackbar } from 'notistack';
+import CircularProgress from '@mui/material/CircularProgress';
+
+
 
 export default function WorkoutForm({ onFormSubmit }) {
-    const [preguntas, setPreguntas] = useState({
-        pregunta1: '',
-        pregunta2: '',
-        pregunta3: '',
-        pregunta4: '',
-        pregunta5: '',
-        pregunta6: '',
+
+    const [ loading, setLoading ] = useState(false);
+    const { enqueueSnackbar } = useSnackbar();
+    const [anamnesis, setAnamnesis] = useState({
+        edad: '',
+        genero: '',
+        objetivo: '',
+        experiencia: '',
+        frecuencia:'',
+        tieneEnfermedad: '',
+        enfermedad: '',
+        tieneLesion: '',
+        lesion: '',
+        comentarios: '',
     });
+
 
     const hndlChange = (e) => {
         const { name, value } = e.target;
-        setPreguntas({
-            ...preguntas,
+        if (name === "tieneEnfermedad" && value === "no") {
+            setAnamnesis({
+                ...anamnesis,
+                tieneEnfermedad: value,
+                enfermedad: ""
+             });
+        return;
+         }
+
+        if (name === "tieneLesion" && value === "no") {
+            setAnamnesis({
+                ...anamnesis,
+                tieneLesion: value,
+                lesion: ""
+            });
+        return;
+       }
+        setAnamnesis({
+            ...anamnesis,
             [name]: value,
         });
     };
 
-    const hndlSubmit = (e) => {
+    const hndlSubmit = async (e) => {
         e.preventDefault();
-        onFormSubmit(preguntas); // Llama a la función del padre y pasa las respuestas
+        if (!formValido) return;
+
+        if (edadValida < 12 || edadValida > 90) {
+          enqueueSnackbar('Edad inválida', { variant: 'error' });
+    return;
+}
+        setLoading(true);
+
+        try {
+        const dataLimpia = {
+            ...anamnesis,
+            edad: Number(anamnesis.edad),
+            frecuencia: Number(anamnesis.frecuencia)
+        };
+
+        await onFormSubmit(dataLimpia);
+
+    } catch (error) {
+        console.log(error);
+    } finally {
+        setLoading(false);
+    }
+
+        
     };
 
+    const estiloTexfield = {
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: '#1f1f1fff', 
+                borderRadius: '10px',
+            },
+            '&:hover fieldset': {
+                borderColor: 'rgb(0, 204, 255)', 
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: 'rgb(0, 204, 255)', 
+            },
+            backgroundColor: 'transparent', 
+            color: '#fff', 
+        },
+        '& .MuiInputBase-input': { color: '#fff' },
+        '& .MuiInputLabel-root': { color: '#888' },
+        '& .MuiInputLabel-root.Mui-focused': { color: 'rgb(0, 204, 255)' }
+    };
+
+    const edadValida = Number(anamnesis.edad);
+
+    const formValido =
+    edadValida >= 12 &&
+    edadValida <= 90 &&
+    !isNaN(edadValida) &&
+    anamnesis.genero &&
+    anamnesis.objetivo &&
+    anamnesis.experiencia &&
+    anamnesis.frecuencia &&
+    anamnesis.tieneEnfermedad &&
+    anamnesis.tieneLesion &&
+    anamnesis.comentarios &&
+    (anamnesis.tieneEnfermedad === "no" || anamnesis.enfermedad) &&
+    (anamnesis.tieneLesion === "no" || anamnesis.lesion);
+
     return (
-        <Box component="form" onSubmit={hndlSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <FormControl fullWidth >
-                <InputLabel>Rango de Edad</InputLabel>
-                <Select
-                    name="pregunta1"
-                    value={preguntas.pregunta1}
-                    label="Edad"
-                    onChange={hndlChange}
-                >
-                    <MenuItem value="18-60"> 18 - 60</MenuItem>
-                    <MenuItem value="+60"> +60</MenuItem>
-                    </Select>
-            </FormControl>
-            <FormControl fullWidth>
+        <Box 
+        component="form" 
+        onSubmit={hndlSubmit} 
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+                type = "text"
+                name="edad"
+                label="Edad"
+                placeholder="Ej: 25"
+                value={anamnesis.edad}
+                onChange={hndlChange}
+                required
+                sx={estiloTexfield}
+                inputProps={{
+        inputMode: "numeric",
+        pattern: "[0-9]*",
+        maxLength: 2,
+        min : 12,
+        max : 90
+    }}
+
+            />
+            <FormControl
+             fullWidth
+             sx = {estiloTexfield}
+             >
                 <InputLabel>Genero </InputLabel>
                 <Select
-                    name="pregunta2"
-                    value={preguntas.pregunta2}
+                    name="genero"
+                    value={anamnesis.genero}
                     label="genero"
                     onChange={hndlChange}
+                    required
                 >
                     <MenuItem value="masculino">Masculino</MenuItem>
                     <MenuItem value="femenino">Femenino</MenuItem>
                 </Select>
             </FormControl>
 
-           <FormControl fullWidth>
+           <FormControl
+           fullWidth
+           sx= {estiloTexfield}
+           >
                 <InputLabel>Objetivo </InputLabel>
                 <Select
-                    name="pregunta3"
-                    value={preguntas.pregunta3}
+                    name="objetivo"
+                    value={anamnesis.objetivo}
                     label="objetivo"
                     onChange={hndlChange}
+                    required
                 >
-                    <MenuItem value="Aumentar masa muscular">Aumentar masa muscular</MenuItem>
-                    <MenuItem value="Bajar de porcentaje de grasa">Bajar de porcentaje de grasa</MenuItem>
+                    <MenuItem value="aumentar masa muscular">Aumentar masa muscular</MenuItem>
+                    <MenuItem value="perdida grasa">Perder grasa</MenuItem>
                     <MenuItem value="salud">Salud</MenuItem>
                 </Select>
             </FormControl>
 
-            <FormControl fullWidth>
+            <FormControl 
+            fullWidth
+            sx= {estiloTexfield}
+            >
                 <InputLabel>Nivel de experiencia</InputLabel>
                 <Select
-                    name="pregunta4"
-                    value={preguntas.pregunta4}
-                    label="Nivel de experiencia"
+                    name="experiencia"
+                    value={anamnesis.experiencia}
+                    label="experiencia"
                     onChange={hndlChange}
+                    required
                 >
-                    <MenuItem value="principiante">Principiante</MenuItem>
-                    <MenuItem value="intermedio">Intermedio</MenuItem>
-                    <MenuItem value="avanzado">Avanzado</MenuItem>
+                    <MenuItem value="principiante">Principiante (0 a 6 meses)</MenuItem>
+                    <MenuItem value="intermedio">Intermedio (6 a 12 meses)</MenuItem>
+                    <MenuItem value="avanzado">Avanzado (+ 12 meses )</MenuItem>
                 </Select>
+            </FormControl>
+            
+             <FormControl 
+            sx= {estiloTexfield}
+            >
+                <Typography color= '#888'>
+                    ¿Cuantos dias entrenas a la semana?
+                    </Typography>
+                <RadioGroup
+                    name="frecuencia"
+                    value={anamnesis.frecuencia}
+                    onChange={hndlChange}
+                    row
+                    required
+
+                >
+                    <FormControlLabel 
+                    value="3" 
+                    control={<Radio 
+                        sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                    />} 
+                    label="3" 
+                    />
+                    <FormControlLabel 
+                    value="4" 
+                    control={<Radio
+                        sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                        />} 
+                    label="4" />
+                     <FormControlLabel 
+                    value="5" 
+                    control={<Radio
+                        sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                        />} 
+                    label="5" />
+                     <FormControlLabel 
+                    value="6" 
+                    control={<Radio
+                        sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                        />} 
+                    label="6" />
+                </RadioGroup>
             </FormControl>
 
-            <FormControl fullWidth>
-                <InputLabel>Enfermedad </InputLabel>
-                <Select
-                    name="pregunta5"
-                    value={preguntas.pregunta5}
-                    label="enfermedad"
+            <FormControl 
+            sx= {estiloTexfield}
+            >
+                <Typography color= '#888'>
+                    ¿Tienes alguna enfermedad?
+                    </Typography>
+                <RadioGroup
+                    name="tieneEnfermedad"
+                    value={anamnesis.tieneEnfermedad}
                     onChange={hndlChange}
+                    row
+                    required
+
                 >
-                    <MenuItem value="ninguna">Ninguna</MenuItem>
-                    <MenuItem value="diabetes">Diabetes</MenuItem>
-                    <MenuItem value="hipertension">Hipertension</MenuItem>
-                    <MenuItem value="osteoporosis">Osteoporosis</MenuItem>
-                    <MenuItem value="artritis">Artritis</MenuItem>
-                    <MenuItem value="otra">Otra</MenuItem>
-                </Select>
+                    <FormControlLabel 
+                    value="si" 
+                    control={<Radio 
+                        sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                    />} 
+                    label="Si" 
+                    />
+                    <FormControlLabel 
+                    value="no" 
+                    control={<Radio
+                        sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                        />} 
+                    label="No" />
+                </RadioGroup>
             </FormControl>
-            <FormControl fullWidth>
-                <InputLabel>Lesiones </InputLabel>
-                <Select
-                    name="pregunta6"
-                    value={preguntas.pregunta6}
-                    label="lesiones"
+
+            {anamnesis.tieneEnfermedad === 'si' && (
+                <TextField
+                    name="enfermedad"
+                    label="Especifique la enfermedad"
+                    value={anamnesis.enfermedad}
                     onChange={hndlChange}
+                    sx= {estiloTexfield}
+                    multiline
+                    rows={2}
+                    required
+                />
+            )}
+
+            <FormControl 
+            sx= {estiloTexfield}
+            >
+                <Typography color= '#888'>
+                    ¿Tienes alguna lesion?
+                    </Typography>
+                <RadioGroup
+                    name="tieneLesion"
+                    value={anamnesis.tieneLesion}
+                    onChange={hndlChange}
+                    row
+                    required
                 >
-                    <MenuItem value="ninguna">Ninguna</MenuItem>
-                    <MenuItem value="lumbar">Lumbar</MenuItem>
-                    <MenuItem value="rodilla">Rodilla</MenuItem>
-                    <MenuItem value="otra">Otra</MenuItem>
-                </Select>
+                    <FormControlLabel 
+                    value="si" 
+                    control={<Radio
+                        sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                        />} 
+                    label="Si" 
+                    />
+                    <FormControlLabel 
+                    value="no" 
+                    control={<Radio
+                         sx= {{ color: '#00B3FF',
+                         '&.Mui-checked': {
+                            color: '#00B3FF',
+                         }
+                         }}
+                        />} 
+                    label="No" />
+                </RadioGroup>
             </FormControl>
+            {anamnesis.tieneLesion === 'si' && (
+                <TextField
+                    name="lesion"
+                    label="Especifique la lesion"
+                    value={anamnesis.lesion}
+                    onChange={hndlChange}
+                    sx= {estiloTexfield}
+                    multiline
+                    rows={2}
+                    required
+                />
+            )}
+            
+            <TextField
+                name="comentarios"
+                label="Informacion adicional..."
+                multiline
+                rows={4}
+                value={anamnesis.comentarios}
+                onChange={hndlChange}
+                sx= {estiloTexfield}
+                required
+            />
 
             
 
-            <Button type="submit" variant="contained" sx={{ mt: 2, fontWeight: 'bold', bgcolor: 'rgb(0, 204, 255)','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
-                Enviar
+            <Button 
+            type="submit"
+             variant="contained" 
+             disabled= {!formValido || loading}
+             sx={{ 
+                mt: 2, 
+                fontWeight: 'bold', 
+                borderRadius: '20px',
+                bgcolor: '#00B3FF',
+                '&:hover': { 
+                    bgcolor: '#01a5ebff '
+                     },
+                '&.Mui-disabled': {
+                        bgcolor: '#2a2a2a',
+                        color: '#666'
+                         }
+                     }}>
+                {loading ? "Cargando..." : "Enviar"}
+
             </Button>
         </Box>
     );

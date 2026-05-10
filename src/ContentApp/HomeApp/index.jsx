@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil'; 
 import { Container, Typography, Box, Card, CardContent, IconButton, Button } from "@mui/material";
-// import { programasState } from '../hooks/estadoGlobal';
-import { userState, usersDataState } from '../hooks/estadoGlobal';
 import DlgGnrl from '../../components/DlgGnrl';
 import ProgramPreview from '../ProgramPreview';
 import SearchUsersForm from '../SearchUsersForm';
 import ProgramCard from '../ProgramCard.jsx';
 import { useAuth } from '../AuthContext/index.jsx';
+import useUsers from '../hooks/useUsers.js';
+import { useSnackbar } from 'notistack';
+import api from '../../api.js';
 
 export default function HomeApp() {
     // const [programas, setProgramas] = useRecoilState(programasState);
@@ -20,14 +21,15 @@ export default function HomeApp() {
     const [openAñadirDlg, setOpenAñadirDlg] = useState(false);
     const [añadirPrograma, setAñadirPrograma] = useState(null);
     const [ programas, setProgramas ] = useState([]);
-    const [ isLoading, setIsLoading ] = useState(true);
+    const [ isLoading, setIsLoading ] = useState(true);//loading programas
 
+
+    const { data: users = [], isUserLoading } = useUsers();//loading usarios
     const { obtenerTokenActual, obtenerUsuarioActual } = useAuth();
     const usuarioActual = obtenerUsuarioActual(); 
     const userRol = usuarioActual.rol;
+    const { enqueueSnackbar } = useSnackbar();
 
-    // const usuario = useRecoilValue(userState);
-    const [ allUsers, setAllUsers ] = useRecoilState(usersDataState);
     console.log("Rol del usuario actual:", userRol);
 
     const fetchProgramas = async () => {
@@ -38,6 +40,7 @@ export default function HomeApp() {
             if (response.ok) {
                 const data = await response.json();
                 setProgramas(data); 
+                
             } else {
                 console.error("Error al cargar programas:", response.status);
             }
@@ -78,33 +81,37 @@ export default function HomeApp() {
     const token = obtenerTokenActual();
 
     try {
-        const response = await fetch(
-            'http://127.0.0.1:8001/entrenamiento/programas/asignar',
+        const res = await api.post(
+            '/entrenamiento/programas/asignar',
             {
-                method: 'POST',
+                programa_id: programaAsignar.id,
+                usuario_id: selectedUser.id,
+            },
+            {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({
-                    programa_id: programaAsignar.id,
-                    usuario_id: selectedUser.id,
-                }),
             }
         );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.error("Error al asignar:", data.detail);
-            return;
+        
+        try {
+            const notiSound = new Audio('/sounds/success.mp3');
+            await notiSound.play();
+        } catch (err) {
+            console.log("Error sonido:", err);
         }
 
-        console.log("Programa asignado:", data);
+        enqueueSnackbar("Programa asignado correctamente", { variant: "success" });
+
         hndlCloseAsignacionDlg();
 
     } catch (error) {
-        console.error("Error de red al asignar programa:", error);
+        console.error("Error al asignar:", error.response?.data?.detail);
+
+        enqueueSnackbar(
+            error.response?.data?.detail || "Error al asignar programa",
+            { variant: "error" }
+        );
     }
 };
 
@@ -125,32 +132,36 @@ export default function HomeApp() {
     const token = obtenerTokenActual();
 
     try {
-        const response = await fetch(
-            'http://127.0.0.1:8001/entrenamiento/programas/asignar',
+        const res = await api.post(
+            '/entrenamiento/programas/asignar',
             {
-                method: 'POST',
+                programa_id: añadirPrograma.id,
+            },
+            {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({
-                    programa_id: añadirPrograma.id,
-                }),
             }
         );
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.error("Error al añadir programa:", data.detail);
-            return;
+        try {
+            const notiSound = new Audio('/sounds/success.mp3');
+            await notiSound.play();
+        } catch (err) {
+            console.log("Error sonido:", err);
         }
 
-        console.log("Programa añadido al entrenamiento:", data);
+        enqueueSnackbar("Programa añadido correctamente", { variant: "success" });
+
         hndlCloseAñadirDlg();
 
     } catch (error) {
-        console.error("Error de red al añadir programa:", error);
+        console.error("Error al añadir:", error.response?.data?.detail);
+
+        enqueueSnackbar(
+            error.response?.data?.detail || "Error al añadir programa",
+            { variant: "error" }
+        );
     }
 };
 
@@ -185,14 +196,13 @@ export default function HomeApp() {
         const programaId = programaToDelete.id;
         const authToken = obtenerTokenActual();
 
-        // 1. Verificación de Token y Rol (Frontend)
+        //Verificación de Token y Rol (Frontend)
         if (!authToken) {
             console.error("No estás autenticado para eliminar programas.");
             hndlCloseDeleteDialog();
             return;
         }
         
-        // Mantenemos la restricción del frontend (solo admin puede eliminar)
         if (userRol !== 'admin') {
             console.error("Permiso denegado: Solo el admin puede eliminar programas.");
             hndlCloseDeleteDialog();
@@ -210,7 +220,7 @@ export default function HomeApp() {
 
             if (response.ok) {
                 console.log(`Programa ${programaId} eliminado exitosamente.`);
-                // 3. Refrescar la lista de programas
+               
                 fetchProgramas(); 
             } else {
                 const errorData = await response.json();
@@ -236,7 +246,7 @@ export default function HomeApp() {
             <Typography variant="h4" color="#fff" mb={4} mt={2} textAlign="center" fontWeight="bold">¡Bienvenido a REPS!</Typography>
             <Box sx={{ display: 'column', justifyContent: 'center', alignItems: 'center', mt: 3,mb: 10, borderRadius: '10px ', border: '1px solid #2a2f33',bgcolor: '#000', p: 1, boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)'
                    }}>
-            <Typography variant="body2"  textAlign={'left'} padding={'10px'} fontStyle={'italic'} color={'#bbb'}>Aqui encontraras programas de entrenamiento para diferentes objetivos, niveles, fuerza e intensidad, clases de abdomen, clases funcionales, entrenamientos metabolicos, videos y mucho mas.<br></br><br></br> Responde el <strong>cuestionario </strong>en tu seccion de <strong>ENTRENAMIENTO</strong>, para que nuestro algoritmo te asigne un plan de entrenamiento adecuado para ti y si el programa asignado no te gusta, puedes cambiarlo en calquier momento o solicitar ayuda en nuestro chat para asignarte el programa que se adapte mejor a tus necesidades. <br></br>Cada programa es parte de un macrociclo de entrenamiento y a sido desarrollado a base de fundamentos biomecanicos, años de experiencia y estudios. Seguiremos actulizando programas, clases y contenido para ti.<br></br><br></br>Acompaña tu entrenamiento con tu plan alimenticio en la seccion de <strong> NUTRICION</strong> para obtener los mejores resultados.<br></br> <br></br>En caso de ser usuario de suscripcion <strong>PRO</strong>, en tu seccion de entrenamiento, tendras la opcion de agendar tu sesion de consulta online con el coach, para personalizarte un programa de entrenamiento <strong>EXCLUSIVO </strong> para ti, adapptado a tus objetivos y preferencias.</Typography>
+            <Typography variant="body2"  textAlign={'left'} padding={'10px'} fontStyle={'italic'} color={'#bbb'}>Aqui encontraras programas de entrenamiento para diferentes objetivos, niveles, fuerza e intensidad, clases de abdomen, clases funcionales, entrenamientos metabolicos, videos y mucho mas.<br></br><br></br> Responde el <strong>cuestionario </strong>en tu seccion de <strong>ENTRENAMIENTO</strong>, para que nuestro algoritmo te asigne un plan de entrenamiento adecuado para ti y si el programa asignado no se adapta a tu objetivos, puedes cambiarlo en calquier momento o solicitar ayuda en nuestro chat para asignarte el programa que se adapte mejor a tus necesidades. <br></br>Cada programa es parte de un macrociclo de entrenamiento y a sido desarrollado a base de fundamentos biomecanicos, años de experiencia y estudios. Seguiremos actulizando programas, clases y contenido para ti.<br></br><br></br>Acompaña tu entrenamiento con tu plan alimenticio en la seccion de <strong> NUTRICION</strong> para obtener los mejores resultados.<br></br> <br></br>En caso de ser usuario de suscripcion <strong>PRO</strong>, en tu seccion de entrenamiento, tendras la opcion de agendar tu sesion de consulta online con el coach, para personalizarte un programa de entrenamiento <strong>EXCLUSIVO </strong> para ti, adapptado a tus objetivos y preferencias.</Typography>
             </Box>
             <Typography variant="h4" color="#ccc" mb={4} mt={4} textAlign="center" fontWeight="bold">PROGRAMAS DE ENTRENAMIENTO</Typography>
             {Object.keys(programasPorObjetivo).length === 0 ? (
@@ -292,7 +302,7 @@ export default function HomeApp() {
                     title={`Asignar ${programaAsignar.nombre}`}
                     content= { 
                         <SearchUsersForm
-                            allUsers={allUsers}
+                            allUsers={users}
                             programa={programaAsignar}
                             onAssign={hndlConfirmarAsignacion}
                             onClose={hndlCloseAsignacionDlg}

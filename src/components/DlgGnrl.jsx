@@ -21,6 +21,7 @@ export default function DlgGnrl({ open, onClose, onConfirm, title, content, acti
                     boxShadow: '0 4px 10px rgba(0, 204, 255, 0.7)',
                 }
             }}
+            keepMounted
         >
             <DialogTitle sx={{ bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', textAlign: 'center'}}>{title}</DialogTitle>
             <DialogContent sx={{bgcolor: '#000', color: '#fff', textAlign: 'center', p: 6, fontSize: '1.2rem'}}>

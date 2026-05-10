@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { Box, CssBaseline} from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AppRoutes from './routes';

@@ -1,7 +1,7 @@
 // src/components/AppTrainingNavBar/AppTrainingMobileNavbar.jsx
 
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Box, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, Box, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Button, Divider } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -12,6 +12,8 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import LogoReps from '../../assets/LogoReps.webp';
 import CloseIcon from '@mui/icons-material/Close';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 export default function MovilNavBar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -26,9 +28,9 @@ export default function MovilNavBar() {
         { text: 'Inicio', path: '/apptraining/home', icon: <HomeIcon /> },
         { text: 'Mi Entrenamiento', path: '/apptraining/entrenamiento', icon: <FitnessCenterIcon /> },
         { text: 'Mi Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
-        { text: 'Perfil', path: '/apptraining/profile', icon: <PersonOutlineIcon /> },
+        { text: 'Perfil', path: '/apptraining/profile', icon: <AssessmentIcon /> },
         { text: 'Programas', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
-        { text: 'Configuracion', path: '/apptraining/settings', icon: <SettingsIcon /> },
+        { text: 'Usuarios', path: '/apptraining/usuarios', icon: <GroupAddIcon /> },
     ];
 
     const hndlLogout = () => {
@@ -40,6 +42,7 @@ export default function MovilNavBar() {
     };
     
     const loggedInUser = "nombreusuario@gmail.com"; 
+    
 
     return (
         <AppBar 
@@ -60,9 +63,9 @@ export default function MovilNavBar() {
                     <img src={LogoReps} alt="AppTraining Logo" style={{ height: '80px',  }}/>
                 </Box>
                 
-                <IconButton onClick={() => navigate('/apptraining/profile')} sx={{ color: 'rgb(0, 204, 255)' }}>
+                {/* <IconButton onClick={() => navigate('/apptraining/profile')} sx={{ color: 'rgb(0, 204, 255)' }}>
                     <PersonOutlineIcon />
-                </IconButton>
+                </IconButton> */}
             </Toolbar>
 
             <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)} PaperProps={{ sx: { background: '#111', color: '#fff' } }}>
@@ -96,7 +99,20 @@ export default function MovilNavBar() {
                             );
                         })}
                     </List>
+                    <Divider sx={{ my: 1, borderColor: '#333' }} />
+                                    <List>
+                                        <ListItem disablePadding>
+                                            <ListItemButton onClick={hndlLogout}>
+                                                <ListItemIcon sx={{ color: 'rgb(0, 179, 255)' }}>
+                                                    <LogoutIcon />
+                                                </ListItemIcon>
+                                                <ListItemText primary="Cerrar Sesión" sx={{ color: '#fff' }} />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    </List>
+                    
                 </Box>
+                
                 <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 35 }} >
                     <Button varaiant="contained" fullWidth sx={{ bgcolor: 'rgb(0, 179, 255)', color: '#fff' , '&:hover': { bgcolor: 'rgb(4, 159, 226)' },  fontWeight: 'bold', fontSize: '1rem', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)',  }} onClick={hndlGymklan}>
                     GYMKLAN

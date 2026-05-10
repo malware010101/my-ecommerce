@@ -7,67 +7,38 @@ import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
+import { useQuery } from "@tanstack/react-query";
+import api from "../../api";
+import { useQueryClient } from "@tanstack/react-query";
+
 
 export default function Nutrition () {
-    const [planActivo, setPlanActivo] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [openDlgNutri, setOpenDlgNutri] = useState(false);
 
     const { obtenerUsuarioActual, obtenerTokenActual } = useAuth();
 
     const usuario = obtenerUsuarioActual();
     const userId = usuario?.id
-    const token = obtenerTokenActual();
     console.log("User ID en Nutricion:", userId);
 
+    const queryClient = useQueryClient();
 
-   
 
-  const fetchPlanActivo = async () => {
-  if (!userId || !token) return;
-
-  try {
-    const res = await fetch(
-      `http://127.0.0.1:8001/nutricion/plan/activo/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+ const { data: planActivo, isLoading: loading } = useQuery({
+  queryKey: ["planNutricional", userId],
+  queryFn: async () => {
+    try {
+      const res = await api.get(`/nutricion/plan/activo/${userId}`);
+      return res.data;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return null;
       }
-    );
-
-    if (!res.ok) {
-      if (res.status === 404) {
-        setPlanActivo(null);
-        return;
-      }
-      throw new Error("Error al consultar plan");
+      throw error;
     }
-
-    const data = await res.json();
-    setPlanActivo(data);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-  useEffect(() => {
-  fetchPlanActivo();
-}, [userId, token]);
-
-useEffect(() => {
-  if (!planActivo) return;
-
-  const hoy=dayjs().format('YYYY-MM-DD');
-  const fin = dayjs(planActivo.fecha_fin).format('YYYY-MM-DD');
-
-  console.log("Estado del plan:", planActivo.estado);
-  console.log("Fecha inicio:", planActivo.fecha_inicio);
-  console.log("Fecha fin:", planActivo.fecha_fin);
-}, [planActivo]);
+  },
+  enabled: !!userId
+});
 
 const diasRestantes = planActivo
   ? dayjs(planActivo.fecha_fin).diff(dayjs(), "day")
@@ -289,7 +260,7 @@ if (loading) {
   currentUser={usuario}
     onSaved={() => {
       setOpenDlgNutri(false);
-      fetchPlanActivo(); 
+      queryClient.invalidateQueries(["planNutricional", userId]);
     }}
   />
 </DialogContent>

@@ -15,6 +15,7 @@ import Nutrition from '../ContentApp/Nutrition/index.jsx';
 import MiEntrenamiento from '../ContentApp/MiEntrenamiento.jsx/index.jsx';
 import ProgramDetails from '../ContentApp/ProgramDetails.jsx/index.jsx';
 import EntrenamientoPage from '../ContentApp/EntrenamientoPage/index.jsx';
+import Usuarios from '../ContentApp/Usuarios/index.jsx';
 
 
 
@@ -41,7 +42,8 @@ export default function AppRoutes() {
         <Route path= "workout" element={<Workout />} />
         <Route path="nutrition" element={<Nutrition />} />
         <Route path="profile" element={<Porfile />} />
-       
+        <Route path="profile/:userId" element={<Porfile />} />
+        <Route path="usuarios" element={<Usuarios />} />
       </Route>
     </Routes>
   );

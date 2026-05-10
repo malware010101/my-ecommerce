@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Tabs, Tab, Snackbar, Button, TextField, Grid, Divider } from "@mui/material";
+import { Box, Typography, Tabs, Tab, Button, TextField, Grid, Divider, Stack, IconButton } from "@mui/material";
 import { Dialog, DialogContent } from "@mui/material";
 import ExerciseCard from "../ExerciseCard";
 import MethodCard from "../MethodCard";
 import api from "../../api";
 import dayjs from "dayjs";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
+
 
 export default function ProgramDetails({ entrenamiento }) {
   const programa = entrenamiento?.programa || {};
@@ -13,10 +20,50 @@ export default function ProgramDetails({ entrenamiento }) {
   const [abrirVideo, setAbrirVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [completadosPorDia, setCompletadosPorDia] = useState({});
-  const [snackOpen, setSnackOpen] = useState(false);
+  const [videoError, setVideoError] = useState('');
   const notiSound = new Audio("/sounds/success.mp3");
+  const [ snack, setSnack] = useState ({
+    open: false,
+    message : '',
+    severity: 'success'
+  })
 
+  const navigate = useNavigate();
   const handleChange = (event, newValue) => setValue(newValue);
+
+  const queryClient = useQueryClient();
+
+ const mutation = useMutation({
+  mutationFn: async () => {
+    const res = await api.post("/entrenamiento/historico", {
+      entrenamiento_id: entrenamiento.entrenamiento_id,
+      dia_realizado: programa.dias[value].dia,
+    });
+    return res.data;
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["historial"] });
+    setSnack({
+      open: true,
+      message: '¡Completaste tu entrenamiento del dia!',
+      severity: 'success'
+    });
+
+      notiSound.currentTime = 0;
+      notiSound.play().catch(() => {});
+  },
+  onError: () => {
+    setSnack({
+      open: true,
+      message: 'Hubo un error al completar el entrenamiento',
+      severity: 'error'
+    })
+  }
+});
+
+  const hndlBack = () => {
+    navigate('/apptraining/entrenamiento', { replace: true });
+  }
 
   useEffect(() => {
     if (!programa) return;
@@ -50,15 +97,7 @@ export default function ProgramDetails({ entrenamiento }) {
   };
 
   const hndlFnlrRutina = async () => {
-    try {
-      await api.post("/entrenamiento/historico", {
-        entrenamiento_id: entrenamiento.entrenamiento_id,
-        dia_realizado: programa.dias[value].dia,
-      });
-
-      setSnackOpen(true);
-      notiSound.currentTime = 0;
-      notiSound.play().catch(() => {});
+     mutation.mutate();
 
       setCompletadosPorDia((prev) => {
         const copy = { ...prev };
@@ -67,24 +106,44 @@ export default function ProgramDetails({ entrenamiento }) {
         Object.keys(copy).forEach((k) => (normalized[k] = new Set(copy[k])));
         return normalized;
       });
-    } catch (e) {
-      console.log("Error registrando historial", e);
-    }
   };
 
-  const hndlVerVideo = (url) => {
-    setVideoUrl(url);
+  const hndlVerVideo = async (videoId) => {
+  if (!videoId) {
+    setVideoError('Este ejercicio no tiene video disponible');
+    setVideoUrl('');
     setAbrirVideo(true);
-  };
+    return;
+  }
+
+  try {
+    const res = await api.get(`/videos/${videoId}/stream`);
+
+    if (!res.data?.embed_url) {
+      setVideoError('Este ejercicio no tiene video disponible');
+      setVideoUrl('');
+      setAbrirVideo(true);
+      return;
+    }
+
+    setVideoError('');
+    setVideoUrl(res.data.embed_url);
+    setAbrirVideo(true);
+
+  } catch (err) {
+    console.error('Error al obtener video', err);
+    setVideoError('Este ejercicio no tiene video disponible');
+    setVideoUrl('');
+    setAbrirVideo(true);
+  }
+};
 
   const hndlCloseVideo = () => {
     setAbrirVideo(false);
     setVideoUrl("");
+    setVideoError('');
   };
 
-  const hndlCloseSnack = () => setSnackOpen(false);
-
-  // --- Conteo de días al estilo Nutrición ---
   const hoy = dayjs();
   const fechaFin = dayjs(entrenamiento?.fecha_fin);
   const diasRestantes = fechaFin.diff(hoy, "day");
@@ -92,22 +151,18 @@ export default function ProgramDetails({ entrenamiento }) {
 
   return (
     <Box sx={{ bgcolor: "#000", color: "#fff", textAlign: "center" }}>
-      {entrenamiento?.fecha_inicio && entrenamiento?.fecha_fin && (
-        <Box sx={{ textAlign: "center", mb: 2}}>
-          {planActivo ? (
-            <Typography color="#1ddf47" fontWeight="bold" mb={5}  >
-              <AccessTimeIcon sx={{ fontSize: 'medium', verticalAlign: 'middle' }} /> 
-              Tu plan vence en {diasRestantes} días
-            </Typography>
-          ) : (
-            <Typography color="red" fontWeight="bold" textAlign='left' mb={10}>
-              ❌ Tu plan venció hace {Math.abs(diasRestantes)} días
-            </Typography>
-          )}
-        </Box>
-      )}
-
-      
+      <Box sx={{ display: "flex", alignItems: "center", ml: 2}}>
+      <IconButton
+        onClick={hndlBack}
+        sx={{
+          color: "rgb(0, 204, 255)",
+         
+        }}
+      >
+        <ArrowBackIosIcon sx= {{ fontSize: "2rem"}}  />
+      </IconButton>
+    </Box>
+ 
       <Box 
       sx={{ display: "flex", 
       display: "flex", 
@@ -165,6 +220,20 @@ export default function ProgramDetails({ entrenamiento }) {
         />
         </Box>
       </Box>
+      {entrenamiento?.fecha_inicio && entrenamiento?.fecha_fin && (
+        <Box sx={{ textAlign: "center", mb: 1}}>
+          {planActivo ? (
+            <Typography color="#1ddf47" fontWeight="bold" mb={1}  >
+              <AccessTimeIcon sx={{ fontSize: 'medium', verticalAlign: 'middle' }} /> 
+              Tu plan vence en {diasRestantes} días
+            </Typography>
+          ) : (
+            <Typography color="red" fontWeight="bold" textAlign='left' mb={1} ml= {2}>
+              Tu plan venció hace {Math.abs(diasRestantes)} días
+            </Typography>
+          )}
+        </Box>
+      )}
       <Divider sx={{ mb: 2 }} />
 
       
@@ -303,34 +372,73 @@ export default function ProgramDetails({ entrenamiento }) {
         </Box>
       </Box>
 
-      <Dialog open={abrirVideo} onClose={hndlCloseVideo} maxWidth="xs" fullWidth sx={{ "& .MuiDialog-paper": { bgcolor: "#000", borderRadius: "10px" } }}>
-        <DialogContent>
-          <video src={videoUrl || null} controls muted autoPlay loop style={{ width: "100%", height: "auto", borderRadius: "10px", display: "block" }} />
-        </DialogContent>
-      </Dialog>
+      <Dialog
+                open={abrirVideo}
+                onClose={hndlCloseVideo} 
+                maxWidth="xs"
+                fullWidth
+                  sx={{
+                    '& .MuiDialog-paper': { bgcolor: '#000', borderRadius: '10px' }
+                      }}
+              >
+                  <DialogContent
+                    sx={{ p: 0 }}>
+                      {videoError ? (
+                        <Typography
+                        backgroundColor="#000"
+              color="#bbb"
+              textAlign="center"
+              sx={{ 
+                py: 4,
+              borderColor: 'rgb(0, 204, 255)',
+              borderStyle: 'solid',
+              borderWidth: '0.5px',
+              borderRadius: '15px' }}
+            >
+              {videoError}
+            </Typography>
+                      ): (
+                    <Box sx={{ 
+                       position: 'relative', 
+                       paddingTop: '56.25%',
+                       aspectRatio: '9/16',
+                       backgroundColor: '#000'
+                              }}>
+                  <iframe
+                      src={videoUrl}
+                      loading="lazy"
+                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                      allowFullScreen
+                        style={{
+                            border: 0,
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            }}
+                   />
+                      </Box>
+                    )}
+                  </DialogContent>
+              </Dialog>   
 
       <Snackbar
-        open={snackOpen}
-        onClose={hndlCloseSnack}
-        autoHideDuration={3000}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        ContentProps={{
-          sx: {
-            bgcolor: "green",
-            color: "#fff",
-            borderRadius: 2,
-            fontWeight: "bold",
-            px: 2,
-            py: 1,
-            textAlign: "center",
-            minHeight: 50,
-            minWidth: "unset",
-            maxWidth: 300,
-            width: "fit-content",
-          },
-        }}
-        message="¡Completaste tu entrenamiento del día!"
-      />
+  open={snack.open}
+  autoHideDuration={3000}
+  onClose={() => setSnack({ ...snack, open: false })}
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+>
+  <Alert
+    onClose={() => setSnack({ ...snack, open: false })}
+    severity={snack.severity}
+    variant="filled"
+    sx={{ width: "100%" }}
+  >
+    {snack.message}
+  </Alert>
+</Snackbar>
     </Box>
   );
 }
+

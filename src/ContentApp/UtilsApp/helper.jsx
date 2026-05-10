@@ -23,3 +23,14 @@ export const getChatId = (userAId, userBId) => {
 
 
 export const soporteRepsChatId= 'chat_soporte_reps';
+
+// AuthContext.jsx (o un archivo utils)
+export const fetchUsuarioReal = async () => {
+  try {
+    const res = await api.get("/auth/me"); // tu endpoint que ya hiciste
+    return res.data; // { id, nombre, rol, tiene_anamnesis }
+  } catch (err) {
+    console.error("Error obteniendo usuario real:", err);
+    return null;
+  }
+};

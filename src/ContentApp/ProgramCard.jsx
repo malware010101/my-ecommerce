@@ -39,6 +39,7 @@ const ProgramCard = ({ programa, onOpenDeleteDialog, onOpenPreviewDialog, onCard
         >
             <CardContent>
             <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}>
+                {onOpenPreviewDialog && (
                     <IconButton 
                         size="small" 
                         sx={{ color: '#fff' }} 
@@ -46,6 +47,8 @@ const ProgramCard = ({ programa, onOpenDeleteDialog, onOpenPreviewDialog, onCard
                     >
                         <VisibilityIcon />
                     </IconButton>
+                )}
+                    
                     
                     {usuario.rol === 'admin' && (
                         <IconButton 

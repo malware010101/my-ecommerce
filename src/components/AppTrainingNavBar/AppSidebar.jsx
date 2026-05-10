@@ -8,6 +8,9 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LogoReps from '../../assets/LogoReps.webp';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+
 
 export default function AppSidebar() {
     const navigate = useNavigate();
@@ -18,9 +21,9 @@ export default function AppSidebar() {
         { text: 'Inicio', path: '/apptraining/home', icon: <HomeIcon /> },
         { text: 'Mi Entrenamiento', path: '/apptraining/entrenamiento', icon: <FitnessCenterIcon /> },
         { text: 'Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
-        { text: 'Perfil', path: '/apptraining/profile', icon: <PersonOutlineIcon /> },
+        { text: 'Perfil', path: '/apptraining/profile', icon: <AssessmentIcon/> },
         { text: 'Programas', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
-        { text: 'Configuracion', path: '/apptraining/configuracion', icon: <SettingsIcon /> },
+        { text: 'Usuarios', path: '/apptraining/usuarios', icon: <GroupAddIcon/> },
     ];
 
     const hndlLogout = () => {

@@ -1,6 +1,5 @@
 import { atom } from 'recoil';
 
-const programasKey = 'programas_de_entrenamiento';
 const usersKey = 'usuarios_app_reps'; 
 
 const getInitialState = (key, defaultData) => {
@@ -16,26 +15,30 @@ const getInitialState = (key, defaultData) => {
   return defaultData; 
 };
 
-export const programasState = atom({
-  key: 'programasState',
-  default: getInitialState(programasKey, []), 
-  effects: [
-    ({ onSet }) => {
-      onSet(newValue => {
-        localStorage.setItem(programasKey, JSON.stringify(newValue));
-      });
-    },
-  ],
-});
+const localStorageEffect = key => ({setSelf, onSet}) => {
+  const savedValue = localStorage.getItem(key);
+  if (savedValue != null) {
+    setSelf(JSON.parse(savedValue));
+  }
+
+  onSet((newValue, _, isReset) => {
+    isReset 
+      ? localStorage.removeItem(key)
+      : localStorage.setItem(key, JSON.stringify(newValue));
+  });
+};
 
 export const userState = atom({
   key: 'userState',
-  default: { 
+  default: {
     rol: 'visitante',
     id: null,
     nombre: '',
     programasAsignados: []
   },
+  effects: [
+    localStorageEffect('user_state_reps')
+  ]
 });
 
 
@@ -51,23 +54,5 @@ export const usersDataState = atom({
   ],
 });
 
-const localStorageEffect = key => ({setSelf, onSet}) => {
-  const savedValue = localStorage.getItem(key);
-  if (savedValue != null) {
-    setSelf(JSON.parse(savedValue));
-  }
 
-  onSet((newValue, _, isReset) => {
-    isReset 
-      ? localStorage.removeItem(key)
-      : localStorage.setItem(key, JSON.stringify(newValue));
-  });
-};
 
-export const chatConversationsState = atom({
-  key: 'chatConversationsState',
-  default: {}, 
-  effects: [
-    localStorageEffect('chat_conversations_reps')
-  ]
-});

@@ -8,39 +8,68 @@ import { useNavigate } from 'react-router-dom';
 import ProgramCard from '../ProgramCard'; 
 import api from "../../api";
 import { useAuth } from "../AuthContext";
+import { useSnackbar } from "notistack";
+import { fetchUsuarioReal } from "../UtilsApp/helper";
+
+
 
 export default function MiEntrenamiento() {
-    const [openDlg, setOpenDlg]= useState(false);
     const usuarioActual = useRecoilValue(userState);
     const allUsers = useRecoilValue(usersDataState);
     const navigate = useNavigate();
     const [misProgramas, setMisProgramas] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const {obtenerUsuarioActual} = useAuth();
-    const usuario= obtenerUsuarioActual();
 
+    const {authData, updateUser} = useAuth();
+    const usuario = {
+            id: authData?.userId,
+            nombre: authData?.nombre,
+            rol: authData?.rol,
+            tiene_anamnesis: authData?.tiene_anamnesis
+           };
+
+     
+    const [openDlg, setOpenDlg] = useState(false);
+    const { enqueueSnackbar } = useSnackbar();
+    
     const loggedInUser = allUsers.find(user => user.id === usuarioActual.id);
 
-    const hndlOpenDlg = () => {
-        setOpenDlg(true);
-    };
 
-    const hndlCloseDlg = () => {
+
+    const hndlFormSubmit = async (formData) => {
+    try {
+        await api.post("/anamnesis/", formData);
+
+        enqueueSnackbar("Anamnesis guardada correctamente", { variant: "success" });
+     
+        updateUser({
+            tiene_anamnesis: true
+        });
+
         setOpenDlg(false);
-    };
 
-    const hndlFormSubmit = (formData) => {
-        console.log('Respuestas Enviadas con exito', formData);
-        hndlCloseDlg();
-    };
+
+    } catch (error) {
+        enqueueSnackbar("Error al guardar anamnesis", {variant: "error"});
+    }
+};
 
     const hndlCardNavigate = (item) => {
         console.log("ITEM:", item);
         navigate(`/apptraining/entrenamiento/${item.entrenamiento_id}`);
     };
-    
-    const workoutFormContent = <WorkoutForm onFormSubmit={hndlFormSubmit} />;
+   
+ useEffect(() => {
+  if (!usuario) return;
+
+  if (usuario?.tiene_anamnesis === false) {
+    setOpenDlg(true);
+  } else {
+    setOpenDlg(false);
+  }
+}, [authData]);
+
 
     useEffect(() => {
     const fetchMisProgramas = async () => {
@@ -56,6 +85,14 @@ export default function MiEntrenamiento() {
 
     fetchMisProgramas();
 }, []);
+
+useEffect(() => {
+  console.log("AUTH DATA:", authData);
+}, [authData]);
+
+console.log("usuario:", usuario);
+console.log("tiene_anamnesis:", usuario?.tiene_anamnesis);
+console.log("openDlg:", openDlg);
 
 if (loading) {
     return (
@@ -78,24 +115,14 @@ if (loading) {
                 </Typography>
             </Box>
             <Divider sx={{ mt: 2, mb: 3 }} />
+            <Box sx={{ mb: 4 }}>
+                    <Typography variant="h5" color="rgb(0, 204, 255)" fontStyle={'italic'} fontWeight="bold">PROGRAMAS ASIGNADOS</Typography>
+            </Box>
 
-            {misProgramas.length === 0 ? (
-                <Box sx={{ display: 'column', justifyContent: 'center', alignItems: 'center', mt: 3, borderRadius: '10px ', border: '1px solid #2a2f33', bgcolor: '#000', p: 1, boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)' }}>
-                    <Typography variant="h6" color={'#fff'} textAlign={'left'} padding={'10px'}>
-                        Para dirigirte a tu plan de entrenamiento, es necesario que respondas el siguiente formulario para conocer tu actividad física y dirigirte al plan adecuado.
-                    </Typography>
-                    <Button
-                        onClick={hndlOpenDlg}
-                        variant="contained"
-                        sx={{ mt: 2, ml: 1, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px', mb: 2, '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}
-                    >
-                        Responder
-                    </Button>
-                </Box>
+            {misProgramas?.length === 0 ? (
+                <Typography fontSize={12} color="red" fontStyle={'italic'} >No tienes ningun programa asignado, puedes asignarte alguno de nuestros programas generales disponibles en el inicio o esperar a que nuestro coach evalue tu anamnesis y te asigne un programa adecuado.</Typography>
             ) : (
                 
-                <Box sx={{ mb: 4 }}>
-                    <Typography variant="h5" color="rgb(0, 204, 255)" fontStyle={'italic'} fontWeight="bold">PROGRAMAS ASIGNADOS</Typography>
                     <Box
                         sx={{
                             display: 'flex',
@@ -115,10 +142,41 @@ if (loading) {
                             />
                         ))}
                     </Box>
-                </Box>
-            )}
+            )
+            }
+                
+            
 
-            <DlgForm open={openDlg} onClose={hndlCloseDlg} title={'Anamnesis'} content={workoutFormContent} />
+            <DlgForm 
+            maxWidth="xs"
+            fullWidth
+            sx={{
+        '& .MuiDialog-paper': {
+          bgcolor: '#000',
+          borderRadius: '16px',
+          border: '1px solid rgba(0, 0, 0, 1)',
+          boxShadow: '0 4px 10px rgba(0, 204, 255, 0.7)'
+        }
+      }}
+            open={openDlg} 
+            onClose={(event, reason) => {
+              if (!usuario?.tiene_anamnesis) return; 
+                  setOpenDlg(false);
+              }}
+            disableEscapeKeyDown={!usuario?.tiene_anamnesis}
+            title={'Anamnesis'}
+            >
+            <Typography fontSize={11} color="red" mb={2}>
+            *Es necesario responder esta breve anamnesis para conocer tu historial clínico y deportivo y así poder asignarte un programa adecuado.
+            <br />
+            Es importante no omitir ninguna pregunta y responder con sinceridad. En <strong>"información adicional" </strong> puedes detallar lesiones, operaciones, restricciones médicas, etc.
+        </Typography>
+
+        <WorkoutForm
+        key={openDlg ? "open" : "closed"}
+        onFormSubmit={hndlFormSubmit} />
+        </DlgForm>
+
         </Container>
     );
 }
