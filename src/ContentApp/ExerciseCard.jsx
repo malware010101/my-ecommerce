@@ -81,37 +81,60 @@ const ExerciseCard = ({
                     )}
                 </Box>
                 
-                <Typography fontWeight="bold">
+                <Typography fontWeight="bold" sx={{
+                    textAlign: 'left',
+                    fontSize:{
+                        xs: '.8rem',
+                        md: '1.1rem',}
+                }}>
                     {exercise.nombre}
                 </Typography>
 
                 <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
                     <NotesIcon sx={{ color: 'rgb(0, 204, 255)', mr: 1 }} />
-                    <Typography fontStyle="italic" color="#bbb" textAlign="left">
+                    <Typography fontStyle="italic" color="#bbb" textAlign="left"
+                    sx={{
+                        fontSize: {
+                            xs: '.8rem',
+                            md: '1rem',
+                        }
+                    }}
+                    >
                         {exercise.descripcion}
                     </Typography>
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                    <FitnessCenterIcon sx={{ color: 'rgb(0, 204, 255)', mr: 1 }} />
-                    <Typography color="rgb(0, 204, 255)" fontWeight="bold">
+                
+                    <Typography color="rgb(0, 204, 255)" fontWeight="bold" 
+                    sx={{
+                        fontSize: {
+                            xs: '.7rem',
+                            md: '1rem',
+                        }
+                    }}
+                    >
                         Series:
-                        <Typography component="span" sx={{ ml: 1, color: '#fff' }}>
+                        <Typography component="span" sx={{ ml: 1, color: '#fff',fontSize: {
+                                xs: '.7rem',
+                                md: '1rem',
+                            } }}
+                        
+                        >
                             {exercise.series}
                         </Typography>
                     </Typography>
 
-                    <Typography sx={{ mx: 2 }} color="rgb(0, 204, 255)" fontWeight="bold">
+                    <Typography sx={{ mx: 2, fontSize:{ xs: '.7rem', md: '1rem'} }} color="rgb(0, 204, 255)" fontWeight="bold">
                         Reps:
-                        <Typography component="span" sx={{ ml: 1, color: '#fff' }}>
+                        <Typography component="span" sx={{ ml: 1, color: '#fff', fontSize:{ xs: '.7rem', md: '1rem'} }}>
                             {exercise.repeticiones}
                         </Typography>
                     </Typography>
 
-                    <AccessAlarmsIcon sx={{ color: 'rgb(0, 204, 255)', mr: 1 }} />
-                    <Typography color="rgb(0, 204, 255)" fontWeight="bold">
+                    <Typography color="rgb(0, 204, 255)" fontWeight="bold" sx={{ fontSize:{ xs: '.7rem', md: '1rem'} }}>
                         Desc:
-                        <Typography component="span" sx={{ ml: 1, color: '#fff' }}>
+                        <Typography component="span" sx={{ ml: 1, color: '#fff', fontSize:{ xs: '.7rem', md: '1rem'} }}>
                             {exercise.descanso} seg
                         </Typography>
                     </Typography>

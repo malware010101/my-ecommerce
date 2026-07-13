@@ -1,8 +1,9 @@
-import { Dialog, DialogTitle, DialogContent, Typography, Box, Grid, Paper } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, Typography, Box, Grid, Paper, Divider } from "@mui/material";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import InfoIcon from "@mui/icons-material/Info";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { Diversity1 } from "@mui/icons-material";
 
 export default function AnamnesisDlg({ open, onClose, anamnesis, loading }) {
 
@@ -11,14 +12,12 @@ export default function AnamnesisDlg({ open, onClose, anamnesis, loading }) {
   const cardStyle = {
   p: 2,
   borderRadius: 3,
-  bgcolor: "#090909",
-  boxShadow: "0 0 15px rgba(0,204,255,0.15)",
-  border: "1px solid rgba(0,204,255,0.2)",
+  bgcolor: "#040404",
   color: "#fff",
   transition: "all 0.3s ease",
   "&:hover": {
     transform: "translateY(-3px)",
-    boxShadow: "0 0 25px rgba(0,204,255,0.3)"
+    boxShadow: "0 0 25px rgba(183, 186, 186, 0.3)"
   }
 };
 
@@ -27,9 +26,16 @@ export default function AnamnesisDlg({ open, onClose, anamnesis, loading }) {
      open={open} 
      onClose={onClose} 
      fullWidth 
-     maxWidth="sm"
-     bgcolor="#000"
+     maxWidth="xs"
+     sx={{
+        '& .MuiDialog-paper': {
+          bgcolor: '#000',
+          borderRadius: '16px',
+          border: '1px solid rgba(0, 0, 0, 1)',
+        }
+      }}
      >
+  
 
       <DialogTitle
       sx={{
@@ -40,8 +46,9 @@ export default function AnamnesisDlg({ open, onClose, anamnesis, loading }) {
       >
         Anamnesis del usuario
         </DialogTitle>
+        <Divider  sx={{ size: 1, bgcolor: "#040404"}} />
 
-      <DialogContent sx={{ bgcolor: "#0b0b0b" }}>
+      <DialogContent sx={{ bgcolor: "#000" }}>
 
         {loading ? (
           <Typography>Cargando...</Typography>
@@ -79,10 +86,9 @@ export default function AnamnesisDlg({ open, onClose, anamnesis, loading }) {
             <Grid item xs={12}>
               <Paper sx={cardStyle}>
                 <Box display="flex" alignItems="center" gap={1}>
-                  <FitnessCenterIcon sx={{ color: "rgb(0,204,255)" }} />
-                  <Typography fontWeight="bold">Objetivo</Typography>
+                  <Typography color= '#ccc' fontSize={13}>Objetivo</Typography>
                 </Box>
-                <Typography mt={1} color="#ccc">
+                <Typography mt={1} fontWeight="bold"  color="#fff">
                   {datos?.objetivo}
                 </Typography>
               </Paper>
@@ -132,7 +138,7 @@ export default function AnamnesisDlg({ open, onClose, anamnesis, loading }) {
                       ? "#ff4d4f" : "#00ff99"
                     }}
                   />
-                  <Typography fontWeight="bold">
+                  <Typography fontsize={12} color='#ccc'>
                     Condición médica
                   </Typography>
                 </Box>
@@ -162,7 +168,7 @@ export default function AnamnesisDlg({ open, onClose, anamnesis, loading }) {
           color: datos?.tieneLesion === "si" ? "#ff4d4f" : "#00ff99"
         }}
       />
-      <Typography fontWeight="bold">
+      <Typography fontsize={12} color='#ccc'>
         Lesiones
       </Typography>
     </Box>

@@ -13,7 +13,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SnackbarProvider } from 'notistack';
 
 // Tu clave pública de Stripe, siempre empieza con 'pk_'
-const stripePromise = loadStripe('pk_test_51S9zBKEyobt1BZsUymJKXirQqGk11OZWiJLz0JzvlUn3XxgAkxJGkXE90UIXO6D1EpjnYBsXPdVH3ttShr23T0gN00z3aSpjMq');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const queryClient = new QueryClient({
   defaultOptions: {

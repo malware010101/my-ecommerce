@@ -56,7 +56,7 @@ export default function MiEntrenamiento() {
 };
 
     const hndlCardNavigate = (item) => {
-        console.log("ITEM:", item);
+        
         navigate(`/apptraining/entrenamiento/${item.entrenamiento_id}`);
     };
    
@@ -85,14 +85,6 @@ export default function MiEntrenamiento() {
 
     fetchMisProgramas();
 }, []);
-
-useEffect(() => {
-  console.log("AUTH DATA:", authData);
-}, [authData]);
-
-console.log("usuario:", usuario);
-console.log("tiene_anamnesis:", usuario?.tiene_anamnesis);
-console.log("openDlg:", openDlg);
 
 if (loading) {
     return (

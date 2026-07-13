@@ -91,14 +91,12 @@ for (let i = 1; i <= Number(programaData.diasEntrenamiento); i++) {
       nivel: 0,
       duracion_semanas: Number(programaData.duracionSemanas, 10) || 0,
       dias_entrenamiento: Number(programaData.diasEntrenamiento, 10) || 0,
-      dias: Object.entries(programaData.dias).map(([dia, items]) => ({
-        dia,
-        items,
-      })),
+      dias: programaData.dias,
       tipo: programaData.tipo, // personalizado_base | personalizado_complemento
       creador_id: parseInt(creador_id),
       is_general: false,
     };
+
 
     const programaRes = await api.post(
       "/entrenamiento/programas/",
@@ -117,7 +115,7 @@ for (let i = 1; i <= Number(programaData.diasEntrenamiento); i++) {
     onClose();
 
   } catch (error) {
-    console.error("Error creando programa personalizado:", error.response || error);
+    console.error("Error creando programa personalizado:", error.response.data);
 
     showSnackbar(
       error.response?.data?.detail || "Error al crear programa personalizado",
@@ -197,6 +195,9 @@ for (let i = 1; i <= Number(programaData.diasEntrenamiento); i++) {
                                 <MenuItem value="Perdida de Grasa">Perdida de Grasa</MenuItem>
                                 <MenuItem value="Salud">Salud</MenuItem>
                                 <MenuItem value="Entrenamiento Funcional">Entrenamiento Funcional</MenuItem>
+                                <MenuItem value="HIIT">HIIT</MenuItem>
+                                <MenuItem value="Tabata">Tabata</MenuItem>
+                                <MenuItem value="Abs">Abs</MenuItem>
                             </Select>
                         </FormControl>
                         

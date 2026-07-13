@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, Typography, List, ListItemButton, ListItemText, Badge, Divider, TextField, IconButton, InputAdornment } from "@mui/material";
 import { Send as SendIcon } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from "../api";
+import api, { WS_URL } from "../api";
 import { useAuth } from "./AuthContext";
 
 export default function AdminChat({ onClose, setCurrentChatOpenId, setNoLeidosPorChat }) {
@@ -55,7 +55,7 @@ export default function AdminChat({ onClose, setCurrentChatOpenId, setNoLeidosPo
     const token = obtenerTokenActual();
     if (!token) return;
 
-    const ws = new WebSocket(`ws://localhost:8001/chat/ws/${selectedChatId}?token=${token}`);
+    const ws = new WebSocket(`${WS_URL}/chat/ws/${selectedChatId}?token=${token}`);
     socketRef.current = ws;
 
     ws.onmessage = (event) => {
@@ -70,8 +70,8 @@ export default function AdminChat({ onClose, setCurrentChatOpenId, setNoLeidosPo
       }
     };
 
-    ws.onopen = () => console.log("✅ Admin WS conectado");
-    ws.onclose = () => console.log("❌ Admin WS cerrado");
+    ws.onopen = () => console.log("Admin WS conectado");
+    ws.onclose = () => console.log(" Admin WS cerrado");
 
     return () => ws.close();
   }, [selectedChatId, obtenerTokenActual, queryClient, setNoLeidosPorChat]);

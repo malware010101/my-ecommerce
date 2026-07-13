@@ -16,8 +16,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 export default function ProductsCard({ product }) {
   const [isHovered, setIsHovered] = useState(false);
   const theme = useTheme(); 
-  console.log('Product in ProductsCard:', product);
-  console.log('Image URL in ProductsCard:', product.image);
+
   return (
     <Card
       sx={{

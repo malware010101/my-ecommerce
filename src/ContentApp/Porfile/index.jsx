@@ -14,7 +14,7 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -23,6 +23,11 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ViewDayIcon from '@mui/icons-material/ViewDay';
 import CalendarViewDayIcon from '@mui/icons-material/CalendarViewDay';
 import AnamnesisDlg from "./anamnesisDlg";
+import Grafico from "./Grafico";
+import DlgFechasPesajes from "./DlgFechasPesajes";
+import DlgImg from "./DlgImg";
+import AddSharpIcon from '@mui/icons-material/AddSharp';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 
 export default function Porfile () {
@@ -32,6 +37,13 @@ const [ openDlgPsje, setOpenDlgPsje ] = useState(false);
 const [ avatar, setAvatar ] = useState(null);
 const [ openDrawer , setOpenDrawer ] = useState(false);
 const [openAnamnesis, setOpenAnamnesis] = useState(false);
+
+const [openDlgFechas, setOpenDlgFechas] = useState(false);
+const [ selectedPesaje, setSelectedPesaje ] = useState(null);
+
+//estado paras las imagenes del pesaje registradas
+const [openDlgImg, setOpenDlgImg] = useState(false);
+
 
 const { obtenerUsuarioActual } = useAuth();
 const usuario = obtenerUsuarioActual();
@@ -110,11 +122,6 @@ const { data: planNutri, isLoading: isLoadingPlanNutri } = useQuery({
   },
   enabled: !!userId
 });
-useEffect(() => {
-  if (planNutri) {
-    console.log("PLAN NUTRICIONAL:", planNutri);
-  }
-}, [planNutri]);
 
 //query del plan activo prinicipal
 const { data: workoutActivo, isLoading: loadingWorkout } = useQuery({
@@ -147,6 +154,33 @@ const { data: anamnesis, isLoading: loadingAnamnesis } = useQuery({
   enabled: !!userId
 });
 
+const { data: pesajes = [], refetch:refetchPesajes } = useQuery({
+  queryKey: ["pesajes", userId],
+  queryFn: async () => {
+    const endpoint =
+      usuario.rol === "admin" || usuario.rol === "coach"
+        ? `/pesajes/historico/usuario/${userId}`
+        : `/pesajes/historico`;
+
+    const res = await api.get(endpoint);
+    return res.data;
+  }
+});
+
+useEffect(() => {
+  if (pesajes?.length) {
+    setSelectedPesaje(pesajes[0]);
+  }
+}, [pesajes]);
+
+const pesajeActivo = selectedPesaje ?? pesajes[0];
+
+const hndlPsjCreated = () => {
+  setSelectedPesaje(prev => {
+    return prev;
+  });
+};
+
 const hndlOpenDlgPsje = () => {
     setOpenDlgPsje(true);
 }  
@@ -169,12 +203,19 @@ const cardStyle = {
 };
 
 const miniCardStyle = {
-  p: 2,
-  bgcolor: "#151515",
-  borderRadius: 5,
+  p: 1,
+  bgcolor: "#111",
+  borderRadius: 3,
   textAlign: "center",
-  boxShadow: "0 0 10px rgba(0,204,255,0.1)",
-  color: "#fff"
+  color: "#ffffff"
+};
+
+const miniCardStyle2 = {
+  p: 1,
+  bgcolor: "#111",
+  borderRadius: 10,
+  textAlign: "center",
+  color: "#ffffff"
 };
 
 
@@ -246,7 +287,9 @@ if (isOtroUser && loadingProfile) {
 }
 
 return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
+    <Container maxWidth="lg" 
+    sx={{ 
+      mt: { xs: 0, md: 4} }}>
 
       {/* ================= HEADER ================= */}
 <Box
@@ -263,7 +306,6 @@ return (
   <IconButton
     onClick={() => navigate("/apptraining/usuarios")}
     sx={{
-      mr: 1,
       color: "rgb(0,204,255)",
       "&:hover": { bgcolor: "rgba(0,204,255,0.15)" }
     }}
@@ -278,14 +320,15 @@ return (
         sx={{
           width: 60,
           height: 60,
-          border: "2px solid rgb(0,204,255)",
+          border: "2px solid #888",
           bgcolor: "#151515",
           fontSize: "1.5rem"
         }}
       >
         {!avatar && "U"}
       </Avatar>
-
+      {/* Aqui va el boton de subir avatar hasta que lo implemente en bunny*/}
+{/* 
       <IconButton
         component="label"
         size="small"
@@ -293,7 +336,7 @@ return (
           position: "absolute",
           bottom: -4,
           right: -4,
-          bgcolor: "rgb(0,204,255)",
+           background: "linear-gradient(180deg,rgb(0, 204, 255) 0%, #2E6CF6 100%)",
           color: "#000",
           width: 22,
           height: 22,
@@ -307,14 +350,17 @@ return (
           type="file"
           onChange={hndlAvatarChange}
         />
-      </IconButton>
+      </IconButton> */}
     </Box>
 
     <Box>
       <Typography
-        variant="h6"
+        fontSize= {{
+          xs: ".9rem",
+          md: "1.2rem"
+        }}
         fontWeight="bold"
-        color="rgb(0, 204, 255)"
+        color="#fff"
       >
         {headerUser?.nombre || "Atleta"} 
       </Typography>
@@ -325,35 +371,75 @@ return (
         Usuario: <strong> {rolShow}</strong> 
 
       </Typography>
-
-      <Typography fontSize={12} color="#888">
-        Último pesaje: 05 Feb 2026
-      </Typography>
     </Box>
 
   </Box>
 
   {/* DERECHA: Botón */}
   <Button
-    onClick={hndlOpenDlgPsje}
-    startIcon={<AddIcon sx={{ color: "#fff" }} />}
+    onClick= {() => 
+      navigate(
+        isOtroUser
+          ? `/apptraining/membresia/${userId}`
+          : `/apptraining/membresia`
+      )}
+    endIcon={<ArrowForwardIosIcon fontSize="small" sx={{ color: "#fff" }} />}
     size="small"
     sx={{
-      height: 36,
-      px: 1.5,
-      borderRadius: "18px",
-      bgcolor: "rgb(0, 204, 255)",
-      color: "#fff",
-      fontWeight: 600,
-      fontSize: "0.75rem",
-      textTransform: "none",
-      boxShadow: "0 0 10px rgba(0,204,255,0.3)",
-      "&:hover": {
-        bgcolor: "rgba(0,204,255,0.15)"
-      }
-    }}
+  px: {
+    xs: 2,
+    md: 2.6,
+  },
+
+  height: {
+    xs: 38,
+    md: 40,
+  },
+
+  minWidth: 0,
+  borderRadius: "999px",
+
+  textTransform: "none",
+
+  fontWeight: 600,
+
+  letterSpacing: ".15px",
+
+  fontSize: {
+    xs: ".7rem",
+    md: ".84rem",
+  },
+
+  color: "#fff",
+
+  background:
+    "linear-gradient(180deg,rgb(0, 204, 255) 0%, #2E6CF6 100%)",
+
+  boxShadow:
+    "0 6px 22px rgba(41,118,255,.28)",
+
+  transition: ".25s",
+
+  "& .MuiButton-endIcon": {
+    ml: 0.5,
+    transition: ".25s",
+  },
+
+  "&:hover": {
+    background:
+      "linear-gradient(180deg,rgb(0, 204, 255) 0%, rgb(46, 108, 246) 100%)",
+
+    transform: "translateY(-1px)",
+
+    boxShadow:
+      "0 10px 26px rgba(41,118,255,.38)",
+  },
+  "&:hover .MuiButton-endIcon": {
+    transform: "translateX(3px)",
+  },
+}}
   >
-    Pesaje
+    Membresia
   </Button>
 
 </Box>
@@ -363,21 +449,17 @@ return (
       <Grid container spacing={3}>
 
         {/* ===== Training Plan Actual ===== */}
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <Paper sx={cardStyle}>
             <Box>
-                <Typography variant="h6" color="#ccc">
+                <Typography fontSize={18} color="#ccc" mb={1}>
               Plan Entrenamiento
             </Typography> 
+            <Divider sx={{ mb: 4 }} />
             
             <Typography variant="h5" mt={1} mb={1} fontWeight="bold"  >
               {workoutInfo.nombre}
             </Typography>
-            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1 }}>
-                <Typography fontSize={13} color={ workoutInfo.diasRestantes === "Vencido" ? "#ff4d4f" : "#888"}>
-              <strong>Dias restantes: </strong> {workoutInfo.diasRestantes}
-            </Typography>
-            </Box>
             </Box>
            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1 }}>
                 <Typography fontSize={13} color="#888">
@@ -387,16 +469,21 @@ return (
               <strong>Fin:</strong> {workoutInfo.fechaFin}
             </Typography>
             </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1}}>
+                <Typography fontSize={13} color={ workoutInfo.diasRestantes === "Vencido" ? "#ff4d4f" : "#888"}>
+              <strong>Dias restantes: </strong> {workoutInfo.diasRestantes}
+            </Typography>
+            </Box>
             
         
           </Paper>
         </Grid>
 
         {/* ===== Activities ===== */}
-        <Grid item xs={6} md={6}>
+        <Grid item xs={12} md={6}>
           <Paper sx={cardStyle}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1 }}>
-                <Typography variant="h6" color="#ccc">
+            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 0 }}>
+                <Typography fontSize={18} color="#ccc">
               Actividad
             </Typography>
 
@@ -404,6 +491,7 @@ return (
                 <VisibilityIcon sx={{ color: "#888" }} />
             </IconButton>
             </Box>
+            <Divider sx={{ mb: 4 }} />
             <Typography variant="h3" fontWeight="bold" mb ={1}>
               {historial.length}
             </Typography>
@@ -417,7 +505,7 @@ return (
         <Grid item xs={12} md={6}>
           <Paper sx={cardStyle}>
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1 }}>
-                <Typography variant="h6" color="#ccc">
+                <Typography fontSize={18} color="#ccc">
               Anamnesis
             </Typography>
 
@@ -425,6 +513,7 @@ return (
                 <VisibilityIcon sx={{ color: "#888" }} />
             </IconButton>
             </Box>
+            <Divider sx={{ mb: 2 }} />
             <Box >
               <FitnessCenterIcon sx={{ color: "#fff", fontSize: 30 }} />
             </Box>
@@ -446,6 +535,7 @@ return (
               <strong>Objetivo: </strong> {nutInfo.objetivo}
             </Typography>
             </Box>
+            <Divider sx={{ mb: 1 }} />
              <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 2}}>
                 <Box sx={miniCardStyle}>
                     <Typography variant="h5" fontWeight="bold">
@@ -507,31 +597,53 @@ return (
                 <Typography variant="h6" color="#ccc">
               Analisis de resultados
             </Typography>
-            <IconButton size="small" >
+            <IconButton
+             onClick={() => setOpenDlgFechas(true)}
+             size="small" >
                 <CalendarViewDayIcon  sx={{ color: "#888" }} />
             </IconButton>
-            <IconButton size="small">
+            <IconButton 
+            size="small"
+            onClick={() => setOpenDlgImg(true)}
+            pesaje={pesajeActivo}
+            >
                 <VisibilityIcon sx={{ color: "#888" }} />
             </IconButton>
+             <IconButton 
+            size="small"
+            onClick={hndlOpenDlgPsje}
+            >
+                <AddSharpIcon sx={{ color: "#888" }} />
+            </IconButton>
+           
             
             </Box>
-            <Chart
-              pesoKg={70}
-              grasaPct={20}
-              masaMuscularKg={50}
+            <Divider sx={{ mb: 1 }} />
+            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1 }}>
+                <Typography variant="body2" color="#888" >
+              Fecha de pesaje:
+            </Typography>
+            <Typography variant="body2" color="#888">
+              {dayjs(pesajeActivo?.registrado_en).format("DD/MM/YYYY HH:mm")}
+            </Typography>
+            </Box>
+            <Grafico
+            data={pesajeActivo}
+            style={{ width: "100%", height: 500 }}
             />
+
             <Grid container spacing={2}>
 
               {[
-                { label: "Peso", value: "70 kg" },
-                { label: "Masa Muscular", value: "50 kg" },
-                { label: "Grasa Corporal", value: "20%" },
-                { label: "IMC", value: "24.1" }
+                { label: "Peso", value: `${pesajeActivo?.peso_kg ?? 0 } kg` },
+                { label: "Masa Muscular", value: `${pesajeActivo?.masa_muscular_kg ?? 0} kg` },
+                { label: "Grasa Corporal", value: `${pesajeActivo?.grasa_kg ?? 0} kg` },
+                { label: "IMC", value: `${pesajeActivo?.imc ?? 0 }` },
               ].map((item, index) => (
-                <Grid item xs={6} md={3} key={index} mb={0}>
-                  <Paper
-                   >
-                    <Box sx={miniCardStyle}>
+                <Grid item xs={12} md={3} key={index} mb={0} >
+                    <Box sx={
+                      miniCardStyle2
+                      }>
                         <Typography variant="body2" color="#888" textAlign="center">
                       {item.label}
                     </Typography>
@@ -539,7 +651,6 @@ return (
                       {item.value}
                     </Typography>
                     </Box>
-                  </Paper>
                 </Grid>
               ))}
 
@@ -552,6 +663,20 @@ return (
       <DlgPesaje
         open={openDlgPsje}
         onClose={hndlClsDlgPsje}
+        onPesajeCreated={hndlPsjCreated}
+      />
+      <DlgFechasPesajes
+        open= {openDlgFechas}
+        onClose={() => setOpenDlgFechas(false)}
+        pesajes={pesajes}
+        selected={selectedPesaje}
+        setSelected={setSelectedPesaje}
+        onApply={() => {setOpenDlgFechas(false);}}
+      />
+      <DlgImg
+        open={openDlgImg}
+        onClose={() => setOpenDlgImg(false)}
+        pesaje={pesajeActivo}
       />
       <Drawer
   anchor="right"

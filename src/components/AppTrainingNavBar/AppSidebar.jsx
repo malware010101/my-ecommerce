@@ -10,6 +10,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LogoReps from '../../assets/LogoReps.webp';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import { useAuth} from '../../ContentApp/AuthContext';
 
 
 export default function AppSidebar() {
@@ -17,13 +18,41 @@ export default function AppSidebar() {
     const location = useLocation();
     const theme = useTheme();
 
+    const {obtenerUsuarioActual} = useAuth();
+
+    const usuarioActual = obtenerUsuarioActual();
+    const Rol = usuarioActual?.rol?.toLowerCase();
+
     const menuItems = [
-        { text: 'Inicio', path: '/apptraining/home', icon: <HomeIcon /> },
-        { text: 'Mi Entrenamiento', path: '/apptraining/entrenamiento', icon: <FitnessCenterIcon /> },
-        { text: 'Nutricion', path: '/apptraining/nutrition', icon: <RestaurantIcon /> },
-        { text: 'Perfil', path: '/apptraining/profile', icon: <AssessmentIcon/> },
-        { text: 'Programas', path: '/apptraining/workout', icon: <FitnessCenterIcon /> },
-        { text: 'Usuarios', path: '/apptraining/usuarios', icon: <GroupAddIcon/> },
+        { text: 'Inicio',
+          path: '/apptraining/home', 
+          icon: <HomeIcon /> 
+            },
+        { text: 'Mi Entrenamiento', 
+          path: '/apptraining/entrenamiento', 
+          icon: <FitnessCenterIcon />
+        },
+        {   text: 'Nutricion', 
+            path: '/apptraining/nutrition', 
+            icon: <RestaurantIcon />
+        },
+        { text: 'Perfil',
+             path: '/apptraining/profile', 
+             icon: <AssessmentIcon/> 
+            },
+            // pa admin y coach
+            ...( Rol === 'admin' || Rol ==='coach' ? [
+                 { text: 'Programas', 
+            path: '/apptraining/workout', 
+            icon: <FitnessCenterIcon />
+         },
+        {   text: 'Usuarios', 
+            path: '/apptraining/usuarios', 
+            icon: <GroupAddIcon/> 
+        },
+            ]
+            : []),
+       
     ];
 
     const hndlLogout = () => {

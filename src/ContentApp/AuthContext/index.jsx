@@ -42,7 +42,15 @@ export const AuthProvider = ({ children }) => {
       userId: data.user_id,
       rol: data.rol,
       nombre: data.nombre,
-      tiene_anamnesis: data.tiene_anamnesis
+      tiene_anamnesis: data.tiene_anamnesis,
+
+      membresia_plan: data.membresia_plan,
+      membresia_inicio: data.membresia_inicio,
+      membresia_fin: data.membresia_fin,
+      membresia_estado: data.membresia_estado,
+
+      duracion_plan: data.duracion_plan,
+      dias_restantes: data.dias_restantes,
     });
   };
 
@@ -66,7 +74,15 @@ export const AuthProvider = ({ children }) => {
       id: authData?.userId,
       rol: authData?.rol,
       nombre: authData?.nombre,
-      tiene_anamnesis: authData?.tiene_anamnesis
+      tiene_anamnesis: authData?.tiene_anamnesis,
+
+      membresia_plan: authData?.membresia_plan,
+      membresia_inicio: authData?.membresia_inicio,
+      membresia_fin: authData?.membresia_fin,
+      membresia_estado: authData?.membresia_estado,
+
+      duracion_plan: authData?.duracion_plan,
+      dias_restantes: authData?.dias_restantes,
   });
   
   const isAuthenticated = !!authData?.token;

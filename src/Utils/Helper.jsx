@@ -59,7 +59,7 @@ export const productSupls = [
 
 
   export const hndlAgregarAlCarrito = (product) => {
-    console.log(`Producto agregado al carrito: ${product.name}`);
+    console.log(`Producto agregado al carrito:`);
   };
 
    

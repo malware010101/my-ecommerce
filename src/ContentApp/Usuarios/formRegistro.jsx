@@ -13,6 +13,7 @@ export default function FormRegistro({  }) {
         email: '',
         password: '',
         rol: 'usuario',
+        membresia_plan: 'standard'
     })
 
     const mutation  = useMutation ({
@@ -34,6 +35,7 @@ export default function FormRegistro({  }) {
                     email: '',
                     password: '',
                     rol: 'usuario',
+                    membresia_plan: 'standard'
                  });
         },
         onError: ( error) => {
@@ -53,6 +55,14 @@ export default function FormRegistro({  }) {
         { value: 'usuario', label: 'usuario' },
         { value: 'pro', label: 'pro' },
     ];
+
+    const planes = [
+        { value: 'trial', label: 'Prueba (7 días)' },
+        { value: 'standard', label: 'Standard (30 días)' },
+        { value: 'platinum', label: 'Platinum (90 días)' },
+        { value: 'gold', label: 'Gold (180 días)' },
+        { value: 'diamond', label: 'Diamond (365 días)' },
+    ]
 
     return (
         <Container maxWidth="lg" 
@@ -94,7 +104,7 @@ export default function FormRegistro({  }) {
                         
                         '& .MuiOutlinedInput-root': {
                             backgroundColor: 'rgba(8, 8, 8, 1)',
-                            color: '#888',
+                            color: '#fff',
                             '&:hover fieldset': {
                                 borderColor: 'rgb(0, 179, 255) !important',
                             },
@@ -122,7 +132,7 @@ export default function FormRegistro({  }) {
                         
                         '& .MuiOutlinedInput-root': {
                             backgroundColor: 'rgba(8, 8, 8, 1)',
-                            color: '#888',
+                            color: '#fff',
                             '&:hover fieldset': {
                                 borderColor: 'rgb(0, 179, 255) !important',
                             },
@@ -150,7 +160,7 @@ export default function FormRegistro({  }) {
                         
                         '& .MuiOutlinedInput-root': {
                             backgroundColor: 'rgba(8, 8, 8, 1)',
-                            color: '#888',
+                            color: '#fff',
                             '&:hover fieldset': {
                                 borderColor: 'rgb(0, 179, 255) !important',
                             },
@@ -178,7 +188,7 @@ export default function FormRegistro({  }) {
                         
                         '& .MuiOutlinedInput-root': {
                             backgroundColor: 'rgba(8, 8, 8, 1)',
-                            color: '#888',
+                            color: '#fff',
                             '&:hover fieldset': {
                                 borderColor: 'rgb(0, 179, 255) !important',
                             },
@@ -198,6 +208,41 @@ export default function FormRegistro({  }) {
                         </MenuItem>
                     ))}
                 </TextField>
+                 <TextField
+                label='planes de membresia'
+                variant="outlined"
+                select
+                fullWidth
+                value={ formData.membresia_plan }
+                onChange={ (e) => setFormData({ ...formData, membresia_plan: e.target.value }) }
+                required
+                sx={{ 
+                   mb: 3, 
+                        
+                        '& .MuiOutlinedInput-root': {
+                            backgroundColor: 'rgba(8, 8, 8, 1)',
+                            color: '#fff',
+                            '&:hover fieldset': {
+                                borderColor: 'rgb(0, 179, 255) !important',
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'rgb(0, 179, 255)',
+                            },
+                        },
+                        '& .MuiInputLabel-root': {
+                            color: '#474747ff',
+                        },
+                        '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' }
+                }}
+                >
+                    {planes.map((plan) => (
+                        <MenuItem key={plan.value} value={plan.value}>
+                            {plan.label}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                    
+
                 <Button 
                 type="submit" 
                 variant="contained"  

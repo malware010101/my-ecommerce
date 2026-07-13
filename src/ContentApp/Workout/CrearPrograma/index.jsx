@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import api from '../../../api';
 import {
     Box,
     Button,
@@ -13,8 +14,15 @@ import {
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import CrearEjercicio from '../CrearEjercicio';
 import { useAuth } from '../../AuthContext';
+import { enqueueSnackbar } from 'notistack';
+import { useSnackbar } from 'notistack';
 
 export default function CrearPrograma( { onClose } ) {
+
+    const {enqueueSnackbar} = useSnackbar();
+      const notiSound = useRef(
+        new Audio('/sounds/success.mp3')
+      )
 
     const { obtenerTokenActual, obtenerUsuarioActual } = useAuth();
     const [step, setStep] = useState(1);
@@ -66,64 +74,59 @@ setStep(2);
   }));
 };
 
-    const hndlFinalizar = async () => {
-        
-    const authToken = obtenerTokenActual(); 
-    const { id: creador_id, rol: userRol } = obtenerUsuarioActual(); 
+   const hndlFinalizar = async () => {
+
+    const authToken = obtenerTokenActual();
+    const { id: creador_id, rol: userRol } = obtenerUsuarioActual();
 
     if (!authToken || !creador_id) {
         console.error("No autenticado. Por favor, inicia sesión.");
-       
-        return; 
+        return;
     }
-    if (userRol !== 'admin' && userRol !== 'coach') {
+
+    if (userRol !== "admin" && userRol !== "coach") {
         console.error("Permiso denegado: Rol insuficiente para crear programas.");
         return;
     }
-    console.log("Token a enviar:", authToken ? authToken.substring(0, 10) + '...' : "TOKEN NO DISPONIBLE"); 
-
 
     const datosFinales = {
-  nombre: programaData.nombre,
-  objetivo: programaData.objetivo,
-  categoria: programaData.categoria,
-  nivel: parseInt(programaData.nivel, 10) || 0,
-  duracion_semanas: parseInt(programaData.duracionSemanas, 10) || 0,
-  dias_entrenamiento: parseInt(programaData.diasEntrenamiento, 10) || 0,
-  dias: programaData.dias, 
-  tipo: programaData.tipo,
-  creador_id: parseInt(creador_id),
-  is_general: true
-};
-{/* ("PAYLOAD FINAL FRONTEND") ELIMINAR ANTES DEL DEPLOY PA QUE NO SE ME OLVIDE*/}
-console.log(
-      "PAYLOAD FINAL (frontend):",
-      JSON.stringify(datosFinales, null, 2)
-    );
-    try {
-        const response = await fetch('http://127.0.0.1:8001/entrenamiento/programas/', { 
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`, 
-            },
-            body: JSON.stringify(datosFinales)
-        });
-
-        if (response.ok) {
-            const nuevoPrograma = await response.json();
-            console.log("Programa creado exitosamente:", nuevoPrograma);
-            onClose(); 
-        } else {
-            const errorData = await response.json();
-            console.error("Error al crear programa:", errorData.detail);
-          
-        }
-    } catch (error) {
-        console.error("Error de red al crear programa:", error);
-    }
-
+        nombre: programaData.nombre,
+        objetivo: programaData.objetivo,
+        categoria: programaData.categoria,
+        nivel: parseInt(programaData.nivel, 10) || 0,
+        duracion_semanas: parseInt(programaData.duracionSemanas, 10) || 0,
+        dias_entrenamiento: parseInt(programaData.diasEntrenamiento, 10) || 0,
+        dias: programaData.dias,
+        tipo: programaData.tipo,
+        creador_id: parseInt(creador_id),
+        is_general: true
     };
+
+    try {
+        const { data: nuevoPrograma } = await api.post(
+            "/entrenamiento/programas/",
+            datosFinales
+        );
+
+        enqueueSnackbar(
+            "Programa creado exitosamente",
+            { variant: "success" }
+        );
+
+        notiSound.current.currentTime = 0;
+        notiSound.current.play().catch(() => {});
+
+        
+        onClose();
+
+    } catch (error) {
+        console.error("Error al crear el programa:", error);
+        enqueueSnackbar(
+            "Error al crear el programa",
+            { variant: "error" }
+        );
+    }
+};
 
     const estiloTexfield = {
         '& .MuiOutlinedInput-root': {
@@ -171,6 +174,9 @@ console.log(
                                 <MenuItem value="Fuerza">Fuerza</MenuItem>
                                 <MenuItem value="Salud">Salud</MenuItem>
                                 <MenuItem value="Entrenamiento Funcional">Entrenamiento Funcional</MenuItem>
+                                <MenuItem value="HIIT">HIIT</MenuItem>
+                                <MenuItem value="Tabata">Tabata</MenuItem>
+                                <MenuItem value="Abs">Abs</MenuItem>
                             </Select>
                         </FormControl>
                         

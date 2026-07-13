@@ -2,16 +2,17 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button, Box, Typography } from '@mui/material';
+import api from '../../api';
+import { enqueueSnackbar } from 'notistack';
 
 const StripeForm = ({ onPaymentSuccess, plan, email, name, password }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log('Datos enviados al backend:', { plan, email, name, password });
 
     if (!stripe || !elements) {
         setLoading(false);
@@ -19,52 +20,50 @@ const StripeForm = ({ onPaymentSuccess, plan, email, name, password }) => {
     }
 
     try {
-        const response = await fetch('http://127.0.0.1:8001/payments/create-subscription', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ plan, email, name, password }),
-        });
-        
-        const responseData = await response.json(); 
-        console.log("Respuesta BACKEND:", responseData);
-
-
-        if (!response.ok) {
-             throw new Error(responseData.detail || "Error al crear la suscripción.");
-        }
-        
-        if (responseData.status === "success_delegated") {
-            // Caso B: Stripe resolvió el pago instantáneamente. 
-            // El Webhook ya se está encargando del registro.
-            console.log("Suscripción creada. Pago completo sin confirmación adicional. Delegando el registro al Webhook.");
-            onPaymentSuccess(); // <-- Redirigir al login/éxito
-            return; 
-        }
-
-        // CASO A: Se obtuvo el client_secret, requiere confirmación del frontend.
-        const { client_secret } = responseData; // Desestructuramos si no fue "success_delegated"
-
-        const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
-            payment_method: {
-                card: elements.getElement(CardElement),
-                billing_details: {
-                    email: email, 
-                    name: name,   
-                },
+        const { data: responseData } = await api.post(
+            "/payments/create-subscription",
+            {
+                plan,
+                email,
+                name,
+                password,
             }
-        });
-           
-        
-        if (error) {
-            console.error(error.message);
-            alert(error.message);
-        } else if (paymentIntent.status === "succeeded") {
-            console.log("Pago exitoso: El usuario se ha suscrito correctamente.");
-             onPaymentSuccess();
+        );
+
+
+        if (responseData.status === "success_delegated") {
+
+            enqueueSnackbar('Pago completado', { variant: 'success' });
+            onPaymentSuccess();
+            
+            return;
         }
+
+        const { client_secret } = responseData;
+
+        const { error, paymentIntent } =
+            await stripe.confirmCardPayment(client_secret, {
+                payment_method: {
+                    card: elements.getElement(CardElement),
+                    billing_details: {
+                        email,
+                        name,
+                    },
+                },
+            });
+
+        if (error) {
+           enqueueSnackbar(error.message, { variant: 'error' });
+        } else if (paymentIntent.status === "succeeded") {
+            enqueueSnackbar('Pago completado', { variant: 'success' });
+            onPaymentSuccess();
+        }
+
     } catch (error) {
-        console.error("Error al procesar el pago:", error);
-        alert("Ocurrió un error. Intenta de nuevo.");
+        console.error();
+        enqueueSnackbar(error?.response?.data?.detail ||
+        error?.message ||
+        "Error al procesar el pago", { variant: 'error' });
     } finally {
         setLoading(false);
     }

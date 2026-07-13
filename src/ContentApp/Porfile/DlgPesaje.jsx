@@ -1,17 +1,23 @@
-import React, { useEffect, useState }  from 'react'
-import { Dialog, DialogContent, DialogActions, Button, DialogTitle, TextField, IconButton, Stack, Typography, Box, Grid } from '@mui/material';
+import React, { useEffect, useState, useRef }  from 'react'
+import { Dialog, DialogContent, DialogActions, Button, DialogTitle, TextField, IconButton, Stack, Typography, Box, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../api';
+import {useSnackbar} from 'notistack';
 
 
-export default function DlgPesaje( { open, onClose } ) {
+export default function DlgPesaje( { open, onClose, onPesajeCreated } ) {
 
     const [ form, setForm ] = useState({
         peso_kg: '',
-        masa_muscular_kg: '',
-        grasa_pct: '',
+        grasa_valor: '',
+        grasa_tipo: '',
+
+        musculo_valor: '',
+        musculo_tipo: '',
+
         imc: ''
     })
 
@@ -22,6 +28,74 @@ export default function DlgPesaje( { open, onClose } ) {
         foto_trasera_url: ''
     });
 
+const [files, setFiles] = useState({
+    foto_frontal_url: null,
+    foto_izquierda_url: null,
+    foto_derecha_url: null,
+    foto_trasera_url: null
+});
+
+  const peso = Number(form.peso_kg);
+  const grasa = Number(form.grasa_valor);
+  const musculo = Number(form.musculo_valor);
+
+const formularioValido =
+  peso > 0 &&
+  peso <= 400 &&
+  grasa > 0 &&
+  musculo > 0 &&
+  !!form.grasa_tipo &&
+  !!form.musculo_tipo;
+
+const resetForm = () => {
+  setForm({
+    peso_kg: '',
+    grasa_valor: '',
+    grasa_tipo: '',
+    musculo_valor: '',
+    musculo_tipo: '',
+    imc: ''
+  });
+
+  setImg({
+    foto_frontal_url: '',
+    foto_izquierda_url: '',
+    foto_derecha_url: '',
+    foto_trasera_url: ''
+  });
+};
+
+const uploadPsjImg = async (files) => {
+
+  const formData = new FormData();
+
+  if (files.foto_frontal_url)
+        formData.append("foto_frontal", files.foto_frontal_url);
+
+    if (files.foto_izquierda_url)
+        formData.append("foto_izquierda", files.foto_izquierda_url);
+
+    if (files.foto_derecha_url)
+        formData.append("foto_derecha", files.foto_derecha_url);
+
+    if (files.foto_trasera_url)
+        formData.append("foto_trasera", files.foto_trasera_url);
+
+    const res = await api.post("/upfiles/pesajes", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    });
+
+    return res.data;
+  
+}
+
+  const {enqueueSnackbar} = useSnackbar();
+  const notiSound = useRef(
+    new Audio('/sounds/success.mp3')
+  )
+
     const queryClient = useQueryClient();
 
     const createPesaje = useMutation({
@@ -30,14 +104,37 @@ export default function DlgPesaje( { open, onClose } ) {
     return res.data;
   },
   onSuccess: () => {
+
     queryClient.invalidateQueries(["pesajes"]);
-    onClose();
+
+    onPesajeCreated?.();
+
+    enqueueSnackbar('Pesaje registrado exitosamente', 
+      { variant: 'success' });
+      
+      notiSound.current.currentTime = 0;
+      notiSound.current.play().catch(() => {});
+
+      resetForm();
+      onClose();
+  },
+  onError: (error) => {
+    console.error("ERROR BACKEND", error);
+    enqueueSnackbar(
+      error.response?.data?.detail || "Error al registrar pesaje",
+      { variant: 'error' }
+    )
   }
 });
 
     const hndlImgChange = (key) => (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        setFiles(prev => ({
+        ...prev,
+        [key]: file
+    }));
 
         setImg((prev) => ({
     ...prev,
@@ -46,17 +143,39 @@ export default function DlgPesaje( { open, onClose } ) {
     };
 
 const hndlSubmit = async () => {
-     createPesaje.mutate({
-    ...form,
-    peso_kg: Number(form.peso_kg),
-    masa_muscular_kg: form.masa_muscular_kg ? Number(form.masa_muscular_kg) : null,
-    grasa_pct: form.grasa_pct ? Number(form.grasa_pct) : null,
-    imc: form.imc ? Number(form.imc) : null,
-    foto_frontal_url: img.frontal,
-    foto_izquierda_url: img.izquierda,
-    foto_derecha_url: img.derecha,
-    foto_trasera_url: img.trasera
-  });
+try {
+  let urls = {};
+  
+const HayImagenes = 
+  files.foto_frontal_url ||
+  files.foto_izquierda_url ||
+  files.foto_derecha_url ||
+  files.foto_trasera_url;
+
+  if(
+    HayImagenes) {
+    urls = await uploadPsjImg(files);
+  }
+  const payload = {
+      peso_kg: Number(form.peso_kg),
+
+      grasa_valor: Number(form.grasa_valor),
+      grasa_tipo: form.grasa_tipo,
+
+      musculo_valor: Number(form.musculo_valor),
+      musculo_tipo: form.musculo_tipo,
+
+      imc: form.imc ? Number(form.imc) : null,
+      ...urls
+  }
+  createPesaje.mutate(payload);
+
+} catch (error) {
+  enqueueSnackbar(
+    'Error al registrar pesaje',
+    { variant: 'error' }
+  )
+}    
 }
 
     const estiloTexfield = {
@@ -79,13 +198,38 @@ const hndlSubmit = async () => {
         '& .MuiInputLabel-root.Mui-focused': { color: 'rgb(0, 204, 255)' }
     };
 
+    const estiloSelect = {
+  minWidth: 70,
+
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#1f1f1f"
+  },
+
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: "rgb(0,204,255)"
+  },
+
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "rgb(0,204,255)"
+  },
+
+  "& .MuiSelect-select": {
+    color: "#fff"
+  },
+
+  "& .MuiSvgIcon-root": {
+    color: "#fff"
+  }
+};
+
    useEffect(() => {
   return () => {
     Object.values(img).forEach(url => {
       if (url) URL.revokeObjectURL(url);
     });
   };
-}, []);
+}, [img]);
+
 
     return (
             <Dialog
@@ -115,7 +259,10 @@ const hndlSubmit = async () => {
                 >
                     Añadir Pesaje
                     <IconButton 
-                         onClick={onClose} 
+                         onClick={() => { 
+                          resetForm(); 
+                          onClose();
+                         }}
                          sx={{ color: '#bbb' }}>
                              <CloseIcon 
                                  sx= {{ color: '#fff', 
@@ -135,22 +282,73 @@ const hndlSubmit = async () => {
                         type="number"
                         sx={estiloTexfield}
                     />
-                    <TextField
-                        value= {form.masa_muscular_kg}
-                        onChange={(e) => setForm({ ...form, masa_muscular_kg: e.target.value })}
-                        fullWidth
-                        label="Masa Muscular (kg)"
-                        type="number"
-                        sx={estiloTexfield}
-                    />
-                    <TextField
-                        value= {form.grasa_pct}
-                        onChange={(e) => setForm({ ...form, grasa_pct: e.target.value })}
-                        fullWidth
-                        label="Grasa Corporal (%)"
-                        type="number"
-                        sx={estiloTexfield}
-                    />
+                    <Box display="flex" gap={2}>
+                 <TextField
+                     fullWidth
+                     label="Masa Muscular"
+                     type="number"
+                     value={form.musculo_valor}
+                     onChange={(e) =>
+                        setForm({
+                           ...form,
+                           musculo_valor: e.target.value
+                    })}
+                   sx={estiloTexfield}
+                  />
+
+                 <FormControl sx={ {
+                  ...estiloTexfield,
+                  width: 120
+                 }}>
+                    <Select
+                    sx={estiloSelect}
+                       value={form.musculo_tipo}
+                       onChange={(e) =>
+                          setForm({
+                            ...form,
+                            musculo_tipo: e.target.value
+                          })
+                       }
+                    >
+                     <MenuItem value="%">%</MenuItem>
+                     <MenuItem value="kg">kg</MenuItem>
+                    </Select>
+                 </FormControl>
+               </Box>
+               <Box display="flex" gap={2}>
+                 <TextField
+                     fullWidth
+                     label="Grasa Corporal"
+                     type="number"
+                     value={form.grasa_valor}
+                     onChange={(e) =>
+                        setForm({
+                           ...form,
+                           grasa_valor: e.target.value
+                    })
+                   }
+                   sx={estiloTexfield}
+                  />
+
+                 <FormControl sx={ {
+                  ...estiloTexfield,
+                  width: 120
+                 }}>
+                    <Select
+                       sx={estiloSelect}
+                       value={form.grasa_tipo}
+                       onChange={(e) =>
+                          setForm({
+                            ...form,
+                            grasa_tipo: e.target.value
+                          })
+                       }
+                    >
+                     <MenuItem value="%">%</MenuItem>
+                     <MenuItem value="kg">kg</MenuItem>
+                    </Select>
+                 </FormControl>
+               </Box>
                     <TextField
                         value= {form.imc}
                         onChange={(e) => setForm({ ...form, imc: e.target.value })}
@@ -181,10 +379,10 @@ const hndlSubmit = async () => {
 
   <Grid container spacing={2}>
     {[
-      { key: 'frontal', label: 'Frontal' },
-      { key: 'izquierda', label: 'Perfil izquierdo' },
-      { key: 'derecha', label: 'Perfil derecho' },
-      { key: 'trasera', label: 'Posterior' },
+      { key: 'foto_frontal_url', label: 'Frontal' },
+      { key: 'foto_izquierda_url', label: 'Perfil izquierdo' },
+      { key: 'foto_derecha_url', label: 'Perfil derecho' },
+      { key: 'foto_trasera_url', label: 'Posterior' },
     ].map(({ key, label }) => (
       <Grid item xs={6} key={key}>
         <Box
@@ -238,6 +436,7 @@ const hndlSubmit = async () => {
                     </DialogContent>
                 <DialogActions sx= {{ px: 3, pb: 2, bgcolor: '#000'}}>
                     <Button
+                    disabled = {!formularioValido || createPesaje.isPending}
                     onClick= {hndlSubmit}
                     variant = "contained"
                     fullWidth
@@ -248,7 +447,9 @@ const hndlSubmit = async () => {
             '&:hover': { bgcolor: 'darkgreen' }
           }}
                     >
-                    Guardar
+                    {createPesaje.isPending 
+                    ? 'Cargando...'
+                     : 'Guardar'}
                     </Button>
                     </DialogActions>
             </Dialog>

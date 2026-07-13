@@ -173,13 +173,13 @@ export default function ProgramDetails({ entrenamiento }) {
     p: 1,
     flexWrap: "wrap"
          }}>
-        <Box sx={{ minWidth: 100 }}>
+        <Box sx={{ maxWidth: 120 }}>
       <Typography 
-        color= '#ccc' 
-        fontSize="0.9rem" 
+        color= 'rgb(0, 204, 255)' 
+        fontSize="0.7rem" 
         fontWeight={'bold'}
         textAlign={'left'}
-        ml={2.5}
+        ml={2.2}
       >
         Inicio
       </Typography>
@@ -189,17 +189,18 @@ export default function ProgramDetails({ entrenamiento }) {
           sx={{
             "& .MuiOutlinedInput-root": {
               borderRadius: "20px",
+              fontSize: "0.8rem",
               color: "#ccc",
-              "& fieldset": { borderColor: "rgb(0, 204, 255)" },
-              "&:hover fieldset": { borderColor: "rgb(0, 204, 255)" },
+              "& fieldset": { borderColor: "#1f1f1fff" },
+              "&:hover fieldset": { borderColor: "rgba(94,166,255,.15)" },
             },
           }}
         />
         </Box>
-        <Box sx={{ minWidth: 100 }}>
+        <Box sx={{ maxWidth: 120 }}>
       <Typography 
-        color= '#ccc' 
-        fontSize="0.9rem" 
+        color= 'rgb(0, 204, 255)' 
+        fontSize="0.7rem" 
         ml={2}
         fontWeight={'bold'}
         textAlign={'left'}
@@ -211,10 +212,11 @@ export default function ProgramDetails({ entrenamiento }) {
           InputProps={{ readOnly: true }}
           sx={{
             "& .MuiOutlinedInput-root": {
+              fontSize: "0.8rem",
               borderRadius: "20px",
               color: "#ccc",
-              "& fieldset": { borderColor: "rgb(0, 204, 255)" },
-              "&:hover fieldset": { borderColor: "rgb(0, 204, 255)" },
+              "& fieldset": { borderColor: "#1f1f1fff" },
+              "&:hover fieldset": { borderColor: "rgba(94,166,255,.15)" },
             },
           }}
         />
@@ -223,7 +225,7 @@ export default function ProgramDetails({ entrenamiento }) {
       {entrenamiento?.fecha_inicio && entrenamiento?.fecha_fin && (
         <Box sx={{ textAlign: "center", mb: 1}}>
           {planActivo ? (
-            <Typography color="#1ddf47" fontWeight="bold" mb={1}  >
+            <Typography color="#414141" fontWeight="bold" mb={1}  >
               <AccessTimeIcon sx={{ fontSize: 'medium', verticalAlign: 'middle' }} /> 
               Tu plan vence en {diasRestantes} días
             </Typography>

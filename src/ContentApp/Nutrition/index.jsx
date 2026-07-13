@@ -19,7 +19,6 @@ export default function Nutrition () {
 
     const usuario = obtenerUsuarioActual();
     const userId = usuario?.id
-    console.log("User ID en Nutricion:", userId);
 
     const queryClient = useQueryClient();
 
@@ -62,14 +61,14 @@ if (loading) {
         <Container maxWidth="lg">
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3
             }}>
-                <Typography variant="h5" textAlign={'center'}  fontWeight={'bold'} color= {'#ccc'} >
+                <Typography  textAlign={'center'}  fontWeight={'bold'} color= {'#ccc'} sx={{ fontSize:{ xs: '1.2rem', md: '1.5rem' } }} >
                     ¡Hola {usuario?.nombre?.toUpperCase() || 'ATLETA'}!<br /> Bienvenido a tu espacio de nutrición personalizada.
                     </Typography>
             </Box>
             <Divider />
             
             {planActivo && (
-  <Box sx={{ textAlign: "leftt", mb: 2, mt: 2 }}>
+  <Box sx={{ textAlign: "right", mb: 2, mt: 2, mr: 2 }}>
     {planActivo.estado === "activo" && (
       <Typography color="#1ddf47" fontWeight="bold">
         <AccessTimeIcon sx={{ fontSize: 'medium' }} /> Tu plan vence en {diasRestantes} días
@@ -77,8 +76,8 @@ if (loading) {
     )}
 
     {planActivo.estado === "vencido" && (
-      <Typography color="red" fontWeight="bold">
-        ❌ Tu plan venció hace {Math.abs(diasRestantes)} días
+      <Typography color="red"  mb={1}>
+        Tu plan venció hace {Math.abs(diasRestantes)} días
       </Typography>
     )}
   </Box>
@@ -94,13 +93,13 @@ if (loading) {
     p: 1,
     flexWrap: "wrap"
   }}>
-    <Box sx={{ minWidth: 100 }}>
+    <Box sx={{ maxWidth: 120 }}>
       <Typography 
-        color= '#ccc' 
-        fontSize="0.9rem" 
-        mb={0.5}
-        ml={2}
+        color= 'rgb(0, 204, 255)' 
+        fontSize="0.7rem" 
         fontWeight={'bold'}
+        textAlign={'left'}
+        ml={2.2}
       >
         Inicio
       </Typography>
@@ -111,24 +110,24 @@ if (loading) {
           readOnly: true,
         }}
         sx={{
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "20px",
-            color: '#ccc',
-            "& fieldset": { borderColor: "rgb(0, 204, 255)" },
-            "&:hover fieldset": { borderColor: "rgb(0, 204, 255)" },
-
-          }
-        }}
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "20px",
+              fontSize: "0.8rem",
+              color: "#ccc",
+              "& fieldset": { borderColor: "#1f1f1fff" },
+              "&:hover fieldset": { borderColor: "rgba(94,166,255,.15)" },
+            },
+          }}
       />
     </Box>
 
-    <Box sx={{ minWidth: 100 }}>
+    <Box sx={{ maxWidth: 120 }}>
       <Typography 
-        color= '#ccc' 
-        fontSize="0.9rem" 
-        mb={0.5}
+       color= 'rgb(0, 204, 255)' 
+        fontSize="0.7rem" 
         ml={2}
         fontWeight={'bold'}
+        textAlign={'left'}
       >
         Fin
       </Typography>
@@ -138,14 +137,15 @@ if (loading) {
         InputProps={{
           readOnly: true,
         }}
-        sx={{
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "20px",
-            color: "#ccc",
-            "& fieldset": { borderColor: "rgb(0, 204, 255)" },
-            "&:hover fieldset": { borderColor: "rgb(0, 204, 255)" },
-          }
-        }}
+      sx={{
+            "& .MuiOutlinedInput-root": {
+              fontSize: "0.8rem",
+              borderRadius: "20px",
+              color: "#ccc",
+              "& fieldset": { borderColor: "#1f1f1fff" },
+              "&:hover fieldset": { borderColor: "rgba(94,166,255,.15)" },
+            },
+          }}
       />
     </Box>
   </Box>
@@ -201,7 +201,7 @@ if (loading) {
                 <Typography 
                      variant="body2" color= {'#fff'} textAlign={'left'} padding={'10px'} fontStyle={'italic'} color={'#bbb'}>
                     Para generar o actualizar su plan de alimentación personalizado, es fundamental completar el siguiente formulario. Esto nos permitirá calcular sus requerimientos de macronutrientes con base en su perfil y objetivos específicos..<br></br> 
-                Para optimizar el análisis de nuestra <strong>IA</strong> , recomendamos que el registro de sus datos <strong>(especialmente el peso)</strong>  se realice por la mañana, en ayunas. Esto asegura una mayor precisión en los cálculos y un ajuste alimenticio óptimo.<br></br>
+                Para optimizar el análisis de nuestra <strong>algoritmo Reps</strong> , recomendamos que el registro de sus datos <strong>(especialmente el peso)</strong>  se realice por la mañana, en ayunas. Esto asegura una mayor precisión en los cálculos y un ajuste alimenticio óptimo.<br></br>
                 Mantener su información actualizada es clave para garantizar un diseño nutricional preciso y efectivo.</Typography>
                 
             </Box>

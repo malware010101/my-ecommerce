@@ -1,11 +1,19 @@
 import hipertrofiaImg from '../../assets/ImagenesApp/hipertrofia.jpeg?url'
 import perdidaGrasaImg from '../../assets/ImagenesApp/perdidaGrasa.jpeg?url'
 import fuerzaImg from '../../assets/ImagenesApp/fuerza.jpeg?url'
+import funcionalImg from '../../assets/ImagenesApp/funcional.png?url'
+import hiitImg from '../../assets/ImagenesApp/hiit.png?url'
+import tabataImg from '../../assets/ImagenesApp/tabata.png?url'
+import absImg from '../../assets/ImagenesApp/abs.png?url'
 
 export const objetivosImagenes = {
     'Hipertrofia' : hipertrofiaImg,
     'Perdida de Grasa' : perdidaGrasaImg,
-    'Fuerza' : fuerzaImg
+    'Fuerza' : fuerzaImg,
+    'Entrenamiento Funcional' : funcionalImg,
+    'HIIT' : hiitImg,
+    'Tabata' : tabataImg,
+    'Abs' : absImg
 }
 
 

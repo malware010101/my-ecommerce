@@ -22,20 +22,43 @@ const metodos = [
 
 ];
 
+const estiloTexfield = {
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: '#1f1f1fff',
+                borderRadius: '10px',
+            },
+            '&:hover fieldset': {
+                borderColor: 'rgb(0, 204, 255)',
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: 'rgb(0, 204, 255)',
+            },
+            backgroundColor: 'transparent',
+            color: '#fff',
+        },
+        '& .MuiInputBase-input': { color: '#fff' },
+        '& .MuiInputLabel-root': { color: '#888' },
+        '& .MuiInputLabel-root.Mui-focused': { color: 'rgb(0, 204, 255)' }
+    };
+
 const MethodLibraryCard = ({ method, onSelect }) => {
     return (
         <Card
             onClick={() => onSelect(method)}
             sx={{
-                bgcolor: '#1c1c1e',
+                bgcolor: '#090909',
                 borderRadius: '10px',
                 color: '#fff',
+                opacity: 0.7,
                 border: '1px solid #333',
-                cursor: 'pointer',
+                ...estiloTexfield,
                 '&:hover': {
                     border: '1px solid rgb(0, 204, 255)',
-                    bgcolor: '#28282b'
+                    bgcolor: '#090909',
+                    opacity: 1
                 }
+                
             }}
         >
             <CardContent>

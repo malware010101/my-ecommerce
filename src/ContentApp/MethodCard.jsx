@@ -13,10 +13,10 @@ const MethodCard = ({ method, onDelete, isDeletable = false }) => {
                 )}
             </Box>
             <CardContent>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1, color: 'rgb(0, 204, 255)' }}>
+                <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1, color: 'rgb(0, 204, 255)', fontSize:{ xs: '.9rem', md: '1rem'} }}>
                     {method.nombre}
                 </Typography>
-                <Typography variant="body2" color="#bbb" fontStyle={'italic'} textAlign={'left'}>
+                <Typography  color="#bbb" fontStyle={'italic'} textAlign={'center'} sx={{ fontSize:{ xs: '.8rem', md: '1rem' }}}>
                     {method.descripcion}
                 </Typography>
             </CardContent>

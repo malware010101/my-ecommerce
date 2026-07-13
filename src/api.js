@@ -1,7 +1,10 @@
 import axios from "axios";
 
+
+export const WS_URL = import.meta.env.VITE_API_URL.replace(/^http/, 'ws');
+
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8001",
+    baseURL: import.meta.env.VITE_API_URL,
 });
 
 api.interceptors.request.use(
@@ -12,7 +15,25 @@ api.interceptors.request.use(
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error) 
+
 );
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response.status === 401) {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("authData");
+
+            sessionStorage.setItem(
+                'message',
+                'Su sesión ha expirado. Inicia sesión nuevamente.'
+            )
+
+            window.location.href = "/apptraining/login";
+        }
+        return Promise.reject(error);
+    }
+)
 
 export default api;

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, IconButton, TextField, InputAdornment } from '@mui/material';
 import { Close as CloseIcon, Send as SendIcon } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '../api';
+import api, { WS_URL } from '../api';
 import { useAuth } from './AuthContext';
 
 export default function Chat({ onClose, setCurrentChatOpenId, setNoLeidosPorChat }) {
@@ -59,7 +59,7 @@ export default function Chat({ onClose, setCurrentChatOpenId, setNoLeidosPorChat
     const token = obtenerTokenActual();
     if (!token) return;
 
-    const ws = new WebSocket(`ws://localhost:8001/chat/ws/${miChat.id}?token=${token}`);
+    const ws = new WebSocket(`${WS_URL}/chat/ws/${miChat.id}?token=${token}`);
     socketRef.current = ws;
 
     ws.onmessage = (event) => {

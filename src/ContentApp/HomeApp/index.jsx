@@ -30,26 +30,30 @@ export default function HomeApp() {
     const userRol = usuarioActual.rol;
     const { enqueueSnackbar } = useSnackbar();
 
-    console.log("Rol del usuario actual:", userRol);
 
-    const fetchProgramas = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('http://127.0.0.1:8001/entrenamiento/programas/general');
-            
-            if (response.ok) {
-                const data = await response.json();
-                setProgramas(data); 
-                
-            } else {
-                console.error("Error al cargar programas:", response.status);
+   const fetchProgramas = async () => {
+    setIsLoading(true);
+
+    try {
+        const { data } = await api.get("/entrenamiento/programas/general");
+
+        setProgramas(data);
+
+    } catch (error) {
+        console.error("Error al cargar programas:", error);
+
+        enqueueSnackbar(
+            error.response?.data?.detail ||
+            "Error al cargar los programas",
+            {
+                variant: "error",
             }
-        } catch (error) {
-            console.error("Error de red al obtener programas:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        );
+    } finally {
+        setIsLoading(false);
+    }
+};
+
     useEffect(() => {
         fetchProgramas();
     }, []);
@@ -167,72 +171,69 @@ export default function HomeApp() {
 
 
     const hndlOpenPreviewDialog = (programa) => {
-        console.log(`[HomeApp] hndlOpenPreviewDialog: programa=${programa ? programa.nombre : 'null'}`);
+      
         setProgramaToPreview(programa);
         setOpenPreviewDialog(true);
     };
     
     const hndlClosePreviewDialog = () => {
-        console.log(`[HomeApp] hndlClosePreviewDialog`);
+       
         setOpenPreviewDialog(false);
         setProgramaToPreview(null);
     };
 
     const hndlOpenDeleteDialog = (programa) => {
-        console.log(`[HomeApp] hndlOpenDeleteDialog: programa=${programa ? programa.nombre : 'null'}`);
+      
         setProgramaToDelete(programa);
         setOpenDeleteDialog(true);
     };
 
     const hndlCloseDeleteDialog = () => {
-        console.log(`[HomeApp] hndlCloseDeleteDialog`);
+   
         setOpenDeleteDialog(false);
         setProgramaToDelete(null); 
     };
 
-    const hndlConfirmDelete = async () => {
-        if (!programaToDelete) return;
+ const hndlConfirmDelete = async () => {
+    if (!programaToDelete) return;
 
-        const programaId = programaToDelete.id;
-        const authToken = obtenerTokenActual();
+    const programaId = programaToDelete.id;
+    const authToken = obtenerTokenActual();
 
-        //Verificación de Token y Rol (Frontend)
-        if (!authToken) {
-            console.error("No estás autenticado para eliminar programas.");
-            hndlCloseDeleteDialog();
-            return;
-        }
-        
-        if (userRol !== 'admin') {
-            console.error("Permiso denegado: Solo el admin puede eliminar programas.");
-            hndlCloseDeleteDialog();
-            return;
-        }
+    // Verificación de Token y Rol (Frontend)
+    if (!authToken) {
+        hndlCloseDeleteDialog();
+        return;
+    }
 
-        try {
-            // Petición DELETE con el ID y el Token
-            const response = await fetch(`http://127.0.0.1:8001/entrenamiento/programas/${programaId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`, // ¡TOKEN REQUERIDO!
-                }
-            });
+    if (userRol !== "admin") {
+        hndlCloseDeleteDialog();
+        return;
+    }
 
-            if (response.ok) {
-                console.log(`Programa ${programaId} eliminado exitosamente.`);
-               
-                fetchProgramas(); 
-            } else {
-                const errorData = await response.json();
-                console.error("Error de API al eliminar:", errorData.detail);
+    try {
+        await api.delete(`/entrenamiento/programas/${programaId}`);
+
+        enqueueSnackbar("Programa eliminado correctamente", {
+            variant: "success",
+        });
+
+        fetchProgramas();
+
+    } catch (error) {
+        console.error("Error al eliminar programa:", error);
+
+        enqueueSnackbar(
+            error.response?.data?.detail ||
+            "Error al eliminar el programa",
+            {
+                variant: "error",
             }
-        } catch (error) {
-            console.error("Error de red al eliminar el programa:", error);
-        } finally {
-            hndlCloseDeleteDialog();
-        }
-    };
-
+        );
+    } finally {
+        hndlCloseDeleteDialog();
+    }
+};
     const programasPorObjetivo = programas.reduce((acc, programa) => {
         if (!acc[programa.objetivo]) {
             acc[programa.objetivo] = [];

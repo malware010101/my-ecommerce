@@ -20,13 +20,16 @@ const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
     return (
         <Card
             sx={{
-                bgcolor: '#1c1c1e',
+                bgcolor: '#090909',
                 borderRadius: '10px',
                 color: '#fff',
+                opacity: 0.7,
                 border: '1px solid #333',
                 '&:hover': {
                     border: '1px solid rgb(0, 204, 255)',
-                    bgcolor: '#28282b'
+                    bgcolor: '#090909',
+                    opacity: 1
+
                 }
             }}
         >
@@ -108,6 +111,26 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
         setVista('lista');
         setEjercicioSeleccionado(null);
     };
+
+    const estiloTexfield = {
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: '#1f1f1fff',
+                borderRadius: '10px',
+            },
+            '&:hover fieldset': {
+                borderColor: 'rgb(0, 204, 255)',
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: 'rgb(0, 204, 255)',
+            },
+            backgroundColor: 'transparent',
+            color: '#fff',
+        },
+        '& .MuiInputBase-input': { color: '#fff' },
+        '& .MuiInputLabel-root': { color: '#888' },
+        '& .MuiInputLabel-root.Mui-focused': { color: 'rgb(0, 204, 255)' }
+    };
     
     const renderContenido = () => {
         if (vista === 'formulario') {
@@ -126,11 +149,11 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                         onChange={hndlFormChange}
                         multiline
                         rows={2}
-                        sx={{
-                            '& .MuiOutlinedInput-root': { color: '#fff' },
-                            '& .MuiInputLabel-root': { color: '#bbb' },
+                        sx={{ ...estiloTexfield ,
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgb(0, 204, 255)', borderRadius: '10px' }
                         }}
+
+                        
                     />
                 </Box>
 
@@ -143,8 +166,8 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                         onChange={hndlFormChange}
                         type="number"
                         sx={{
-                            '& .MuiOutlinedInput-root': { color: '#fff' },
-                            '& .MuiInputLabel-root': { color: '#bbb' },
+                            
+                        ...estiloTexfield ,
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgb(0, 204, 255)', borderRadius: '10px' }
                         }}
                     />
@@ -157,8 +180,7 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                         value={formData.repeticiones}
                         onChange={hndlFormChange}
                         sx={{
-                            '& .MuiOutlinedInput-root': { color: '#fff' },
-                            '& .MuiInputLabel-root': { color: '#bbb' },
+                            ...estiloTexfield ,
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgb(0, 204, 255)', borderRadius: '10px' }
                         }}
                     />
@@ -172,8 +194,7 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                         onChange={hndlFormChange}
                         type="number"
                         sx={{
-                            '& .MuiOutlinedInput-root': { color: '#fff' },
-                            '& .MuiInputLabel-root': { color: '#bbb' },
+                            ...estiloTexfield ,
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgb(0, 204, 255)', borderRadius: '10px' }
                         }}
                     />
@@ -202,7 +223,7 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                 <>
                     <TextField
                         fullWidth
-                        placeholder="Buscar un ejercicio..."
+                        placeholder="Busca un ejercicio..."
                         variant="outlined"
                         onChange={(e) => setSearchTerm(e.target.value)}
                         sx={{
@@ -211,11 +232,12 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                             '& .MuiOutlinedInput-root': {
                                 '& fieldset': { borderColor: 'rgb(0, 204, 255)' },
                                 '&:hover fieldset': { borderColor: 'rgb(0, 204, 255)' },
+                                'borderRadius': '10px',
                                 '&.Mui-focused fieldset': { borderColor: 'rgb(0, 204, 255)' },
                                 color: '#fff',
                             },
                             '& .MuiInputBase-input': { color: '#fff' },
-                            '& .MuiInputBase-input::placeholder': { color: '#fff', opacity: 1 },
+                            '& .MuiInputBase-input::placeholder': { color: '#ccc', opacity: 1 },
                         }}
                         InputProps={{
                             startAdornment: (

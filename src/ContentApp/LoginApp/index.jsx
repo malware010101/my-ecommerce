@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, TextField, Button } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom"; 
 import { useAuth } from '../AuthContext';
+import { useSnackbar } from "notistack";
+import api from '../../api';
 
 export default function LoginApp() {
+    const { enqueueSnackbar } = useSnackbar();
      const navigate = useNavigate();
      const {login} = useAuth();
     // const setUsuario = useSetRecoilState(userState);
@@ -17,48 +20,40 @@ export default function LoginApp() {
         setCredenciales({ ...credenciales, [name]: value });
     };
 
-    const hndlIniciarSesion = async () => {
-        try {
-            const response = await fetch('http://localhost:8001/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: credenciales.email,
-                    password: credenciales.password
-                }),
-            });
+   const hndlIniciarSesion = async () => {
+    try {
+        const { data } = await api.post("/auth/login", {
+            email: credenciales.email,
+            password: credenciales.password,
+        });
 
-            if (response.ok) {
-                const data = await response.json();
+        localStorage.setItem("access_token", data.access_token);
 
-                console.log("¡Inicio de sesión exitoso!", data);
-                
-                localStorage.setItem("access_token", data.access_token);
+        login(data);
 
-                login(data);
-                navigate('/apptraining/home');
-            } else {
-                let errorDetail = `Error HTTP: ${response.status} - ${response.statusText}. Ruta incorrecta o servidor caído.`;
-                
-                try {
-                    const text = await response.text();
-                    
-                    if (text) {
-                        const errorData = JSON.parse(text);
-                        errorDetail = errorData.detail || errorDetail; 
-                    }
-                } catch (e) {
-                    console.warn("La respuesta de error no fue JSON. Posiblemente un 404 con cuerpo vacío.");
-                }
-            
-                console.error(`Error de autenticación: ${errorDetail}`);
-            }
-        } catch (error) {
-            console.error("Hubo un error al iniciar sesión:", error.message || error);
+        navigate("/apptraining/home");
+
+        enqueueSnackbar("¡Bienvenido a Reps!", {
+         variant: "success",
+         autoHideDuration: 3000,
+        });
+
+    } catch (error) {
+        enqueueSnackbar(
+            error.response?.data?.detail || "Error al iniciar sesión",
+            { variant: "error" }
+        );
+    }
+};
+
+    useEffect(() => {
+        const mensaje = sessionStorage.getItem('message');
+        if (mensaje) {
+            enqueueSnackbar(mensaje, { variant: 'error' });
+            sessionStorage.removeItem('message');
         }
-    };
+    }, []);
+
     return (
         <Container 
             maxWidth="lg" 
@@ -153,17 +148,19 @@ export default function LoginApp() {
                     onClick={hndlIniciarSesion}
                     fullWidth
                     sx={{
+                        borderRadius: '20px',
                         bgcolor: 'rgb(0, 179, 255)',
                         '&:hover': { bgcolor: 'rgb(0, 179, 255)' },
                         py: 1.5,
                         mb: 2,
                         fontWeight: 'bold',
+
                     }}
                 >
                     Acceder
                 </Button>
 
-                <Typography variant="body2" sx={{ color: '#fff', textAlign: 'center' }}>
+                {/* <Typography variant="body2" sx={{ color: '#fff', textAlign: 'center' }}>
                     ¿No tienes una cuenta? {' '}
                     <Link to="/apptraining/suscription" style={{ textDecoration: 'none', color: 'rgb(0, 179, 255)', fontWeight: 'bold' }}>
                         Suscribirse
@@ -174,7 +171,7 @@ export default function LoginApp() {
                     <Link to="/apptraining/forgot-password" style={{ textDecoration: 'none', color: 'rgb(0, 179, 255)', fontWeight: 'bold' }}>
                         Recuperar
                     </Link>
-                </Typography>
+                </Typography> */}
             </Box>
         </Container>
     );

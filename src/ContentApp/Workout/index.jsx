@@ -59,7 +59,7 @@ export default function Workout () {
                         bgcolor: 'rgb(0, 204, 255)'
                     }
                 }}>
-                   Crear Programa
+                   Crear Programa 
                    </Button>
                     <Button
                      onClick = {() => hndlBtnActivado('CrearEntrenamiento')}

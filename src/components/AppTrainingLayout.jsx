@@ -37,7 +37,11 @@ export default function AppTrainingLayout() {
     const ws = new WebSocket(`ws://localhost:8001/chat/ws/${chatId}?token=${token}`);
     socketRef.current = ws;
 
-    ws.onopen = () => console.log("✅ WS global conectado");
+  ws.onopen = () => {
+    if (import.meta.env.DEV) {
+        console.log("WS global conectado");
+    }
+};
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -66,7 +70,11 @@ export default function AppTrainingLayout() {
       }
     };
 
-    ws.onclose = () => console.log("❌ WS global cerrado");
+  ws.onclose = () => {
+    if (import.meta.env.DEV) {
+        console.log("WS global cerrado");
+    }
+};
 
     return () => ws.close();
   }, [chatOpen, currentChatOpenId, isStaff, currentUser.id, obtenerTokenActual, queryClient]);
@@ -80,7 +88,9 @@ export default function AppTrainingLayout() {
           setNoLeidosPorChat(prev => ({ ...prev, [isStaff ? 0 : currentUser.id]: data.total_no_leidos }));
         }
       } catch (e) {
-        console.error("Error fetch total no leidos", e);
+        if (import.meta.env.DEV){
+          console.error("Error fetch total no leidos", e);
+        }
       }
     };
     fetchTotal();

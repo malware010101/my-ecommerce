@@ -16,6 +16,8 @@ import MiEntrenamiento from '../ContentApp/MiEntrenamiento.jsx/index.jsx';
 import ProgramDetails from '../ContentApp/ProgramDetails.jsx/index.jsx';
 import EntrenamientoPage from '../ContentApp/EntrenamientoPage/index.jsx';
 import Usuarios from '../ContentApp/Usuarios/index.jsx';
+import Membresia from '../ContentApp/Membresia/index.jsx';
+import ProtectedRoute from './ProtectedRoute.jsx';
 
 
 
@@ -36,6 +38,8 @@ export default function AppRoutes() {
       {/* Rutas para la app */}
       <Route path="/apptraining" element={<AppTrainingLayout />}>
         {/* Rutas anidadas de la aplicación */}
+
+        <Route element={<ProtectedRoute />}>  {/* Rutas prtoegidas si el usuario tiene membresia vencida */}
         <Route path="home" element={<HomeApp />} />
         <Route path="entrenamiento" element={<MiEntrenamiento />} />
         <Route path="entrenamiento/:entrenamientoId" element={<EntrenamientoPage />} />
@@ -44,6 +48,10 @@ export default function AppRoutes() {
         <Route path="profile" element={<Porfile />} />
         <Route path="profile/:userId" element={<Porfile />} />
         <Route path="usuarios" element={<Usuarios />} />
+        </Route>
+
+        <Route path="membresia" element={<Membresia />} />
+            <Route path="membresia/:userId" element={<Membresia />} />
       </Route>
     </Routes>
   );

@@ -207,9 +207,11 @@ const hndlCloseVideo = () => {
                     backgroundColor: '#000'
                     }}>
                        <iframe
+                         key={videoUrl}
                          src={videoUrl}
                          loading="lazy"
                          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                         muted
                          allowFullScreen
                          style={{
                            border: 0,

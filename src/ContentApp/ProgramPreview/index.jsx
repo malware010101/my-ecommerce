@@ -35,7 +35,6 @@ export default function ProgramPreview({ programa }) {
     setVideoUrl(res.data.embed_url);
     setAbrirVideo(true);
   } catch (err) {
-    console.error(err);
     setVideoError('Este ejercicio no tiene video disponible');
     setAbrirVideo(true);
   }
@@ -50,9 +49,11 @@ const hndlCloseVideo = () => {
   return (
     <Box sx={{ p: 3, bgcolor: '#000', color: '#fff' }}>
       <Typography variant="h5" fontWeight="bold" color="rgb(0, 204, 255)" mb={2}>{programa.nombre}</Typography>
-      <Typography variant="body1" color= '#ccc'>Objetivo: {programa.objetivo}</Typography>
-      <Typography variant="body1" color= '#ccc'>Categoría: {programa.categoria}</Typography>
-      <Typography variant="body1" color= '#ccc'>Nivel: {programa.nivel}</Typography>
+      <Typography variant="body1" color= '#fff'><strong>Objetivo:</strong> {programa.objetivo}</Typography>
+      <Typography variant="body1" color= '#fff'><strong>Categoría:</strong> {programa.categoria}</Typography>
+      <Typography variant="body1" color= '#fff'><strong>Tipo:</strong> {programa.tipo}</Typography>
+      <Typography variant="body1" color= '#fff'><strong>Nivel:</strong> {programa.nivel}</Typography>
+      
 
 
       <Box sx={{ borderBottom: 1, borderColor: 'rgb(0, 204, 255)', mt: 3 }}>

@@ -79,7 +79,7 @@ export default function InfoProductos({ product }) {
           borderRadius: 3,
         }}
         onClick={() => {
-          console.log(`Se agregaron ${cantidad} unidades de ${product.name} al carrito`);
+
         }}
       >
         Agregar al Carrito

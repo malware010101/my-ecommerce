@@ -235,7 +235,6 @@ const hndlGeneratePlan = () => {
     altura: parseFloat(restoData.altura),
     edad: parseInt(restoData.edad, 10),
   };
-  console.log("Final Payload:", finalPayload);
 
   generateMutation.mutate(finalPayload);
 };
