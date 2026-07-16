@@ -16,6 +16,7 @@ import CrearEjercicio from '../CrearEjercicio';
 import { useAuth } from '../../AuthContext';
 import { enqueueSnackbar } from 'notistack';
 import { useSnackbar } from 'notistack';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export default function CrearPrograma( { onClose } ) {
 
@@ -169,6 +170,7 @@ setStep(2);
                         <FormControl fullWidth margin="normal" sx={estiloTexfield}>
                             <InputLabel id="objetivo-label">Objetivo</InputLabel>
                             <Select name="objetivo" value={programaData.objetivo} onChange={hndlChange} labelId="objetivo-label" sx={{ color: '#fff' }}>
+                                <MenuItem value="Acondicionamiento">Acondicionamiento Fisico</MenuItem>
                                 <MenuItem value="Hipertrofia">Hipertrofia</MenuItem>
                                 <MenuItem value="Perdida de Grasa">Perdida de Grasa</MenuItem>
                                 <MenuItem value="Fuerza">Fuerza</MenuItem>
@@ -177,6 +179,8 @@ setStep(2);
                                 <MenuItem value="HIIT">HIIT</MenuItem>
                                 <MenuItem value="Tabata">Tabata</MenuItem>
                                 <MenuItem value="Abs">Abs</MenuItem>
+                                <MenuItem value="Hipertrofia Mujeres">Hipertrofia Mujeres</MenuItem>
+                                <MenuItem value="Metabolicos Mujeres">Metabolicos Mujeres</MenuItem>
                             </Select>
                         </FormControl>
                         
@@ -241,7 +245,7 @@ setStep(2);
                         </FormControl>
                         
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                            <Button type="submit" variant="contained" endIcon={<ExpandMoreIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
+                            <Button type="submit" variant="contained" endIcon={<ArrowForwardIosIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '20px','&:hover': { bgcolor: 'rgb(0, 153, 204)' }  }}>
                                 Siguiente
                             </Button>
                         </Box>
@@ -253,11 +257,11 @@ setStep(2);
                             onExercisesChange={hndlEjercicios}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
-                            <Button onClick={() => setStep(1)} variant="contained" sx={{ color: '#fff', fontWeight: 'bold', borderColor: 'rgb(0, 204, 255)',bgcolor: 'rgb(0, 204, 255)','&:hover': { bgcolor: 'rgb(0, 153, 204)',} }}>
-                                Volver
+                            <Button onClick={() => setStep(1)} variant="contained" size={'small'} sx={{ color: '#fff', fontWeight: 'bold', fontSize: { xs: '12px', md: '14px'}, borderRadius: '20px', borderColor: 'rgb(0, 204, 255)',bgcolor: 'rgb(0, 204, 255)','&:hover': { bgcolor: 'rgb(0, 153, 204)',} }}>
+                                Regresar
                             </Button>
-                            <Button onClick={hndlFinalizar} variant="contained" sx={{ bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight:'bold','&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
-                                Guardar Programa
+                            <Button onClick={hndlFinalizar} variant="contained" size={'small'} sx={{ bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontSize: { xs: '12px', md: '14px'}, borderRadius: '20px', fontWeight:'bold','&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
+                                Guardar 
                             </Button>
                         </Box>
                     </Box>

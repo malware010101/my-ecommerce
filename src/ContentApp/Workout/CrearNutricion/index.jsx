@@ -12,7 +12,8 @@ import {
     Autocomplete,
     RadioGroup,
     FormControlLabel,
-    Radio
+    Radio,
+    Divider
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import NutriViewer from '../../NutriViewer';
@@ -21,6 +22,9 @@ import { useSnackbar } from "notistack";
 import api from "../../../api";
 import useUsers from '../../hooks/useUsers';
 import CircularProgress from '@mui/material/CircularProgress';
+import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+
 
 export default function CrearNutricion({ onClose, selfMode = false, currentUser = null, onSaved = null }) {
   
@@ -313,16 +317,23 @@ const mensajes = {
 
 
     return (
-        <Container maxWidth="lg">
+        <Container 
+        maxWidth="lg"
+        disableGutters
+        sx={{
+            p:0,
+        }}
+        >
             <Box sx={{
                 p: 3,
                 bgcolor: '#000',
                 borderRadius: '10px',
                 boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)'
             }}>
-                <Typography variant="h5" color="#fff" mt={1} mb={3} textAlign="center" fontWeight="bold">
+                <Typography variant="h6" color="#fff" mt={1} mb={3} textAlign="center" fontWeight="bold">
                     {step === 1 ? 'Crear Plan Nutricional' : 'Generar Plan Nutricional'}
                 </Typography>
+                <Divider />
 
                 {step === 1 ? (
                     <Box component="form" onSubmit={hndlNextStep}>
@@ -496,7 +507,7 @@ const mensajes = {
 )}
 
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                            <Button type="submit" variant="contained" endIcon={<ExpandMoreIcon />} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', borderRadius: '10px', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
+                            <Button type="submit" variant="contained" endIcon={<ArrowForwardIosIcon/>} sx={{ mt: 2, bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', fontSize:{ xs: '0.7rem', md: '1rem'}, borderRadius: '20px', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
                                 Siguiente
                             </Button>
                         </Box>
@@ -515,45 +526,49 @@ const mensajes = {
                             planData ? (
                                 <>
                                   <NutriViewer plan={planData} />
+                                  <Divider />
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
                                         <Button 
                                             onClick={() => setStep(1)} 
                                             variant="contained"
-                                            sx={{ ...estiloTexfield, bgcolor: 'rgb(0, 204, 255)', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
-                                            Volver
+                                            sx={{  fontSize:{ xs: '0.7rem', md: '.7rem'},mr: 3, borderRadius: '20px',fontWeight: 'bold', bgcolor: 'rgb(0, 204, 255)', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
+                                            REGRESAR
                                         </Button>
                                         <Button
                                             onClick={hndlSavePlan}
                                             variant="contained"
                                             disabled={saveMutation.isPending}
-                                            sx={{ ...estiloTexfield, bgcolor: 'rgb(0, 204, 255)', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
-                                            {saveMutation.isPending ? <CircularProgress size={24} /> : 'Guardar Plan'}
+                                            sx={{ fontSize:{ xs: '0.8rem', md: '.9rem'}, borderRadius: '20px', fontWeight: 'bold', bgcolor: 'rgb(0, 204, 255)', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
+                                            {saveMutation.isPending ? <CircularProgress size={24} /> : 'Guardar'}
                                         </Button>
                                     </Box>
                                 </>
                             ) : (
                                 <Box sx={{ bgcolor: '#000' }}>
-                                    <Typography color="#fff" textAlign="center" sx={{p:4}}>
-                                        Haz clic en "Generar Plan" para crear el plan de nutrición.
+                                    <Typography color="#ccc" textAlign="center" fontSize={{ xs: '0.8rem', md: '1rem' }} sx={{p:4}}>
+                                        Haz clic en <strong>"Generar"</strong>  para crear tu plan nutricional con nuestro motor de nutrición avanzado.
                                     </Typography>
                                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, gap: 2 }}>
                                         <Button 
                                             onClick={() => setStep(1)}
                                             variant="contained"
-                                            sx={{ color: '#fff', fontWeight: 'bold', borderColor: 'rgb(0, 204, 255)', bgcolor: 'rgb(0, 204, 255)', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
-                                            Volver
+                                            sx={{ color: '#fff', fontWeight: 'bold', fontSize: { xs: '0.7rem', md: '0.9rem' }, borderRadius: '20px', borderColor: 'rgb(0, 204, 255)', bgcolor: 'rgb(0, 204, 255)', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}>
+                                            Regresar
                                         </Button>
                                         <Button 
                                             onClick={hndlGeneratePlan} 
                                             variant="contained" 
+                                            endIcon={<AutoAwesomeOutlinedIcon />}
                                             disabled={generateMutation.isPending} 
                                             sx={{ 
                                                 bgcolor: 'rgb(0, 204, 255)', 
                                                 color: '#fff', 
+                                                borderRadius: '20px',
+                                                fontSize: { xs: '0.7rem', md: '0.9rem' },
                                                 fontWeight: 'bold', 
                                                 '&:hover': { bgcolor: 'rgb(0, 153, 204)' }
                                             }}>
-                                            {generateMutation.isPending ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Generar Plan'}
+                                            {generateMutation.isPending ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Generar'}
                                         </Button>
                                     </Box>
                                 </Box>
@@ -562,6 +577,7 @@ const mensajes = {
                     </Box>
                 )}
             </Box>
+    
         </Container>
     );
 }

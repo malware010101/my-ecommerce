@@ -317,23 +317,83 @@ export const ejercicios = [
         videoUrl: '9d3cf5ee-b7d2-471a-a995-e9fc50aab268'
     },
     { id: "80", 
+        nombre: 'Curl biceps inclinado mancuernas', 
+        videoUrl: '89aabdd0-f679-460a-b828-4eef6856aeb3'
+    },
+    { id: "81", 
         nombre: 'Curl biceps alterno con mancuernas', 
         videoUrl: 'd4111004-4fc5-4d38-b5b3-70b7cfc3839b'
     },
-    { id: "81", 
+    { id: "82", 
+        nombre: 'Curl biceps alterno con mancuernas sentado', 
+        videoUrl: '1c89133b-4524-47f3-83c7-65ffe8ac176d'
+    },
+    { id: "83", 
         nombre: 'Curl biceps neutro mancuernas', 
         videoUrl: '9f5aab8d-6f7b-4431-90ed-d87b49b55a74'
     },
-    { id: "82", 
+    { id: "84", 
+        nombre: 'Curl biceps maquina', 
+        videoUrl: '2220f058-40f4-4218-ad68-6c9432efbefa'
+    },
+    { id: "85", 
+        nombre: 'Curl biceps scott maquina', 
+        videoUrl: '160d04bc-3519-4e31-b1e2-7d4f12146d06'
+    },
+    { id: "86", 
+        nombre: 'Curl biceps scott barra z', 
+        videoUrl: '5bb8cde6-22fb-49f6-aef3-ff6549d8e8d4'
+    },
+    { id: "87", 
         nombre: 'Curl scott con mancuernas', 
         videoUrl: '28457f3f-1a79-4202-b7da-daa79cc2ebdf'
     },
-    { id: "83", 
+    { id: "88", 
         nombre: 'Curl scott unilateral mancuerna', 
         videoUrl: 'c9e26311-d321-4037-aaeb-35bc2e4c2b80'
     },
-    { id: "84", 
+    { id: "89", 
         nombre: 'Extension triceps barra recta polea', 
         videoUrl: 'eecc44d9-63c9-4d8f-a89b-2ed6c6fdfac9'
+    },
+    { id: "90", 
+        nombre: 'Extension triceps con cuerda', 
+        videoUrl: '4d211c4f-7dcf-47fd-9983-167e437e3975'
+    },
+    { id: "91", 
+        nombre: 'Extension triceps cruzado cable', 
+        videoUrl: 'e7faa2e6-73ad-4dfa-b41a-2f9be0e130f9'
+    },
+    { id: "92", 
+        nombre: 'Extension triceps unilateral cable', 
+        videoUrl: 'e8a225d1-4513-4334-8830-90a7722df631'
+    },
+    { id: "93", 
+        nombre: 'Copa de triceps con cuerda', 
+        videoUrl: '197fc4ec-f6e5-40d2-b515-06532e74309b'
+    },
+    { id: "94", 
+        nombre: 'Copa de triceps con barra z', 
+        videoUrl: '09762754-45c1-4b5c-9ed5-c97f144d7338'
+    },
+    { id: "95", 
+        nombre: 'Copa de triceps con mancuernas dual', 
+        videoUrl: 'e11e6d36-2cad-4e27-a574-67dd4ededcbc'
+    },
+    { id: "96", 
+        nombre: 'Copa de triceps unilateral con mancuernas', 
+        videoUrl: '66a1423c-d3a6-4824-a6e4-4383010ecf8f'
+    },
+    { id: "97", 
+        nombre: 'Copa de triceps con mancuerna', 
+        videoUrl: '1f0ea7a1-ac7f-4365-b1c0-2bc54bfdd6d7'
+    },
+    { id: "98", 
+        nombre: 'Press de triceps maquina', 
+        videoUrl: '8a7c9966-4f30-43f6-acf4-fa36593c74b4'
+    },
+    { id: "99", 
+        nombre: 'Triceps en maquina', 
+        videoUrl: '72739c08-e595-4fb1-9bae-dcd9c0c6bf2d'
     },
 ]

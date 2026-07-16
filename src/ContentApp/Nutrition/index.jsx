@@ -70,13 +70,15 @@ if (loading) {
             {planActivo && (
   <Box sx={{ textAlign: "right", mb: 2, mt: 2, mr: 2 }}>
     {planActivo.estado === "activo" && (
-      <Typography color="#1ddf47" fontWeight="bold">
-        <AccessTimeIcon sx={{ fontSize: 'medium' }} /> Tu plan vence en {diasRestantes} días
+      <Typography color="#414141" fontWeight="bold" fontSize={{ xs: ".8rem", md: "1rem" }}>
+        <AccessTimeIcon sx={{ fontSize: 'medium', verticalAlign: 'middle' }} />
+         Tu plan vence en {diasRestantes} días
       </Typography>
     )}
 
     {planActivo.estado === "vencido" && (
-      <Typography color="red"  mb={1}>
+      <Typography color="red"  mb={1} fontSize={{ xs: ".8rem", md: "1rem" }}>
+        <AccessTimeIcon sx={{ fontSize: 'medium', verticalAlign: 'middle' }} />
         Tu plan venció hace {Math.abs(diasRestantes)} días
       </Typography>
     )}

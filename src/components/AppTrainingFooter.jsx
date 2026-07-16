@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material';
+import LogoReps from '../assets/LogoReps.webp';
 
 export default function AppTrainingFooter() {
     const theme = useTheme();
@@ -10,6 +11,7 @@ export default function AppTrainingFooter() {
     return (
         <Box
             component="footer"
+            
             sx={{
                 background: '#000',
                 color: '#fff',
@@ -22,9 +24,12 @@ export default function AppTrainingFooter() {
                 gap: { xs: 1, sm: 1 },
             }}
         >
-            <Typography variant="body2" sx={{ color: 'rgb(0, 179, 255)', textAlign: 'center' }}>
-                REPS BY GYMKLAN
-            </Typography>
+            <Box
+                component="img"
+                src={LogoReps}
+                alt="Reps"
+                sx={{ maxWidth: 90, opacity: 0.5 }}
+            />
             <Typography variant="body2" sx={{ color: '#aaa', textAlign: 'center' }}>
                 © {new Date().getFullYear()} Todos los derechos reservados.
             </Typography>

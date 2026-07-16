@@ -21,6 +21,25 @@ export default function LoginApp() {
     };
 
    const hndlIniciarSesion = async () => {
+
+     // Validar campos vacios
+    if (!credenciales.email.trim() || !credenciales.password.trim()) {
+        enqueueSnackbar("Complete todos los campos.", {
+            variant: "error",
+        });
+        return;
+    }
+
+    // Validar formato del correo
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(credenciales.email.trim())) {
+        enqueueSnackbar("Ingrese un correo electrónico válido.", {
+            variant: "error",
+        });
+        return;
+    }
+
     try {
         const { data } = await api.post("/auth/login", {
             email: credenciales.email,
@@ -39,8 +58,13 @@ export default function LoginApp() {
         });
 
     } catch (error) {
+        
+        const mensaje =
+        error.response?.data?.detail?.trim() ||
+        "Credenciales incorrectas";
+
         enqueueSnackbar(
-            error.response?.data?.detail || "Error al iniciar sesión",
+            mensaje,
             { variant: "error" }
         );
     }

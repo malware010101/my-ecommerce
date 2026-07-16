@@ -1,4 +1,4 @@
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Divider, Typography } from "@mui/material";
 import {  useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import CrearPrograma from "./CrearPrograma";
@@ -30,13 +30,16 @@ export default function Workout () {
                      mt: 3,
                      p: 2
                    }}>
-                       <Typography  variant="h4" fontWeight={'bold'} color= {'#ccc'} textAlign={'center'} >
+                       <Typography  variant="h5" fontWeight={'bold'} color= {'#fff'} textAlign={'center'} >
                             ¡Bienvenido a la creacion de programas!
                         </Typography> 
                    </Box>
+
+                   <Divider light sx={{ mb: 5 }} />
+                   
                    <Box sx={{ display: 'column', justifyContent: 'center', alignItems: 'center', mt: 3, borderRadius: '10px ', border: '1px solid #2a2f33',bgcolor: '#000', p: 1, boxShadow: '0 4px 10px rgba(0, 183, 255, 0.7)'
                    }}>
-                       <Typography variant="h6"  color= {'#fff'} textAlign={'left'} padding={'10px'}  > Aqui es donde surgirá la magia para crear nuevos programas de entrenamientos para todos los usuarios, desde generales, hasta personalizados para los usuarios de suscripcion <strong>PRO</strong>. <br></br> Esta seccion es exculsivamente para los entrenadores de <strong>REPS</strong>.</Typography>
+                       <Typography fontSize={{ xs: '12px' ,md: '14px'}}  color= {'#ccc'} textAlign={'left'} padding={'10px'}  > Aqui es donde surgirá la magia para crear nuevos programas de entrenamientos para todos los usuarios, desde generales, hasta personalizados para los usuarios de suscripcion <strong>PRO</strong>. <br></br> Esta seccion es exculsivamente para los entrenadores de <strong>REPS</strong></Typography>
                        
                    </Box>
                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 3, borderRadius: '10px ',bgcolor: '#000', p: 1 }}>
@@ -49,14 +52,16 @@ export default function Workout () {
                     ml: 1,
                     mb: 2,
                     fontWeight: 'bold',
-                    borderRadius: '10px',
+                    borderRadius: '20px',
+                    fontSize: { xs: '9px', md: '14px' },
                     borderColor: 'rgb(0, 204, 255)',
                     '&:hover': { bgcolor: 'rgb(0, 153, 204)', borderColor: 'rgb(0, 153, 204)', color: '#fff' },
                     color: activarComponente === 'CrearPrograma' ? '#fff' : 'rgb(0, 204, 255)',
                     bgcolor: activarComponente === 'CrearPrograma' ? 'rgb(0, 204, 255)' : 'transparent',
                     '&:hover': {
                         color: '#fff',
-                        bgcolor: 'rgb(0, 204, 255)'
+                        bgcolor: 'rgb(0, 204, 255)',
+                        borderColor: 'rgb(0, 204, 255)'
                     }
                 }}>
                    Crear Programa 
@@ -70,13 +75,15 @@ export default function Workout () {
                         ml: 1,
                         mb: 2,
                         fontWeight: 'bold',
-                        borderRadius: '10px',
+                        borderRadius: '20px',
+                        fontSize: { xs: '9px', md: '14px' },
                         borderColor: 'rgb(0, 204, 255)',
                         color: activarComponente === 'CrearEntrenamiento' ? '#fff' : 'rgb(0, 204, 255)',
                         bgcolor: activarComponente === 'CrearEntrenamiento' ? 'rgb(0, 204, 255)' : 'transparent',
                         '&:hover': {
                             color: '#fff',
-                            bgcolor: 'rgb(0, 204, 255)'
+                            bgcolor: 'rgb(0, 204, 255)',
+                            borderColor: 'rgb(0, 204, 255)'
                         }
                     }}>
                         Crear Personalizado
@@ -90,13 +97,15 @@ export default function Workout () {
                         ml: 1,
                         mb: 2,
                         fontWeight: 'bold',
-                        borderRadius: '10px',
+                        borderRadius: '20px',
+                        fontSize: { xs: '9px', md: '14px' },
                         borderColor: 'rgb(0, 204, 255)',
                         color: activarComponente === 'AsignarEntrenamiento' ? '#fff' : 'rgb(0, 204, 255)',
                         bgcolor: activarComponente === 'AsignarEntrenamiento' ? 'rgb(0, 204, 255)' : 'transparent',
                         '&:hover': {
                             color: '#fff',
                             bgcolor: 'rgb(0, 204, 255)',
+                            borderColor: 'rgb(0, 204, 255)'
                         }
                     }}>
                         Crear Nutricion

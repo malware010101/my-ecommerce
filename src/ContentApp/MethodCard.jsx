@@ -1,14 +1,15 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent, IconButton } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const MethodCard = ({ method, onDelete, isDeletable = false }) => {
     return (
         <Card sx={{ bgcolor: 'rgba(0, 204, 255, 0.2)', mb: 2, color: '#fff', border: '1px solid rgb(0, 204, 255)', borderRadius: '30px', position: 'relative' }}>
             <Box sx={{ position: 'absolute', top: 5, right: 5 }}>
                 {isDeletable && (
-                    <IconButton onClick={onDelete} color="error" size="small">
-                        <DeleteIcon />
+                    <IconButton onClick={onDelete} color="white" size="small">
+                        <CloseIcon fontSize="small" opacity={0.7} />
                     </IconButton>
                 )}
             </Box>

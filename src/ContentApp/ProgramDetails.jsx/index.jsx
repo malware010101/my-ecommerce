@@ -156,10 +156,11 @@ export default function ProgramDetails({ entrenamiento }) {
         onClick={hndlBack}
         sx={{
           color: "rgb(0, 204, 255)",
+          opacity: 0.5,
          
         }}
       >
-        <ArrowBackIosIcon sx= {{ fontSize: "2rem"}}  />
+        <ArrowBackIosIcon sx= {{ fontSize: "1.5rem"}}  />
       </IconButton>
     </Box>
  
@@ -225,12 +226,13 @@ export default function ProgramDetails({ entrenamiento }) {
       {entrenamiento?.fecha_inicio && entrenamiento?.fecha_fin && (
         <Box sx={{ textAlign: "center", mb: 1}}>
           {planActivo ? (
-            <Typography color="#414141" fontWeight="bold" mb={1}  >
+            <Typography color="#414141" fontWeight="bold" mb={1} fontSize={{ xs: '.8rem', md: '1rem'}}  >
               <AccessTimeIcon sx={{ fontSize: 'medium', verticalAlign: 'middle' }} /> 
               Tu plan vence en {diasRestantes} días
             </Typography>
           ) : (
-            <Typography color="red" fontWeight="bold" textAlign='left' mb={1} ml= {2}>
+            <Typography color="red" fontWeight="bold" textAlign='left' mb={1} ml= {2} fontSize={{ xs: '.8rem', md: '1rem'}}>
+              <AccessTimeIcon sx={{ fontSize: 'medium', verticalAlign: 'middle' }} />
               Tu plan venció hace {Math.abs(diasRestantes)} días
             </Typography>
           )}

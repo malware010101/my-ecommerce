@@ -5,6 +5,9 @@ import funcionalImg from '../../assets/ImagenesApp/funcional.png?url'
 import hiitImg from '../../assets/ImagenesApp/hiit.png?url'
 import tabataImg from '../../assets/ImagenesApp/tabata.png?url'
 import absImg from '../../assets/ImagenesApp/abs.png?url'
+import acondicionamientoImg from '../../assets/ImagenesApp/acondicionamiento.png?url'
+import hipertrofiaMujeresImg from '../../assets/ImagenesApp/hipertrofiaMujeres.png?url'
+import metabolicosMujeresImg from '../../assets/ImagenesApp/metabolicosMujeres.png?url'
 
 export const objetivosImagenes = {
     'Hipertrofia' : hipertrofiaImg,
@@ -13,7 +16,10 @@ export const objetivosImagenes = {
     'Entrenamiento Funcional' : funcionalImg,
     'HIIT' : hiitImg,
     'Tabata' : tabataImg,
-    'Abs' : absImg
+    'Abs' : absImg,
+    'Acondicionamiento' : acondicionamientoImg,
+    'Hipertrofia Mujeres' : hipertrofiaMujeresImg,
+    'Metabolicos Mujeres' : metabolicosMujeresImg,
 }
 
 

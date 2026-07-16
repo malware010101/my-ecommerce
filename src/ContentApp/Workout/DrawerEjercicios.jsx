@@ -59,7 +59,7 @@ const LibraryExerciseCard = ({ exercise, onSelect, onShowVideo }) => {
                         /// videoUrl es el videoId de bunny, no el url real, por logica anterior asi lo deje con ese nombre
                         onClick={() => onShowVideo(exercise.videoUrl)}
                     >
-                        <VisibilityIcon/>
+                        <VisibilityIcon size="small"/>
                     </IconButton>
                 </Box>
             </CardContent>
@@ -204,14 +204,14 @@ export default function DrawerEjercicios({ open, onClose, onSelectExercise, onSh
                         <Button
                             variant="contained"
                             onClick={hndlBackLista}
-                            sx={{ bgcolor: 'rgb(0, 204, 255)', borderRadius: '10px', fontWeight: 'bold', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}
+                            sx={{ bgcolor: 'rgb(0, 204, 255)', borderRadius: '20px', fontSize: { xs: '12px', md: '14px'}, fontWeight: 'bold', color: '#fff', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}
                         >
-                            Volver
+                            Regresar
                         </Button>
                         <Button
                             variant="contained"
                             onClick={hndlAddExercise}
-                            sx={{ bgcolor: 'rgb(0, 204, 255)', borderRadius: '10px', fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}
+                            sx={{ bgcolor: 'rgb(0, 204, 255)', borderRadius: '20px', fontSize: { xs: '12px', md: '14px'}, fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 153, 204)' } }}
                         >
                             Añadir
                         </Button>

@@ -8,6 +8,7 @@ import {
     Delete as DeleteIcon, 
     CheckCircleOutline as CheckIcon 
 } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const ExerciseCard = ({ 
     exercise, 
@@ -51,7 +52,7 @@ const ExerciseCard = ({
                             onShowVideo(exercise.videoUrl);
                         }}
                     >
-                        <VisibilityIcon/>
+                        <VisibilityIcon fontSize="small"/>
                     </IconButton>
                     
                     {isInteractive && (
@@ -63,7 +64,7 @@ const ExerciseCard = ({
                             }} 
                             onClick={hndlToggleComplete}
                         >
-                            <CheckIcon/>
+                            <CheckIcon fontSize="small"/>
                         </IconButton>
                     )}
 
@@ -73,10 +74,10 @@ const ExerciseCard = ({
                                 e.stopPropagation();
                                 onDelete(exercise.id);
                             }}
-                            color="error"
+                            color="white"
                             size="small"
                         >
-                            <DeleteIcon />
+                            <CloseIcon fontSize="small" opacity={0.7} />
                         </IconButton>
                     )}
                 </Box>

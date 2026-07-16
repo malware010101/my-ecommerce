@@ -132,19 +132,21 @@ const hndlCloseVideo = () => {
             <Box sx={{ display: 'flex', justifyContent: 'right', mt: 3 }}>
                 <Button
                     variant="outlined"
-                    startIcon={<AddIcon />}
+                    startIcon={<AddIcon style={{ paddingRight: '5px' }} />}
                     onClick={hndlOpenDrawerMetodo}
-                    sx={{  color: 'rgb(0, 204, 255)', fontWeight: 'bold', border: '1px solid rgb(0, 204, 255)', borderRadius: '15px', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff' } }}
+                    size="small"
+                    sx={{  color: 'rgb(0, 204, 255)', fontWeight: 'bold', border: '1px solid rgb(0, 204, 255)',fontSize: { xs: '10px', md: '12px'}, borderRadius: '20px', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', border: '1px solid rgb(0, 204, 255)' } }}
                 >
-                    Agregar Metodo
+                    Metodo
                 </Button>
                 <Button
                     variant="outlined"
-                    startIcon={<AddIcon />}
+                    startIcon={<AddIcon style={{ paddingRight: '5px' }} />}
                     onClick={hndlOpenDrawerEjercicio}
-                    sx={{ ml:2,  color: 'rgb(0, 204, 255)', fontWeight: 'bold', border: '1px solid rgb(0, 204, 255)', borderRadius: '15px', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff' } }}
+                    size="small"
+                    sx={{ ml:2,  color: 'rgb(0, 204, 255)', fontSize: { xs: '10px', md: '12px'}, fontWeight: 'bold', border: '1px solid rgb(0, 204, 255)', borderRadius: '20px', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', border: '1px solid rgb(0, 204, 255)' } }}
                 >
-                    Agregar Ejercicio
+                    Ejercicio
                 </Button>
             </Box>
             

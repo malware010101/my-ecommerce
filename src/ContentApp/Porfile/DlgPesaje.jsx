@@ -444,7 +444,7 @@ const HayImagenes =
             borderRadius: '20px',
             bgcolor: '#00B3FF',
             fontWeight: 'bold',
-            '&:hover': { bgcolor: 'darkgreen' }
+            '&:hover': { bgcolor: '#0096d7' }
           }}
                     >
                     {createPesaje.isPending 

@@ -26,7 +26,7 @@ export default function LoginNavbar() {
             <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-start' }}>
                     <IconButton onClick={hndlBackStore} sx={{ color: '#fff' }}>
-                        <ArrowBackIosNewIcon style ={{ color: 'rgb(0, 204, 255)' ,fontSize: '2rem', filter: 'drop-shadow(0 0 5px rgb(92, 214, 245))'  }}/>
+                        <ArrowBackIosNewIcon style ={{ color: 'rgb(0, 204, 255)' ,fontSize: '1.5rem', opacity: '0.7', filter: 'drop-shadow(0 0 5px rgb(92, 214, 245))'  }}/>
                     </IconButton>
                 </Box>
                 
@@ -35,7 +35,7 @@ export default function LoginNavbar() {
                         src={LogoReps}
                         alt="AppTraining Logo"
                         style={{ 
-                            height: '120px', 
+                            height: '80px', 
                         }}
                     />
                 </Box>
