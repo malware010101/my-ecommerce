@@ -396,4 +396,48 @@ export const ejercicios = [
         nombre: 'Triceps en maquina', 
         videoUrl: '72739c08-e595-4fb1-9bae-dcd9c0c6bf2d'
     },
+    { id: "100", 
+        nombre: 'Extension de cadera en poela', 
+        videoUrl: ''
+    },
+    { id: "101", 
+        nombre: 'Extension de cadera en maquina', 
+        videoUrl: ''
+    },
+    {id: "102", 
+        nombre: 'Abductores en polea', 
+        videoUrl: ''
+    },
+    {id: "103", 
+        nombre: 'Step up con mancuerna', 
+        videoUrl: ''
+    },
+    {id: "104", 
+        nombre: 'Step up en smith', 
+        videoUrl: ''
+    },
+    {id: "105", 
+        nombre: 'Step up en poela', 
+        videoUrl: ''
+    },
+    {id: "106", 
+        nombre: 'Curl de pierna maquina acostado', 
+        videoUrl: ''
+    },
+    {id: "107", 
+        nombre: 'Caminadora', 
+        videoUrl: ''
+    },
+    {id: "108", 
+        nombre: 'Eliptica', 
+        videoUrl: ''
+    },
+    {id: "109", 
+        nombre: 'Escaladora', 
+        videoUrl: ''
+    },
+    {id: "110", 
+        nombre: 'Bicileta', 
+        videoUrl: ''
+    },
 ]

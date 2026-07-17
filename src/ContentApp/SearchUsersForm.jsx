@@ -20,7 +20,7 @@ export default function SearchUsersForm({ programa, onAssign, onClose, allUsers 
 
   return (
     <Box>
-      <Typography variant="h6" color="#fff" mb={2}>
+      <Typography fontSize={{ xs: '1rem', md: '1.5rem' }} mt= {2}  color="#fff" mb={2}>
         Selecciona un usuario para asignar el programa:
       </Typography>
 
@@ -41,6 +41,8 @@ export default function SearchUsersForm({ programa, onAssign, onClose, allUsers 
                 '& fieldset': { borderColor: 'rgb(0, 204, 255)' },
                 '&:hover fieldset': { borderColor: 'rgb(0, 204, 255)' },
                 '&.Mui-focused fieldset': { borderColor: 'rgb(0, 204, 255)' },
+                borderRadius: '20px',
+
               },
               '& .MuiInputLabel-root': { color: '#bbb' },
               '& .MuiSvgIcon-root': { color: '#bbb' },
@@ -49,27 +51,31 @@ export default function SearchUsersForm({ programa, onAssign, onClose, allUsers 
         )}
       />
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, bgcolor: '#000', mt: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, bgcolor: '#000', mt: 8 }}>
         <Button 
-          variant="outlined" 
+          variant="contained" 
           onClick={onClose}
           sx={{ 
+            bgcolor: 'rgb(0, 204, 255)',
             borderColor: 'rgb(0, 204, 255)', 
-            color: 'rgb(0, 204, 255)', 
+            color: '#fff', 
             mr: 2, 
+            borderRadius: '20px',
             fontWeight: 'bold', 
             '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } 
           }}>
           Cerrar
         </Button>
         <Button
-          variant="outlined"
+          variant="contained"
           onClick={hndlAssign}
           disabled={!selectedUser} 
           sx={{
+            bgcolor: 'rgb(0, 204, 255)',
             borderColor: 'rgb(0, 204, 255)',
-            color: 'rgb(0, 204, 255)',
+            color: '#fff',
             fontWeight: 'bold',
+            borderRadius: '20px',
             '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' },
             '&.Mui-disabled': {
               borderColor: '#666',

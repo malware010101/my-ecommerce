@@ -24,7 +24,7 @@ export default function DlgGnrl({ open, onClose, onConfirm, title, content, acti
             keepMounted
         >
             <DialogTitle sx={{ bgcolor: 'rgb(0, 204, 255)', color: '#fff', fontWeight: 'bold', textAlign: 'center'}}>{title}</DialogTitle>
-            <DialogContent sx={{bgcolor: '#000', color: '#fff', textAlign: 'center', p: 6, fontSize: '1.2rem'}}>
+            <DialogContent sx={{bgcolor: '#000', color: '#fff', textAlign: 'center', p: 6,  fontSize: { xs: '1rem', md: '1.2rem' }}}>
                 {content}
             </DialogContent>
             
@@ -36,10 +36,10 @@ export default function DlgGnrl({ open, onClose, onConfirm, title, content, acti
 
             {!actions && onConfirm && (
                 <DialogActions sx={{ bgcolor: '#000', justifyContent: 'center', p: 2 }}>
-                    <Button variant="outlined" onClick={onConfirm} sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', mr: 2, fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
+                    <Button variant="contained" onClick={onConfirm} sx={{ borderColor: 'rgb(0, 204, 255)', bgcolor: 'rgb(0, 204, 255)', color: '#fff',  mr: 3, fontWeight: 'bold', borderRadius: '20px', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
                         Sí
                     </Button>
-                    <Button variant="outlined" onClick={onClose} sx={{ borderColor: 'rgb(0, 204, 255)', color: 'rgb(0, 204, 255)', fontWeight: 'bold', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
+                    <Button variant="contained" onClick={onClose} sx={{ borderColor: 'rgb(0, 204, 255)', color: '#fff', bgcolor: 'rgb(0, 204, 255)', fontWeight: 'bold', borderRadius: '20px', '&:hover': { bgcolor: 'rgb(0, 204, 255)', color: '#fff', borderColor: 'rgb(0, 204, 255)' } }}>
                         No
                     </Button>
                 </DialogActions>
