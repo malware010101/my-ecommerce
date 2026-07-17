@@ -61,7 +61,7 @@ const currentImagen = fotos.length ? fotos[index % fotos.length] : null;
                     fontSize: '1.0rem'
                 }}
             >
-                FOTOS DE EL PESAJE
+                FOTOGRAFIAS DEL PESAJE
                 <IconButton 
                     onClick={onClose}
                     sx={{

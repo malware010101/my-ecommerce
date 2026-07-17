@@ -364,7 +364,7 @@ const HayImagenes =
     color="#bbb"
     textAlign="left"
   >
-    Fotos Actuales
+    Fotos Actuales (opcional)
   </Typography>
   <Typography
     mb={1}

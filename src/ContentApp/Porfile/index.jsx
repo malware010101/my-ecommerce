@@ -536,22 +536,22 @@ return (
             </Typography>
             </Box>
             <Divider sx={{ mb: 1 }} />
-             <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 2}}>
+             <Box sx={{ display: "flex", justifyContent: "center", gap: { xs: 1, md: 2}, mb: 2}}>
                 <Box sx={miniCardStyle}>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography fontSize={{ xs: '1rem', md: '1.2rem'}} fontWeight="bold">
                       {nutInfo.kcal}
                     </Typography>
-                    <Typography variant="body2" color="#888">
+                    <Typography fontSize={{ xs: '.6rem', md: '1rem'}} color="#888">
                       kcal
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
 
                 <Box sx={miniCardStyle}>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography fontSize={{ xs: '1rem', md: '1.2rem'}} fontWeight="bold">
                       {nutInfo.proteina }
                     </Typography>
-                    <Typography variant="body2" color="#888">
+                    <Typography fontSize={{ xs: '.6rem', md: '1rem'}} color="#888">
                       Proteina g
                     </Typography>
                 </Box>
@@ -559,10 +559,10 @@ return (
                 <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
 
                 <Box sx={miniCardStyle}>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography fontSize={{ xs: '1rem', md: '1.2rem'}} fontWeight="bold">
                       { nutInfo.carbs }
                     </Typography>
-                    <Typography variant="body2" color="#888">
+                    <Typography fontSize={{ xs: '.6rem', md: '1rem'}} color="#888">
                       Carbs g
                     </Typography>
                 </Box>
@@ -570,10 +570,10 @@ return (
                 <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
 
                 <Box sx={miniCardStyle}>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography fontSize={{ xs: '1rem', md: '1.2rem'}} fontWeight="bold">
                       { nutInfo.grasas }
                     </Typography>
-                    <Typography variant="body2" color="#888">
+                    <Typography fontSize={{ xs: '.6rem', md: '1rem'}} color="#888">
                       Grasas g
                     </Typography>
                 </Box>
