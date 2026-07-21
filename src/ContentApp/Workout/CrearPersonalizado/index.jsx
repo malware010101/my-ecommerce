@@ -220,6 +220,8 @@ for (let i = 1; i <= Number(programaData.diasEntrenamiento); i++) {
                         <FormControl fullWidth margin="normal" sx={estiloTexfield}>
                             <InputLabel id="dias-label">Días de Entrenamiento</InputLabel>
                             <Select name="diasEntrenamiento" value={programaData.diasEntrenamiento} onChange={hndlChange} labelId="dias-label" sx={{ color: '#fff' }}>
+                                <MenuItem value= {1}>1 Día</MenuItem>
+                                <MenuItem value={2}>2 Días</MenuItem>
                                 <MenuItem value={3}>3 Días</MenuItem>
                                 <MenuItem value={4}>4 Días</MenuItem>
                                 <MenuItem value={5}>5 Días</MenuItem>
